@@ -7,3 +7,4 @@ web/.astro/
 __pycache__/
 .DS_Store
 .env
+data/shortlist.md

@@ -28,6 +28,7 @@ SOURCES = ROOT / "collector" / "sources.json"
 DATA = ROOT / "data"
 INBOX = DATA / "inbox"
 SEEN = DATA / "seen.json"
+DC_SIGNALS = DATA / "dc_signals.json"  # 특갤 X 링크 글의 최신 추천·조회 수 (rank.py가 화제성 점수에 씀)
 
 KST = dt.timezone(dt.timedelta(hours=9))
 USER_AGENT = "ai-brief-collector/0.1 (+https://github.com/clock-droid/ai-brief)"
@@ -36,6 +37,7 @@ SEEN_TTL = dt.timedelta(days=21)      # seen 기록 보존 기간
 SUMMARY_LIMIT = 600                   # 후보 요약 최대 글자 수 (원문 전체를 저장하지 않는다)
 DC_POSTS_PER_RUN = 15                 # 디시 본문 요청 상한 (과요청 차단 방지)
 DC_DELAY_SEC = 2.0
+DRY_RUN = False  # --dry-run이면 어떤 파일도 쓰지 않는다
 X_STATUS = re.compile(r"(?:x|twitter)\.com/([A-Za-z0-9_]{1,15})/status/(\d{15,20})")
 
 
@@ -171,10 +173,14 @@ def dc_x_post_list(gallery: str) -> list[dict]:
             continue
         title = re.search(r'class="gall_tit[^"]*"[\s\S]*?<a[^>]*>([\s\S]*?)</a>', block)
         date = re.search(r'class="gall_date"[^>]*title="([^"]+)"', block)
+        rec = re.search(r'class="gall_recommend"[^>]*>\s*(\d+)', block)
+        views = re.search(r'class="gall_count"[^>]*>\s*(\d+)', block)
         posts.append({
             "no": row.group(1),
             "title": clean_text(title.group(1), 200) if title else "",
             "date": date.group(1) if date else None,
+            "recommend": int(rec.group(1)) if rec else 0,
+            "views": int(views.group(1)) if views else 0,
         })
     return posts
 
@@ -193,7 +199,9 @@ def collect_dc_x(src: dict, seen: dict) -> list[dict]:
     gallery = src["gallery"]
     items = []
     fetched = 0
-    for post in dc_x_post_list(gallery):
+    posts = dc_x_post_list(gallery)
+    update_dc_signals(gallery, posts)
+    for post in posts:
         key = f"dc:{gallery}:{post['no']}"
         if key in seen:
             continue
@@ -223,6 +231,20 @@ def collect_dc_x(src: dict, seen: dict) -> list[dict]:
             item["signal"] = {"title": post["title"], "url": f"https://gall.dcinside.com/mgallery/board/view/?id={gallery}&no={post['no']}"}
             items.append(item)
     return items
+
+
+def update_dc_signals(gallery: str, posts: list[dict]) -> None:
+    """목록에 보이는 글의 추천·조회 수를 매 실행 갱신한다. 글이 올라온 뒤 반응이 쌓이므로 처음 본 값으로 고정하지 않는다."""
+    if DRY_RUN:
+        return
+    signals = json.loads(DC_SIGNALS.read_text()) if DC_SIGNALS.exists() else {}
+    cutoff = now_utc() - SEEN_TTL
+    signals = {k: v for k, v in signals.items() if dt.datetime.fromisoformat(v["updated"]) >= cutoff}
+    for p in posts:
+        url = f"https://gall.dcinside.com/mgallery/board/view/?id={gallery}&no={p['no']}"
+        signals[url] = {"title": p["title"], "recommend": p["recommend"], "views": p["views"], "updated": now_utc().isoformat()}
+    DC_SIGNALS.parent.mkdir(parents=True, exist_ok=True)
+    DC_SIGNALS.write_text(json.dumps(signals, ensure_ascii=False, indent=0, sort_keys=True))
 
 
 # ---------- 조립 ----------
@@ -257,6 +279,8 @@ def main() -> int:
     ap.add_argument("--only", help="쉼표로 구분한 출처 id만 실행")
     ap.add_argument("--dry-run", action="store_true", help="파일에 쓰지 않고 결과만 출력")
     args = ap.parse_args()
+    global DRY_RUN
+    DRY_RUN = args.dry_run
 
     sources = json.loads(SOURCES.read_text())["sources"]
     if args.only:
