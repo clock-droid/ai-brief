@@ -148,6 +148,8 @@ def collect_rss(src: dict) -> list[dict]:
     for e in parse_feed(fetch(src["url"]), naive_tz):
         if e["published"] and now_utc() - e["published"] > max_age:
             continue
+        if src.get("video") and "/shorts/" in e["url"]:
+            continue  # 쇼츠는 발언 확인이 어려워 뺀다
         item = make_item(src, e["title"], e["url"], e["published"], e["summary"])
         if src.get("video"):
             item["video"] = True
