@@ -15,7 +15,8 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
 - 급상승 지표: GitHub 오늘 별 500/1000 이상 +1/+2, 허깅페이스 급상승 점수 100/300 이상 +1/+2
 
-사용: python3 collector/rank.py [--top 30]
+사용: python3 collector/rank.py [--top 60]
+이미 검토하고 건너뛴 후보(data/skipped.jsonl)는 빠진다.
 """
 from __future__ import annotations
 
@@ -70,6 +71,14 @@ def written_urls() -> set[str]:
     for p in glob.glob(str(CONTENT / "*" / "*.md")):
         urls |= {u.strip('"').rstrip("/") for u in re.findall(r"url: (\S+)", Path(p).read_text(encoding="utf-8"))}
     return urls
+
+
+def skipped_urls() -> set[str]:
+    """글쓰기 작업이 이미 검토하고 건너뛴 후보 (data/skipped.jsonl). 순위표에서 뺀다."""
+    path = DATA / "skipped.jsonl"
+    if not path.exists():
+        return set()
+    return {json.loads(l)["url"].rstrip("/") for l in path.read_text(encoding="utf-8").splitlines() if l.strip()}
 
 
 def written_token_sets() -> list[set[str]]:
@@ -181,7 +190,7 @@ def cluster(rows: list[dict]) -> list[list[dict]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--top", type=int, default=30)
+    ap.add_argument("--top", type=int, default=60)
     args = ap.parse_args()
 
     srcs = json.loads((ROOT / "collector" / "sources.json").read_text())["sources"]
@@ -195,6 +204,8 @@ def main() -> int:
     fresh = [r for r in load_candidates() if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
     # 같은 URL 중복 제거
     fresh = list({r["url"].rstrip("/"): r for r in fresh}.values())
+    skipped = skipped_urls()
+    fresh = [r for r in fresh if r["url"].rstrip("/") not in skipped]
 
     ranked = []
     for g in cluster(fresh):
