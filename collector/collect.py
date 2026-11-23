@@ -31,11 +31,14 @@ SEEN = DATA / "seen.json"
 DC_SIGNALS = DATA / "dc_signals.json"  # 특갤 X 링크 글의 최신 추천·조회 수 (rank.py가 화제성 점수에 씀)
 
 KST = dt.timezone(dt.timedelta(hours=9))
-USER_AGENT = "ai-brief-collector/0.1 (+https://github.com/clock-droid/ai-brief)"
+USER_AGENT = "ai-brief-collector/0.1"  # URL을 덧붙이면 Techmeme이 휴대폰용 간이 페이지(기사별 X 토론 없음)를 준다
 MAX_AGE = dt.timedelta(days=2)        # 이보다 오래된 글은 후보로 넣지 않는다 (WRITING.md 2절 신선도 기준과 맞춤)
 SEEN_TTL = dt.timedelta(days=21)      # seen 기록 보존 기간
 SUMMARY_LIMIT = 600                   # 후보 요약 최대 글자 수 (원문 전체를 저장하지 않는다)
-DC_POSTS_PER_RUN = 15                 # 디시 본문 요청 상한 (과요청 차단 방지)
+DC_POSTS_PER_RUN = 20                 # 디시 본문 요청 상한 (과요청 차단 방지)
+DC_LIST_PAGES = 2                     # 특갤 "x.com" 검색 결과를 몇 쪽까지 볼지 (쪽당 20개)
+TM_TWEETS_PER_STORY = 5               # Techmeme 기사 하나당 가져올 X 토론 글 수
+TM_TWEETS_PER_RUN = 80                # Techmeme X oEmbed 요청 상한
 DC_DELAY_SEC = 2.0
 DRY_RUN = False  # --dry-run이면 어떤 파일도 쓰지 않는다
 X_STATUS = re.compile(r"(?:x|twitter)\.com/([A-Za-z0-9_]{1,15})/status/(\d{15,20})")
@@ -164,8 +167,16 @@ def collect_hf_papers(src: dict) -> list[dict]:
 # ---------- 특갤 X 링크 레이더 ----------
 
 def dc_x_post_list(gallery: str) -> list[dict]:
-    q = urllib.parse.urlencode({"id": gallery, "s_type": "search_subject_memo", "s_keyword": "x.com"})
-    page = fetch(f"https://gall.dcinside.com/mgallery/board/lists/?{q}")
+    posts = []
+    for page_no in range(1, DC_LIST_PAGES + 1):
+        q = urllib.parse.urlencode({"id": gallery, "s_type": "search_subject_memo", "s_keyword": "x.com", "page": page_no})
+        if page_no > 1:
+            time.sleep(DC_DELAY_SEC)
+        posts.extend(_dc_rows(fetch(f"https://gall.dcinside.com/mgallery/board/lists/?{q}")))
+    return list({p["no"]: p for p in posts}.values())
+
+
+def _dc_rows(page: str) -> list[dict]:
     posts = []
     for row in re.finditer(r'<tr class="ub-content us-post[^"]*"[^>]*data-no="(\d+)"[\s\S]*?</tr>', page):
         block = row.group(0)
@@ -247,6 +258,45 @@ def update_dc_signals(gallery: str, posts: list[dict]) -> None:
     DC_SIGNALS.write_text(json.dumps(signals, ensure_ascii=False, indent=0, sort_keys=True))
 
 
+# ---------- Techmeme 기사별 X 토론 ----------
+
+def collect_techmeme_x(src: dict, seen: dict) -> list[dict]:
+    """Techmeme 첫 화면의 기사마다 붙은 X 글(헤드라인 자체가 트윗인 경우 포함)을 가져온다.
+    기사 제목을 context로 남겨, 순위표가 같은 기사의 다른 출처와 묶을 수 있게 한다."""
+    page = fetch(src["url"])
+    blocks = [(m.start(), m.group(1)) for m in re.finditer(r'CLASS="itc2" ID="(\d{6}p\d+)"', page)]
+    items = []
+    budget = TM_TWEETS_PER_RUN
+    for i, (start, sid) in enumerate(blocks):
+        block = page[start: blocks[i + 1][0] if i + 1 < len(blocks) else len(page)]
+        head = re.search(r'<STRONG CLASS="L\d+"><A[^>]*HREF="([^"]+)"[^>]*>([\s\S]*?)</A>', block)
+        if not head:
+            continue
+        headline, head_url = clean_text(head.group(2), 300), head.group(1)
+        story_url = f"https://www.techmeme.com/{sid[:6]}/p{sid.split('p')[1]}#a{sid}"
+        tweets = []
+        if m := X_STATUS.search(head_url):
+            tweets.append((m.group(1), m.group(2), True))  # 기사 자체가 트윗 (발표 트윗)
+        x_sec = re.search(r'<SPAN CLASS="drhed">X:</SPAN>([\s\S]*?)</span>', block)
+        if x_sec:
+            tweets += [(h, t, False) for h, t in X_STATUS.findall(x_sec.group(1))][:TM_TWEETS_PER_STORY]
+        for handle, tid, is_headline in tweets:
+            url = f"https://x.com/{handle}/status/{tid}"
+            iid = item_id(url)
+            if iid in seen or handle.lower() == "techmeme" or budget <= 0:
+                continue
+            posted = snowflake_time(tid)
+            if now_utc() - posted > MAX_AGE:
+                continue
+            budget -= 1
+            tweet = oembed(url) or {"author": None, "text": ""}
+            item = make_item(src, tweet["text"][:120] or f"@{handle} 게시물", url, posted, tweet["text"])
+            item["tweet"] = {"handle": handle, "author": tweet["author"], "text": tweet["text"], "url": url}
+            item["context"] = {"title": headline, "url": story_url, "headline_tweet": is_headline}
+            items.append(item)
+    return items
+
+
 # ---------- 조립 ----------
 
 def make_item(src: dict, title: str, url: str, published: dt.datetime | None, summary: str) -> dict:
@@ -294,6 +344,8 @@ def main() -> int:
         try:
             if src["type"] == "dc_x_search":
                 items = collect_dc_x(src, seen)
+            elif src["type"] == "techmeme_x":
+                items = collect_techmeme_x(src, seen)
             else:
                 items = COLLECTORS[src["type"]](src)
         except Exception as exc:

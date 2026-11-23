@@ -6,6 +6,7 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 점수 구성 (높을수록 먼저 검토):
 - 신선도: 6시간 이내 3, 12시간 2, 24시간 1, 48시간 0
 - 출처 등급(sources.json tier): 1차 원천 3, 전문 매체 2, 국내 2차·대량 집계 0. X 원문은 2
+- Techmeme이 트윗 자체를 기사로 올렸으면(발표 트윗) +2
 - 특갤 화제: X 링크가 특갤 글에 올라왔으면 2, 그 글의 추천 10/20/40 이상이면 +1/+2/+3, 조회 3000 이상 +1
 - HF 논문 추천 수: 20 이상 +1, 50 이상 +2
 - 같은 사건을 다룬 출처 수: 출처 하나 늘 때마다 +1 (최대 +3)
@@ -67,13 +68,17 @@ def display_title(r: dict) -> str:
     title = r["title"].strip()
     if (not title or PLACEHOLDER.match(title)) and r.get("signal"):
         return f"[특갤] {r['signal']['title']}"
+    if ctx := r.get("context"):
+        who = (r.get("tweet") or {}).get("author") or ""
+        return f"{ctx['title']}  ← X {who}: {title[:60]}"
     return title
 
 
 def tokens(r: dict) -> set[str]:
     tw = r.get("tweet") or {}
     # 트윗은 작성자 이름도 넣는다 — 같은 발언을 다룬 기사("Alexandr Wang says …")와 묶이도록
-    text = " ".join([r["title"], (r.get("signal") or {}).get("title", ""), tw.get("text", "")[:200], tw.get("author") or ""])
+    text = " ".join([r["title"], (r.get("signal") or {}).get("title", ""), (r.get("context") or {}).get("title", ""),
+                     tw.get("text", "")[:200], tw.get("author") or ""])
     text = re.sub(r"https?://\S+", " ", text)
     toks = set()
     for w in re.findall(r"[A-Za-z][A-Za-z0-9.\-]{2,}|[0-9]+[A-Za-z][A-Za-z0-9.\-]*|[가-힣]{3,}", text):
@@ -101,6 +106,9 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
         pts = 2 + (3 if rec >= 40 else 2 if rec >= 20 else 1 if rec >= 10 else 0) + (1 if views >= 3000 else 0)
         score += pts
         why.append(f"특갤 추천{rec}·조회{views}")
+    if (ctx := r.get("context")) and ctx.get("headline_tweet"):
+        score += 2
+        why.append("Techmeme 헤드라인 트윗")
     if (up := r.get("upvotes")) is not None:
         score += 2 if up >= 50 else 1 if up >= 20 else 0
         why.append(f"HF 추천{up}")
