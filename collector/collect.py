@@ -31,7 +31,7 @@ SEEN = DATA / "seen.json"
 
 KST = dt.timezone(dt.timedelta(hours=9))
 USER_AGENT = "ai-brief-collector/0.1 (+https://github.com/clock-droid/ai-brief)"
-MAX_AGE = dt.timedelta(days=3)        # 이보다 오래된 글은 후보로 넣지 않는다
+MAX_AGE = dt.timedelta(days=2)        # 이보다 오래된 글은 후보로 넣지 않는다 (WRITING.md 2절 신선도 기준과 맞춤)
 SEEN_TTL = dt.timedelta(days=21)      # seen 기록 보존 기간
 SUMMARY_LIMIT = 600                   # 후보 요약 최대 글자 수 (원문 전체를 저장하지 않는다)
 DC_POSTS_PER_RUN = 15                 # 디시 본문 요청 상한 (과요청 차단 방지)
