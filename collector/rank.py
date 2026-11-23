@@ -12,6 +12,7 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 같은 사건을 다룬 출처 수: 출처 하나 늘 때마다 +1 (최대 +3)
 - 이미 다룬 사건(묶음 안에 이미 실린 URL이 있음): -3
 - 범위가 넓은 매체(sources.json broad)의 글이 AI·기술과 무관하면: -4
+- 핵심 인물(연구소 경영진·수석 과학자·튜링/필즈상 수상자 등)의 발언 +2
 - 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
 - 급상승 지표: GitHub 오늘 별 500/1000 이상 +1/+2, 허깅페이스 급상승 점수 100/300 이상 +1/+2
 
@@ -165,6 +166,8 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
         why.append(f"HF 급상승{tr:.0f}")
     if r.get("video"):
         why.append("영상")
+    if KEY_PEOPLE.search(" ".join([r["title"], r.get("summary", "")[:300], (r.get("tweet") or {}).get("author") or ""])):
+        score += 2  # 핵심 인물의 발언·강연
     if (vw := r.get("views")) is not None:
         score += 2 if vw >= 100_000 else 1 if vw >= 20_000 else 0
         why.append(f"조회{vw:,}")

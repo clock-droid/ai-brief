@@ -248,7 +248,7 @@ def collect_youtube_search(src: dict) -> list[dict]:
         return []
     after = (now_utc() - VIDEO_MAX_AGE).strftime("%Y-%m-%dT%H:%M:%SZ")
     # 검색어에 든 인물 이름이 제목·설명에 실제로 나와야 후보로 받는다 (드라마·무관 영상 걸러내기)
-    names = [n.strip().lower() for q in src["queries"] for n in q.split("|") if n.strip()]
+    names = [re.sub(r"\s+ai$", "", n.strip().lower()) for q in src["queries"] for n in q.split("|") if n.strip()]
     found: dict[str, dict] = {}
     for q in src["queries"]:
         params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": q, "publishedAfter": after,
