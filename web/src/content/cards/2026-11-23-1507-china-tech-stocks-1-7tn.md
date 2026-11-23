@@ -5,6 +5,7 @@ category: economy
 sources:
   - name: AI타임스 — 중국 AI 열풍 급랭
     url: https://www.aitimes.com/news/articleView.html?idxno=217683
+    published: 2026-11-23T03:54:23+00:00
 ---
 
 - 블룸버그 집계(11월 21일 기준)로 중국 기술주 중심 3개 지수의 시가총액이 6월 말 이후 1조7000억달러(약 2300조원) 줄어듦.

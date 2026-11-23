@@ -5,6 +5,7 @@ category: models
 sources:
   - name: METR — Q4 2026 capability update
     url: https://metr.org/blog/2026-11-20-q4-2026-capability-update/
+    published: 2026-11-20T08:00:00+00:00
 ---
 
 - AI 평가기관 METR이 11월 20일 4분기 능력 업데이트를 공개함.

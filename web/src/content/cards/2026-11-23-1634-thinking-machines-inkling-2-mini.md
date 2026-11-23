@@ -5,6 +5,7 @@ category: models
 sources:
   - name: AI타임스
     url: https://www.aitimes.com/news/articleView.html?idxno=217656
+    published: 2026-11-22T03:09:37+00:00
 ---
 
 - 싱킹머신즈(Thinking Machines Lab)가 11월 20일 '잉클링 2 미니(Inkling 2 Mini)' 가중치를 공개함. 허깅페이스와 자체 플랫폼 팅커(Tinker)로 제공하고 라이선스는 아파치 2.0임.

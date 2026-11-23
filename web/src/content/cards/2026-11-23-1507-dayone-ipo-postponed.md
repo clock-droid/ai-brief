@@ -5,6 +5,7 @@ category: economy
 sources:
   - name: AI타임스 — AI 데이터센터 IPO 잇단 차질
     url: https://www.aitimes.com/news/articleView.html?idxno=217688
+    published: 2026-11-23T04:16:58+00:00
 ---
 
 - 블룸버그가 11월 20일(현지시간) 싱가포르 데이터센터 기업 데이원(DayOne)이 최대 50억달러 규모 미국 IPO를 보류했다고 보도함.

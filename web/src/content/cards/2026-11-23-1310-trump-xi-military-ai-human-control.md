@@ -5,6 +5,7 @@ category: policy
 sources:
   - name: AI타임스 — 트럼프·시진핑, 군사 AI에 인간 통제 합의
     url: https://www.aitimes.com/news/articleView.html?idxno=217640
+    published: 2026-11-21T01:42:02+00:00
 ---
 
 - 스콧 베선트 미 재무장관이 11월 20일 CNBC 인터뷰에서 두 정상이 군사적 AI 결정에 인간이 항상 관여해야 한다는 데 합의했다고 밝힘.

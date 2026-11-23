@@ -5,6 +5,7 @@ category: safety
 sources:
   - name: AI타임스
     url: https://www.aitimes.com/news/articleView.html?idxno=217696
+    published: 2026-11-23T06:24:15+00:00
 ---
 
 - 오픈AI 재단 이사회에 참여하는 폴 크리스티아노(Paul Christiano)가 11월 16일 공개된 드와르케시 파텔 팟캐스트에서 "향후 1년 내 통제 상실 위험은 1%보다 10%에 가깝다"고 말함.

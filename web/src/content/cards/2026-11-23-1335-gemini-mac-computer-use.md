@@ -5,6 +5,7 @@ category: agents
 sources:
   - name: AI타임스 — 구글, 제미나이에 '컴퓨터 유즈' 기능 도입
     url: https://www.aitimes.com/news/articleView.html?idxno=217606
+    published: 2026-11-20T07:38:01+00:00
 ---
 
 - 구글이 11월 19일 맥용 제미나이 앱에 AI가 컴퓨터를 직접 조작하는 컴퓨터 유즈(Computer Use)를 추가한다고 발표함.

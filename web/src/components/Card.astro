@@ -1,7 +1,7 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../categories';
-import { href, timeLabel } from '../lib/format';
+import { dateTimeLabel, earliestSourceTime, href, timeLabel } from '../lib/format';
 
 interface Props {
   card: CollectionEntry<'cards'>;
@@ -10,11 +10,20 @@ interface Props {
 const { card } = Astro.props;
 const { title, date, category, sources, tweet, post } = card.data;
 const { Content } = await render(card);
+const sourceTime = earliestSourceTime(sources, tweet?.url);
 ---
 
 <article class="card" id={card.id}>
   <p class="meta">
     <time datetime={date.toISOString()}>{timeLabel(date)}</time>
+    {
+      sourceTime && (
+        <>
+          <span aria-hidden="true"> · </span>
+          원문 <time datetime={sourceTime.toISOString()}>{dateTimeLabel(sourceTime)}</time>
+        </>
+      )
+    }
     <span aria-hidden="true"> · </span>
     <a class="category" href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
   </p>

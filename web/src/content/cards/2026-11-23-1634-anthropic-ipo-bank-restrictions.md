@@ -5,6 +5,7 @@ category: economy
 sources:
   - name: AI타임스 (로이터 보도 인용)
     url: https://www.aitimes.com/news/articleView.html?idxno=217689
+    published: 2026-11-23T06:35:32+00:00
 ---
 
 - 로이터 보도에 따르면 앤트로픽이 일부 은행 핵심 담당자에게 상장 후 6개월간 오픈AI·커서·딥시크·허깅페이스 업무를 맡지 않겠다는 문서에 서명하도록 요구함.

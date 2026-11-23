@@ -5,6 +5,7 @@ category: policy
 sources:
   - name: AI타임스 — 앨리스 황 뒤 숨은 실세 기소
     url: https://www.aitimes.com/news/articleView.html?idxno=217678
+    published: 2026-11-23T03:35:43+00:00
 ---
 
 - 월스트리트저널(WSJ)이 11월 21일(현지시간) 소식통을 인용해, 중국인 리밍이 메가스피드 등 칩 거래 기업을 잇는 핵심 인물이라고 보도함.

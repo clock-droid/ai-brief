@@ -5,6 +5,7 @@ category: economy
 sources:
   - name: AI타임스 — 엔비디아, SEC 회계 조사에 주가 14% 폭락
     url: https://www.aitimes.com/news/articleView.html?idxno=217645
+    published: 2026-11-21T01:32:11+00:00
 ---
 
 - 로이터가 11월 20일 소식통 2명을 인용해 SEC 집행부서가 엔비디아의 회계 처리 관련 잠재적 문제를 조사 중이라고 보도함.

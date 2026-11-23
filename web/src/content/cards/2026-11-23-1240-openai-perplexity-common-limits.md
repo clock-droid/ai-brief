@@ -5,6 +5,7 @@ category: safety
 sources:
   - name: OpenAI — Perplexity and Intelligence
     url: https://openai.com/index/perplexity-and-intelligence
+    published: 2026-11-22T00:00:00+00:00
 tweet:
   author: Sam Altman
   handle: sama

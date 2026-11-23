@@ -5,6 +5,7 @@ category: models
 sources:
   - name: The Decoder — GPT-6.2 Astra and Sol (Artificial Analysis AA-PersonalityBench)
     url: https://the-decoder.com/gpt-6-2-astra-and-sol-get-to-the-point-faster-but-score-lower-on-transparency-than-claude/
+    published: 2026-11-22T09:41:37+00:00
 ---
 
 - 아티피셜 애널리시스(Artificial Analysis)의 성격 평가(AA-PersonalityBench, 영어 질문 900개)에서 GPT-6.2 아스트라(Astra)의 평균 답변 길이가 352단어에서 210단어로 줄었음. 솔(Sol)은 337단어에서 223단어로 줄었음.

@@ -5,6 +5,7 @@ category: policy
 sources:
   - name: AI타임스 — 캘리포니아, 엔비디아 형사법 위반 가능성 조사
     url: https://www.aitimes.com/news/articleView.html?idxno=217680
+    published: 2026-11-23T04:01:39+00:00
 ---
 
 - 롭 본타(Rob Bonta) 캘리포니아주 법무장관이 11월 20일(현지시간) 엔비디아와 젠슨 황 전 CEO를 조사 중이라고 밝힘.

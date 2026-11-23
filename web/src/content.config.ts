@@ -3,7 +3,8 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { CATEGORY_KEYS } from './categories';
 
-const source = z.object({ name: z.string(), url: z.url() });
+// published: 원문 발표 시각 (후보의 published). 카드 위 시각 줄에 "원문 …"으로 표시된다.
+const source = z.object({ name: z.string(), url: z.url(), published: z.coerce.date().optional() });
 
 // 속보 카드: 짧은 글. 본문은 ▶ 줄 · 한 줄 요약 · ※ 단서 (WRITING.md 참고).
 const cards = defineCollection({

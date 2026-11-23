@@ -5,8 +5,10 @@ category: science
 sources:
   - name: The Decoder — Lean and Mathlib community officially confirms Levent Alpöge's proof
     url: https://the-decoder.com/lean-and-mathlib-community-officially-confirms-levent-alpoges-proof-of-the-riemann-hypothesis-is-correct/
+    published: 2026-11-22T11:08:31+00:00
   - name: The Decoder — Anthropic 주장과 스탠퍼드 경쟁 초안
     url: https://the-decoder.com/hours-after-anthropic-claims-a-claude-proof-of-the-riemann-hypothesis-stanford-releases-an-all-human-competing-draft/
+    published: 2026-11-21T11:19:49+00:00
 post: 2026-11-23-1330-riemann-proof-explainer
 ---
 
