@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import email.utils
+import gzip
 import hashlib
 import html
 import json
@@ -49,6 +50,8 @@ def fetch(url: str, timeout: int = 25) -> str:
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         raw = resp.read()
         charset = resp.headers.get_content_charset() or "utf-8"
+    if raw[:2] == b"\x1f\x8b":  # 요청하지 않아도 gzip으로 주는 서버가 있다 (DeepMind)
+        raw = gzip.decompress(raw)
     return raw.decode(charset, "replace")
 
 
