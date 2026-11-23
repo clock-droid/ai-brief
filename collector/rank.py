@@ -252,7 +252,12 @@ def main() -> int:
         for m in x["members"]:
             lines.append(f"   - {m['source']}: {m['url']}")
             if m.get("video"):
-                lines.append(f"     자막 확인 필수: python3 collector/transcript.py '{m['url']}'")
+                vid = re.search(r"v=([\w-]{11})", m["url"])
+                shared = ROOT.parent / "ai-brief-transcripts" / f"{vid.group(1) if vid else '-'}.txt"
+                if shared.exists():
+                    lines.append(f"     자막 있음: {shared}")
+                else:
+                    lines.append(f"     자막 확인 필수: python3 collector/transcript.py '{m['url']}'")
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0

@@ -26,6 +26,20 @@ def main() -> int:
     if len(sys.argv) < 2:
         print(__doc__)
         return 1
+    # Mac이 미리 받아 둔 자막(비공개 저장소 ai-brief-transcripts)이 있으면 그것을 쓴다.
+    # 클라우드 서버에서는 유튜브가 자막 요청을 막는다.
+    shared = [Path(__file__).resolve().parent.parent.parent / "ai-brief-transcripts", Path.home() / ".ai-brief" / "transcripts"]
+    pending = []
+    for arg in sys.argv[1:]:
+        vid = video_id(arg)
+        hit = next((d / f"{vid}.txt" for d in shared if (d / f"{vid}.txt").exists()), None)
+        if hit:
+            print(f"{vid}: Mac이 받아 둔 자막 → {hit}")
+        else:
+            pending.append(arg)
+    if not pending:
+        return 0
+    sys.argv = sys.argv[:1] + pending
     try:
         from youtube_transcript_api import YouTubeTranscriptApi
     except ImportError:
