@@ -245,10 +245,13 @@ def collect_youtube_search(src: dict) -> list[dict]:
         print("  (YOUTUBE_API_KEY 없음 — 유튜브 인물 검색 건너뜀)", file=sys.stderr)
         return []
     after = (now_utc() - VIDEO_MAX_AGE).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # 검색어에 든 인물 이름이 제목·설명에 실제로 나와야 후보로 받는다 (드라마·무관 영상 걸러내기)
+    names = [n.strip().lower() for q in src["queries"] for n in q.split("|") if n.strip()]
     found: dict[str, dict] = {}
     for q in src["queries"]:
         params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": q, "publishedAfter": after,
-                                         "order": "relevance", "maxResults": 15, "key": key})
+                                         "order": "relevance", "maxResults": 15, "relevanceLanguage": "en",
+                                         "key": key})
         for it in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/search?{params}")).get("items", []):
             found.setdefault(it["id"]["videoId"], it["snippet"])
     if not found:
@@ -261,6 +264,9 @@ def collect_youtube_search(src: dict) -> list[dict]:
         dur = st.get("contentDetails", {}).get("duration", "")
         if not re.search(r"\d+M|\d+H", dur):
             continue  # 1분 미만 쇼츠 제외
+        text = (sn.get("title", "") + " " + sn.get("description", "")).lower()
+        if not any(n in text for n in names):
+            continue
         views = int(st.get("statistics", {}).get("viewCount", 0))
         url = f"https://www.youtube.com/watch?v={vid}"
         summary = f"{sn.get('channelTitle', '')} · 조회 {views:,} · {clean_text(sn.get('description'), 400)}"
