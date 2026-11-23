@@ -164,6 +164,68 @@ def collect_hf_papers(src: dict) -> list[dict]:
     return items
 
 
+# ---------- 새 기술 출처 (허깅페이스 급상승 모델, GitHub 급상승 저장소, RSS 없는 공식 뉴스 페이지) ----------
+
+AI_REPO = re.compile(r"\b(ai|llm|gpt|claude|gemini|agent|agentic|model|transformer|diffusion|rag|inference|robot|neural|mcp)\b|인공지능|大模型|模型", re.I)
+
+
+def collect_hf_models(src: dict) -> list[dict]:
+    """허깅페이스 급상승 모델 중 최근 MAX_AGE 안에 올라온 것 — 막 나온 오픈 모델."""
+    items = []
+    for m in json.loads(fetch(src["url"])):
+        created = parse_date(m.get("createdAt"))
+        if not created or now_utc() - created > MAX_AGE:
+            continue
+        mid = m["id"]
+        if re.search(r"gguf|uncensored|abliterated|-awq|-gptq|exl2|mlx", mid, re.I):
+            continue  # 원본이 아닌 변환·파생본은 뺀다
+        summary = f"허깅페이스 급상승 점수 {m.get('trendingScore', 0):.0f}, 좋아요 {m.get('likes', 0)}, 분야 {m.get('pipeline_tag') or '-'}"
+        item = make_item(src, mid, f"https://huggingface.co/{mid}", created, summary)
+        item["trending"] = m.get("trendingScore")
+        items.append(item)
+    return items
+
+
+def collect_gh_trending(src: dict) -> list[dict]:
+    """GitHub 오늘의 급상승 저장소 중 AI 관련만."""
+    page = fetch(src["url"])
+    items = []
+    for art in re.findall(r'<article class="Box-row">([\s\S]*?)</article>', page):
+        name = re.search(r'<h2[^>]*>\s*<a[^>]*href="/([^"]+)"', art)
+        desc = re.search(r'<p class="col-9[^"]*">([\s\S]*?)</p>', art)
+        stars = re.search(r"([\d,]+) stars today", art)
+        if not name:
+            continue
+        repo, d = name.group(1).strip(), clean_text(desc.group(1), 300) if desc else ""
+        if not AI_REPO.search(repo + " " + d):
+            continue
+        today = int(stars.group(1).replace(",", "")) if stars else 0
+        # 급상승 목록은 '오늘' 기준이라 수집 시각을 발표 시각으로 쓴다 (같은 저장소는 seen으로 한 번만)
+        item = make_item(src, f"{repo} — {d}"[:200], f"https://github.com/{repo}", now_utc(), f"오늘 별 {today}개. {d}")
+        item["stars_today"] = today
+        items.append(item)
+    return items
+
+
+def collect_page_links(src: dict) -> list[dict]:
+    """RSS가 없는 공식 뉴스 목록 페이지에서 글 링크·제목·날짜를 읽는다 (예: Anthropic)."""
+    page = fetch(src["url"])
+    base = re.match(r"https?://[^/]+", src["url"]).group(0)
+    items = {}
+    for m in re.finditer(r'<a[^>]*href="(' + re.escape(src["path_prefix"]) + r'[a-z0-9-]+)"[^>]*>([\s\S]*?)</a>', page):
+        text = clean_text(m.group(2), 400)
+        date = re.search(r"([A-Z][a-z]{2} \d{1,2}, \d{4})", text)
+        if not date:
+            continue  # 날짜 없는 링크는 분류 메뉴 등
+        published = dt.datetime.strptime(date.group(1), "%b %d, %Y").replace(tzinfo=dt.timezone.utc)
+        if now_utc() - published > MAX_AGE:
+            continue
+        title = re.sub(r"\s*" + re.escape(date.group(1)) + r"\s*", " ", text).strip()
+        url = base + m.group(1)
+        items[url] = make_item(src, title[:200], url, published, "")
+    return list(items.values())
+
+
 # ---------- 특갤 X 링크 레이더 ----------
 
 def dc_x_post_list(gallery: str) -> list[dict]:
@@ -313,7 +375,8 @@ def make_item(src: dict, title: str, url: str, published: dt.datetime | None, su
     }
 
 
-COLLECTORS = {"rss": collect_rss, "hf_papers": collect_hf_papers}
+COLLECTORS = {"rss": collect_rss, "hf_papers": collect_hf_papers, "hf_models": collect_hf_models,
+              "gh_trending": collect_gh_trending, "page_links": collect_page_links}
 
 
 def load_seen() -> dict:

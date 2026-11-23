@@ -5,6 +5,9 @@
 
     { "id": "latent-space", "tier": 2, "name": "Latent Space", "type": "rss", "url": "https://www.latent.space/feed", "category": "models" },
     { "id": "zvi", "tier": 2, "name": "Zvi Mowshowitz", "type": "rss", "url": "https://thezvi.substack.com/feed", "category": "safety" },
+    { "id": "hf-trending-models", "tier": 2, "name": "허깅페이스 급상승 모델", "type": "hf_models", "url": "https://huggingface.co/api/models?sort=trendingScore&direction=-1&limit=60", "category": "models" },
+    { "id": "github-trending", "tier": 3, "name": "GitHub 급상승 저장소", "type": "gh_trending", "url": "https://github.com/trending?since=daily", "category": "agents" },
+    { "id": "anthropic", "tier": 1, "name": "Anthropic", "type": "page_links", "url": "https://www.anthropic.com/news", "path_prefix": "/news/", "category": "models" },
     { "id": "hf-papers", "tier": 3, "name": "Hugging Face Daily Papers", "type": "hf_papers", "url": "https://huggingface.co/api/daily_papers", "category": "models" },
     { "id": "import-ai", "tier": 2, "name": "Import AI", "type": "rss", "url": "https://importai.substack.com/feed", "category": "models" },
     { "id": "interconnects", "tier": 2, "name": "Interconnects", "type": "rss", "url": "https://www.interconnects.ai/feed", "category": "models" },

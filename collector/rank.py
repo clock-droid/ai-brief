@@ -12,6 +12,8 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 같은 사건을 다룬 출처 수: 출처 하나 늘 때마다 +1 (최대 +3)
 - 이미 다룬 사건(묶음 안에 이미 실린 URL이 있음): -3
 - 범위가 넓은 매체(sources.json broad)의 글이 AI·기술과 무관하면: -4
+- 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
+- 급상승 지표: GitHub 오늘 별 500/1000 이상 +1/+2, 허깅페이스 급상승 점수 100/300 이상 +1/+2
 
 사용: python3 collector/rank.py [--top 30]
 """
@@ -36,6 +38,16 @@ https http com www status""".split())
 AI_TECH = re.compile(
     r"\b(ai|a\.i\.|llm|gpt|claude|gemini|agent|robot|machine learning|neural|algorithm|chip|semiconductor|compute|data ?center|quantum|automation|software|brain-computer|bci)\b"
     r"|인공지능|에이전트|로봇|반도체|자동화|양자", re.I)
+INNOVATION = re.compile(
+    r"\b(launch(es|ed)?|release[sd]?|unveil\w*|introduc(es|ed|ing)|open[- ]?sourc\w*|open[- ]weights?|new model|"
+    r"benchmark\w*|state[- ]of[- ]the[- ]art|sota|breakthrough|proof|proves?|proved|theorem|discover\w*|arxiv|"
+    r"humanoid|outperform\w*|surpass\w*)\b"
+    r"|공개|출시|증명|돌파|발견|벤치마크|신모델|오픈소스|시연|최초", re.I)
+BUSINESS = re.compile(
+    r"\b(acquir\w*|acquisition|raise[sd]?|raising|funding|valuation|ipo|stock|shares|lawsuit|sue[sd]?|suing|ceo|board|"
+    r"investor\w*|merger|antitrust|probe|tariff\w*|lobby\w*|earnings|revenue|layoff\w*|scandal|resign\w*)\b"
+    r"|인수|투자 유치|상장|주가|시총|소송|이사회|제소|실적|매출|정치", re.I)
+TRENDING_SOURCES = {"github-trending", "hf-trending-models"}
 PLACEHOLDER = re.compile(r"^(pic\.twitter\.com/\S+|https?://t\.co/\S+)$")
 
 
@@ -106,6 +118,21 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
         pts = 2 + (3 if rec >= 40 else 2 if rec >= 20 else 1 if rec >= 10 else 0) + (1 if views >= 3000 else 0)
         score += pts
         why.append(f"특갤 추천{rec}·조회{views}")
+    # 제목(+Techmeme 기사 제목, 특갤 제목)만 본다. 요약까지 보면 잡음이 커진다.
+    # 급상승 목록(GitHub·허깅페이스)은 자체 지표로 점수를 받으므로 혁신 가산을 주지 않는다.
+    text = " ".join([r["title"], (r.get("context") or {}).get("title", ""), (r.get("signal") or {}).get("title", "")])
+    innov, biz = bool(INNOVATION.search(text)), bool(BUSINESS.search(text))
+    if innov and not biz and r["source"] not in TRENDING_SOURCES:
+        score += 2
+        why.append("혁신")
+    elif biz and not innov:
+        score -= 1
+    if (st := r.get("stars_today")) is not None:
+        score += 2 if st >= 1000 else 1 if st >= 500 else 0
+        why.append(f"GitHub 오늘 별{st}")
+    if (tr := r.get("trending")) is not None:
+        score += 2 if tr >= 300 else 1 if tr >= 100 else 0
+        why.append(f"HF 급상승{tr:.0f}")
     if (ctx := r.get("context")) and ctx.get("headline_tweet"):
         score += 2
         why.append("Techmeme 헤드라인 트윗")
