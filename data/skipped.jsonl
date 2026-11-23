@@ -104,3 +104,19 @@
 {"url": "https://www.nature.com/articles/d41586-026-03795-5", "reason": "확인 불가(로그인 벽)", "at": "2026-11-24T05:15:00+09:00"}
 {"url": "https://www.pewresearch.org/short-reads/2026/11/23/74-of-us-latinos-say-theyve-seen-or-heard-about-ice-activity-in-their-local-area/", "reason": "AI 무관", "at": "2026-11-24T05:15:00+09:00"}
 {"url": "https://www.techmeme.com/261122/p17#a261122p17", "reason": "사소함(규모·AI 무관)", "at": "2026-11-24T05:15:00+09:00"}
+{"url": "https://www.youtube.com/watch?v=MpsO8Ds8uyo", "reason": "자막 받기 실패(IpBlocked), 내용은 11/4 공개된 OpenAI 연구와 같아 이미 2주 전 사건", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://www.youtube.com/watch?v=5eON_8rgKzk", "reason": "영상 공개 후 3일 지남, 자막 없음, 제품 리뷰", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://x.com/JackWoth98/status/2124901645385347216", "reason": "사용 후기성 트윗, 사소함", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://www.bok.or.kr/portal/bbs/B0000501/view.do?nttId=11066918&menuNo=201264", "reason": "AI 무관", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://news.hada.io/topic?id=37732&utm_source=geeknews&utm_medium=rss&utm_campaign=news", "reason": "AI 무관(개인 앱 삭제 분쟁)", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://news.hada.io/topic?id=37728&utm_source=geeknews&utm_medium=rss&utm_campaign=news", "reason": "이미 다룬 사건(Kagi Mail)", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://news.hada.io/topic?id=37724&utm_source=geeknews&utm_medium=rss&utm_campaign=news", "reason": "이미 다룬 사건(Ladybird)", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://www.canarymedia.com/articles/data-centers/ohio-oks-gas-plant-for-data-centers", "reason": "지역 인허가 소식, 사소함", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://x.com/omidmogasemi/status/2124963430138511449", "reason": "이미 카드로 씀", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://x.com/tokengremlin/status/2124961301474730165", "reason": "이미 카드로 씀", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://www.thelec.kr/news/articleView.html?idxno=65796", "reason": "이미 카드로 씀", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://www.aitimes.com/news/articleView.html?idxno=217709", "reason": "이미 카드로 씀", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://terrytao.wordpress.com/2026/11/23/finite-time-singularity-formation-for-the-three-dimensional-euler-equations/", "reason": "이미 카드로 씀", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://the-decoder.com/ai-is-getting-better-faster-than-experts-can-reliably-test-whether-new-systems-are-safe-metr-warns/", "reason": "이미 다룬 사건(METR)", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://the-decoder.com/ai-coding-agents-ace-isolated-tests-but-complete-fewer-than-one-in-ten-tasks-in-a-simulated-workplace/", "reason": "유료벽, 벤치마크 이름·세부 확인 불가", "at": "2026-11-24T07:15:00+09:00"}
+{"url": "https://the-decoder.com/security-researchers-show-how-cheap-ai-inference-providers-steal-keys-and-snoop-on-users/", "reason": "이미 카드로 씀", "at": "2026-11-24T07:15:00+09:00"}
