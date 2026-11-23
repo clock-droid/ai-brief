@@ -49,6 +49,10 @@ BUSINESS = re.compile(
     r"\b(acquir\w*|acquisition|raise[sd]?|raising|funding|valuation|ipo|stock|shares|lawsuit|sue[sd]?|suing|ceo|board|"
     r"investor\w*|merger|antitrust|probe|tariff\w*|lobby\w*|earnings|revenue|layoff\w*|scandal|resign\w*)\b"
     r"|인수|투자 유치|상장|주가|시총|소송|이사회|제소|실적|매출|정치", re.I)
+KEY_PEOPLE = re.compile(
+    r"\b(hinton|lecun|bengio|hassabis|sutskever|altman|amodei|jensen huang|suleyman|musk|karpathy|noam brown|pachocki|"
+    r"terence tao|fei-fei li|eisman|borcherds|schmidt|gundotra|tegmark|nadella|pichai|zuckerberg|alexandr wang|mark chen|"
+    r"jan leike|chris olah|paul christiano|ilya)\b|힌튼|르쿤|벤지오|하사비스|알트만|아모데이|젠슨|머스크|카파시", re.I)
 TRENDING_SOURCES = {"github-trending", "hf-trending-models"}
 PLACEHOLDER = re.compile(r"^(pic\.twitter\.com/\S+|https?://t\.co/\S+)$")
 
@@ -235,11 +239,17 @@ def main() -> int:
         if x["done"]:
             flags.append("이미 다룸 — 큰 진전 있을 때만")
         flags += x["why"]
+        lead_text = " ".join([lead["title"], lead.get("summary", "")[:300], (lead.get("tweet") or {}).get("author") or "",
+                              (lead.get("signal") or {}).get("title", "")])
+        if KEY_PEOPLE.search(lead_text):
+            flags.insert(0, "핵심 인물 발언 — 의견이어도 싣는다")
         lines.append(f"{i}. **{x['score']}점** · {age_hours(lead):.0f}시간 전 · {lead['source_name']} — {display_title(lead)[:110]}")
         if flags:
             lines.append(f"   - {' · '.join(flags)}")
         for m in x["members"]:
             lines.append(f"   - {m['source']}: {m['url']}")
+            if m.get("video"):
+                lines.append(f"     자막 확인 필수: python3 collector/transcript.py '{m['url']}'")
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0
