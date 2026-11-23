@@ -4,7 +4,7 @@ AI와 미래 산업 소식을 빠르게 모으고, 읽기 편한 카드와 긴 �
 
 | 단계 | 담당 | 파일 |
 |---|---|---|
-| 수집 | GitHub Actions, 30분마다 | `collector/collect.py`, `collector/sources.json` → `data/inbox/` |
+| 수집 | 글쓰기 예약 작업이 시작할 때 (수동: Actions "수집") | `collector/collect.py`, `collector/sources.json` → `data/inbox/` |
 | 글쓰기 | Claude 클라우드 예약 작업 | `WRITING.md` 규칙 → `web/src/content/` |
 | 배포 | GitHub Actions → GitHub Pages | `web/` (Astro) |
 

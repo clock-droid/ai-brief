@@ -7,18 +7,17 @@
 
 ## 1. 실행 절차 (매 실행)
 
-1. `data/cursor.json`의 `last_collected`를 읽는다. 없으면 24시간 전으로 본다.
-2. `data/inbox/`에서 `collected`가 그 시각 이후인 후보를 모두 읽는다.
-3. 이미 글이 된 후보는 뺀다. 기존 카드·긴 글 frontmatter의 `sources[].url`과 `tweet.url`에 같은 URL이 있으면 이미 쓴 것이다.
+1. **먼저 수집한다.** 저장소 루트에서 `python3 collector/collect.py`를 실행한다 (1분 안팎). 새 후보가 `data/inbox/`에 쌓인다.
+2. `data/inbox/`에서 **발표 48시간 이내** 후보를 모두 읽는다 (`published` 기준, 없으면 `collected` 기준).
+3. 이미 글이 된 후보는 뺀다. 기존 카드·긴 글 frontmatter의 `sources[].url`과 `tweet.url`에 같은 URL이 있으면 이미 쓴 것이다. 같은 **사건**을 이미 다룬 카드가 있으면 큰 진전이 없는 한 다시 쓰지 않는다.
 4. **2절 기준으로 고른다.** 한 번에 카드는 최대 10개, 긴 글은 최대 1개.
 5. 고른 후보마다 **원문을 직접 열어 확인한다.** 후보의 `summary`는 요약 조각일 뿐이다. 원문에 없는 내용은 쓰지 않는다.
    - X 후보는 예외: 후보의 `tweet.text`가 X 공식 oEmbed로 받은 트윗 원문이다. x.com을 열 필요 없다. 발언자 본인의 말(발표·의견)은 트윗 원문만으로 카드를 쓸 수 있고, 트윗이 다른 글·발표를 가리키면 그 원문을 열어 확인한다.
 6. 카드는 `web/src/content/cards/`, 긴 글은 `web/src/content/posts/`에 쓴다. 파일 이름은 `YYYY-MM-DD-HHmm-영문-슬러그.md`(KST 기준).
 7. `web/`에서 `npm ci && npm run build`로 빌드한다. 실패하면 고쳐서 다시 빌드한다. frontmatter 형식은 `web/src/content.config.ts`가 검사한다. **빌드 뒤에 파일을 하나라도 고쳤으면 다시 빌드한다.** 마지막 빌드가 성공한 상태로만 커밋한다.
-8. `data/cursor.json`의 `last_collected`를 이번에 읽은 후보 중 가장 늦은 `collected` 값으로 갱신한다.
-9. `main` 브랜치에 커밋하고 푸시한다. 커밋 메시지: `글: 카드 N개, 긴 글 M개`. 푸시가 막히면 `git pull --rebase` 후 다시 푸시한다.
+8. `data/`(수집 결과)와 쓴 글을 함께 `main` 브랜치에 커밋하고 푸시한다. 커밋 메시지: `글: 카드 N개, 긴 글 M개`. 푸시가 막히면 `git pull --rebase` 후 다시 푸시한다.
 
-고를 후보가 하나도 없으면 커서만 갱신하고 끝낸다.
+고를 후보가 하나도 없어도 수집 결과(`data/`)는 커밋·푸시한다. 그래야 다음 실행이 같은 글을 다시 받지 않는다.
 
 ---
 
