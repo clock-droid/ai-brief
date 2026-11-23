@@ -37,7 +37,7 @@
     { "id": "stat", "name": "STAT", "type": "rss", "url": "https://www.statnews.com/feed/", "category": "medicine" },
 
     { "id": "semianalysis", "name": "SemiAnalysis", "type": "rss", "url": "https://newsletter.semianalysis.com/feed", "category": "infra" },
-    { "id": "thelec", "name": "디일렉", "type": "rss", "url": "https://www.thelec.kr/rss/allArticle.xml", "category": "infra" },
+    { "id": "thelec", "timezone": "KST", "name": "디일렉", "type": "rss", "url": "https://www.thelec.kr/rss/allArticle.xml", "category": "infra" },
     { "id": "latitude", "name": "Latitude Media", "type": "rss", "url": "https://www.latitudemedia.com/feed", "category": "infra" },
 
     { "id": "fed-press", "name": "미 연준 보도자료", "type": "rss", "url": "https://www.federalreserve.gov/feeds/press_all.xml", "category": "economy" },
@@ -46,7 +46,7 @@
     { "id": "noahpinion", "name": "Noahpinion", "type": "rss", "url": "https://www.noahpinion.blog/feed", "category": "economy" },
     { "id": "money-stuff", "name": "Money Stuff", "type": "rss", "url": "https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss", "category": "economy" },
     { "id": "stratechery", "name": "Stratechery", "type": "rss", "url": "https://stratechery.com/feed/", "category": "economy" },
-    { "id": "aitimes", "name": "AI타임스", "type": "rss", "url": "https://www.aitimes.com/rss/allArticle.xml", "category": "economy" },
+    { "id": "aitimes", "timezone": "KST", "name": "AI타임스", "type": "rss", "url": "https://www.aitimes.com/rss/allArticle.xml", "category": "economy" },
 
     { "id": "alignment-forum", "name": "Alignment Forum", "type": "rss", "url": "https://www.alignmentforum.org/feed.xml", "category": "safety" },
     { "id": "cais", "name": "AI Safety Newsletter", "type": "rss", "url": "https://newsletter.safe.ai/feed", "category": "safety" },

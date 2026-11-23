@@ -69,7 +69,8 @@ def clean_text(s: str | None, limit: int = SUMMARY_LIMIT) -> str:
     return s if len(s) <= limit else s[: limit - 1].rstrip() + "…"
 
 
-def parse_date(s: str | None) -> dt.datetime | None:
+def parse_date(s: str | None, naive_tz: dt.tzinfo = dt.timezone.utc) -> dt.datetime | None:
+    """시간대 표기가 없는 날짜는 naive_tz로 본다 (국내 피드는 KST를 표기 없이 준다)."""
     if not s:
         return None
     s = s.strip()
@@ -81,7 +82,7 @@ def parse_date(s: str | None) -> dt.datetime | None:
         except ValueError:
             return None
     if d.tzinfo is None:
-        d = d.replace(tzinfo=dt.timezone.utc)
+        d = d.replace(tzinfo=naive_tz)
     return d.astimezone(dt.timezone.utc)
 
 
@@ -115,7 +116,7 @@ def _atom_link(el: ET.Element) -> str | None:
     return fallback
 
 
-def parse_feed(text: str) -> list[dict]:
+def parse_feed(text: str, naive_tz: dt.tzinfo = dt.timezone.utc) -> list[dict]:
     text = re.sub(r"^[^<]+", "", text)  # BOM·공백 등 선행 잡음
     root = ET.fromstring(text)
     entries = [el for el in root.iter() if _local(el.tag) in ("item", "entry")]
@@ -123,7 +124,7 @@ def parse_feed(text: str) -> list[dict]:
     for el in entries:
         title = clean_text(_child_text(el, "title"), 300)
         link = _atom_link(el) or _child_text(el, "link", "guid")
-        date = parse_date(_child_text(el, "pubDate", "published", "updated", "date"))
+        date = parse_date(_child_text(el, "pubDate", "published", "updated", "date"), naive_tz)
         summary = clean_text(_child_text(el, "description", "summary", "content", "encoded"))
         if title and link:
             out.append({"title": title, "url": link.strip(), "published": date, "summary": summary})
@@ -132,7 +133,8 @@ def parse_feed(text: str) -> list[dict]:
 
 def collect_rss(src: dict) -> list[dict]:
     items = []
-    for e in parse_feed(fetch(src["url"])):
+    naive_tz = KST if src.get("timezone") == "KST" else dt.timezone.utc
+    for e in parse_feed(fetch(src["url"]), naive_tz):
         if e["published"] and now_utc() - e["published"] > MAX_AGE:
             continue
         items.append(make_item(src, e["title"], e["url"], e["published"], e["summary"]))
