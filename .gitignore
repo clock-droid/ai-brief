@@ -8,3 +8,4 @@ __pycache__/
 .DS_Store
 .env
 data/shortlist.md
+data/transcripts/

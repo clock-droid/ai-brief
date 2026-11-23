@@ -161,6 +161,9 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
         why.append(f"HF 급상승{tr:.0f}")
     if r.get("video"):
         why.append("영상")
+    if (vw := r.get("views")) is not None:
+        score += 2 if vw >= 100_000 else 1 if vw >= 20_000 else 0
+        why.append(f"조회{vw:,}")
     if (ctx := r.get("context")) and ctx.get("headline_tweet"):
         score += 2
         why.append("Techmeme 헤드라인 트윗")

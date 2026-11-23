@@ -62,6 +62,11 @@
     { "id": "edsurge", "tier": 2, "name": "EdSurge", "type": "rss", "url": "https://www.edsurge.com/articles_rss", "category": "education" },
     { "id": "pew", "tier": 2, "name": "Pew Research", "type": "rss", "url": "https://www.pewresearch.org/internet/feed/", "category": "society" },
 
+    { "id": "yt-people", "tier": 2, "video": true, "name": "유튜브 인물 검색", "type": "youtube_search", "category": "models",
+      "queries": ["Geoffrey Hinton|Yann LeCun|Yoshua Bengio|Demis Hassabis|Ilya Sutskever",
+                  "Sam Altman|Dario Amodei|Jensen Huang|Mustafa Suleyman|Elon Musk AI",
+                  "Andrej Karpathy|Noam Brown|Jakub Pachocki|Terence Tao|Fei-Fei Li",
+                  "AGI interview|superintelligence interview|frontier AI lecture"] },
     { "id": "yt-openai", "tier": 1, "video": true, "name": "OpenAI (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXZCJLdBC09xxGZ6gcdrc6A", "category": "models" },
     { "id": "yt-deepmind", "tier": 1, "video": true, "name": "Google DeepMind (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCP7jMXSY2xbc3KCAE0MHQ-A", "category": "models" },
     { "id": "yt-anthropic", "tier": 1, "video": true, "name": "Anthropic (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrDwWp7EBBv4NwvScIpBDOA", "category": "models" },

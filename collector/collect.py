@@ -15,6 +15,7 @@ import gzip
 import hashlib
 import html
 import json
+import os
 import re
 import sys
 import time
@@ -234,6 +235,43 @@ def collect_page_links(src: dict) -> list[dict]:
     return list(items.values())
 
 
+# ---------- 유튜브 인물 검색 (YouTube Data API, 무료 할당량) ----------
+
+def collect_youtube_search(src: dict) -> list[dict]:
+    """핵심 인물 이름으로 최근 영상을 검색한다. 강연·인터뷰는 매번 다른 채널에 올라오므로 채널 구독으로는 못 따라간다.
+    YOUTUBE_API_KEY 환경변수가 없으면 건너뛴다. 검색 1회 = 100 단위 (하루 무료 10,000 단위)."""
+    key = os.environ.get("YOUTUBE_API_KEY")
+    if not key:
+        print("  (YOUTUBE_API_KEY 없음 — 유튜브 인물 검색 건너뜀)", file=sys.stderr)
+        return []
+    after = (now_utc() - VIDEO_MAX_AGE).strftime("%Y-%m-%dT%H:%M:%SZ")
+    found: dict[str, dict] = {}
+    for q in src["queries"]:
+        params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": q, "publishedAfter": after,
+                                         "order": "relevance", "maxResults": 15, "key": key})
+        for it in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/search?{params}")).get("items", []):
+            found.setdefault(it["id"]["videoId"], it["snippet"])
+    if not found:
+        return []
+    params = urllib.parse.urlencode({"part": "statistics,contentDetails", "id": ",".join(list(found)[:50]), "key": key})
+    stats = {v["id"]: v for v in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/videos?{params}")).get("items", [])}
+    items = []
+    for vid, sn in found.items():
+        st = stats.get(vid, {})
+        dur = st.get("contentDetails", {}).get("duration", "")
+        if not re.search(r"\d+M|\d+H", dur):
+            continue  # 1분 미만 쇼츠 제외
+        views = int(st.get("statistics", {}).get("viewCount", 0))
+        url = f"https://www.youtube.com/watch?v={vid}"
+        summary = f"{sn.get('channelTitle', '')} · 조회 {views:,} · {clean_text(sn.get('description'), 400)}"
+        item = make_item(src, clean_text(sn.get("title"), 200), url, parse_date(sn.get("publishedAt")), summary)
+        item["video"] = True
+        item["views"] = views
+        item["channel"] = sn.get("channelTitle")
+        items.append(item)
+    return items
+
+
 # ---------- 특갤 X 링크 레이더 ----------
 
 def dc_x_post_list(gallery: str) -> list[dict]:
@@ -384,7 +422,8 @@ def make_item(src: dict, title: str, url: str, published: dt.datetime | None, su
 
 
 COLLECTORS = {"rss": collect_rss, "hf_papers": collect_hf_papers, "hf_models": collect_hf_models,
-              "gh_trending": collect_gh_trending, "page_links": collect_page_links}
+              "gh_trending": collect_gh_trending, "page_links": collect_page_links,
+              "youtube_search": collect_youtube_search}
 
 
 def load_seen() -> dict:
