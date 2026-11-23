@@ -1,0 +1,11 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import CardFeed from '../components/CardFeed.astro';
+
+const cards = await getCollection('cards');
+---
+
+<Base current="cards">
+  <CardFeed cards={cards} />
+</Base>

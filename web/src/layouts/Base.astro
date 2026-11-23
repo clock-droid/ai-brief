@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+import { href } from '../lib/format';
+
+interface Props {
+  title?: string;
+  description?: string;
+  current?: 'cards' | 'posts';
+}
+
+const SITE_NAME = 'AI 브리핑'; // 가제
+const { title, description = 'AI와 미래 산업 소식을 빠르고 깊게.', current } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="wrap site-header">
+      <a class="site-name" href={href('/')}>{SITE_NAME}</a>
+      <nav aria-label="주요 메뉴">
+        <a href={href('/')} aria-current={current === 'cards' ? 'page' : undefined}>속보</a>
+        <a href={href('/posts/')} aria-current={current === 'posts' ? 'page' : undefined}>긴 글</a>
+      </nav>
+    </header>
+    <main class="wrap">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-top: var(--s-5);
+    padding-bottom: var(--s-6);
+  }
+
+  .site-name {
+    color: var(--text);
+    font-size: var(--fs-title);
+    font-weight: 700;
+  }
+
+  nav {
+    display: flex;
+    gap: var(--s-4);
+    font-size: var(--fs-small);
+  }
+
+  nav a {
+    color: var(--muted);
+    /* 터치 타깃 44px 확보 */
+    padding: var(--s-3) 0;
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  main {
+    padding-bottom: var(--s-7);
+  }
+</style>

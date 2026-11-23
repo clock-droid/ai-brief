@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import CardFeed from '../../components/CardFeed.astro';
+import { CATEGORIES, CATEGORY_KEYS, type CategoryKey } from '../../categories';
+
+export function getStaticPaths() {
+  return CATEGORY_KEYS.map((category) => ({ params: { category } }));
+}
+
+const category = Astro.params.category as CategoryKey;
+const cards = await getCollection('cards', (c) => c.data.category === category);
+---
+
+<Base title={CATEGORIES[category]} current="cards">
+  <h1 class="page-title">{CATEGORIES[category]}</h1>
+  <CardFeed cards={cards} />
+</Base>
+
+<style>
+  .page-title {
+    font-size: var(--fs-display);
+    font-weight: 700;
+    margin-bottom: var(--s-6);
+  }
+</style>

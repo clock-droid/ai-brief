@@ -1,0 +1,72 @@
+{
+  "_comment": "수집 출처 목록. category는 web/src/categories.ts의 키와 같아야 한다. 근거: research/02-leading-sources.md (2026-11-23 접속 확인분만 등록).",
+  "sources": [
+    { "id": "dc-singularity-x", "name": "특이점이 온다 갤러리 (X 링크 레이더)", "type": "dc_x_search", "gallery": "thesingularity", "category": "models" },
+
+    { "id": "latent-space", "name": "Latent Space", "type": "rss", "url": "https://www.latent.space/feed", "category": "models" },
+    { "id": "zvi", "name": "Zvi Mowshowitz", "type": "rss", "url": "https://thezvi.substack.com/feed", "category": "safety" },
+    { "id": "hf-papers", "name": "Hugging Face Daily Papers", "type": "hf_papers", "url": "https://huggingface.co/api/daily_papers", "category": "models" },
+    { "id": "import-ai", "name": "Import AI", "type": "rss", "url": "https://importai.substack.com/feed", "category": "models" },
+    { "id": "interconnects", "name": "Interconnects", "type": "rss", "url": "https://www.interconnects.ai/feed", "category": "models" },
+    { "id": "dwarkesh", "name": "Dwarkesh Podcast", "type": "rss", "url": "https://www.dwarkesh.com/feed", "category": "models" },
+    { "id": "epoch", "name": "Epoch AI", "type": "rss", "url": "https://epochai.substack.com/feed", "category": "models" },
+    { "id": "openai", "name": "OpenAI", "type": "rss", "url": "https://openai.com/news/rss.xml", "category": "models" },
+    { "id": "deepmind", "name": "Google DeepMind", "type": "rss", "url": "https://deepmind.google/blog/rss.xml", "category": "models" },
+    { "id": "google-ai", "name": "Google AI 블로그", "type": "rss", "url": "https://blog.google/technology/ai/rss/", "category": "models" },
+    { "id": "google-research", "name": "Google Research", "type": "rss", "url": "https://research.google/blog/rss/", "category": "science" },
+    { "id": "ms-research", "name": "Microsoft Research", "type": "rss", "url": "https://www.microsoft.com/en-us/research/feed/", "category": "science" },
+    { "id": "metr", "name": "METR", "type": "rss", "url": "https://metr.org/feed.xml", "category": "models" },
+
+    { "id": "simonw", "name": "Simon Willison", "type": "rss", "url": "https://simonwillison.net/atom/everything/", "category": "agents" },
+    { "id": "github-blog", "name": "GitHub 블로그", "type": "rss", "url": "https://github.blog/feed/", "category": "agents" },
+    { "id": "geeknews", "name": "GeekNews", "type": "rss", "url": "https://news.hada.io/rss/news", "category": "agents" },
+
+    { "id": "the-decoder", "name": "The Decoder", "type": "rss", "url": "https://the-decoder.com/feed/", "category": "media" },
+
+    { "id": "robot-report", "name": "The Robot Report", "type": "rss", "url": "https://www.therobotreport.com/feed/", "category": "robotics" },
+    { "id": "ieee-spectrum", "name": "IEEE Spectrum", "type": "rss", "url": "https://spectrum.ieee.org/feeds/feed.rss", "category": "robotics" },
+
+    { "id": "nature", "name": "Nature", "type": "rss", "url": "https://www.nature.com/nature.rss", "category": "science" },
+    { "id": "science", "name": "Science", "type": "rss", "url": "https://www.science.org/rss/news_current.xml", "category": "science" },
+    { "id": "quanta", "name": "Quanta Magazine", "type": "rss", "url": "https://www.quantamagazine.org/feed/", "category": "science" },
+    { "id": "tao", "name": "Terence Tao", "type": "rss", "url": "https://terrytao.wordpress.com/feed/", "category": "science" },
+    { "id": "aaronson", "name": "Scott Aaronson", "type": "rss", "url": "https://scottaaronson.blog/?feed=rss2", "category": "science" },
+    { "id": "xena", "name": "Xena Project (Lean)", "type": "rss", "url": "https://xenaproject.wordpress.com/feed/", "category": "science" },
+
+    { "id": "stat-healthtech", "name": "STAT 헬스테크", "type": "rss", "url": "https://www.statnews.com/category/health-tech/feed/", "category": "medicine" },
+    { "id": "stat", "name": "STAT", "type": "rss", "url": "https://www.statnews.com/feed/", "category": "medicine" },
+
+    { "id": "semianalysis", "name": "SemiAnalysis", "type": "rss", "url": "https://newsletter.semianalysis.com/feed", "category": "infra" },
+    { "id": "thelec", "name": "디일렉", "type": "rss", "url": "https://www.thelec.kr/rss/allArticle.xml", "category": "infra" },
+    { "id": "latitude", "name": "Latitude Media", "type": "rss", "url": "https://www.latitudemedia.com/feed", "category": "infra" },
+
+    { "id": "fed-press", "name": "미 연준 보도자료", "type": "rss", "url": "https://www.federalreserve.gov/feeds/press_all.xml", "category": "economy" },
+    { "id": "fed-speeches", "name": "미 연준 연설", "type": "rss", "url": "https://www.federalreserve.gov/feeds/speeches.xml", "category": "economy" },
+    { "id": "bok", "name": "한국은행", "type": "rss", "url": "https://www.bok.or.kr/portal/bbs/B0000501/news.rss?menuNo=201264", "category": "economy" },
+    { "id": "noahpinion", "name": "Noahpinion", "type": "rss", "url": "https://www.noahpinion.blog/feed", "category": "economy" },
+    { "id": "money-stuff", "name": "Money Stuff", "type": "rss", "url": "https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss", "category": "economy" },
+    { "id": "stratechery", "name": "Stratechery", "type": "rss", "url": "https://stratechery.com/feed/", "category": "economy" },
+    { "id": "aitimes", "name": "AI타임스", "type": "rss", "url": "https://www.aitimes.com/rss/allArticle.xml", "category": "economy" },
+
+    { "id": "alignment-forum", "name": "Alignment Forum", "type": "rss", "url": "https://www.alignmentforum.org/feed.xml", "category": "safety" },
+    { "id": "cais", "name": "AI Safety Newsletter", "type": "rss", "url": "https://newsletter.safe.ai/feed", "category": "safety" },
+
+    { "id": "chinatalk", "name": "ChinaTalk", "type": "rss", "url": "https://www.chinatalk.media/feed", "category": "policy" },
+    { "id": "transformer", "name": "Transformer", "type": "rss", "url": "https://www.transformernews.ai/feed", "category": "policy" },
+    { "id": "defense-one", "name": "Defense One", "type": "rss", "url": "https://www.defenseone.com/rss/all/", "category": "policy" },
+    { "id": "krebs", "name": "Krebs on Security", "type": "rss", "url": "https://krebsonsecurity.com/feed/", "category": "policy" },
+
+    { "id": "edsurge", "name": "EdSurge", "type": "rss", "url": "https://www.edsurge.com/articles_rss", "category": "education" },
+    { "id": "pew", "name": "Pew Research", "type": "rss", "url": "https://www.pewresearch.org/internet/feed/", "category": "society" },
+
+    { "id": "techmeme", "name": "Techmeme", "type": "rss", "url": "https://www.techmeme.com/feed.xml", "category": "tech" },
+    { "id": "platformer", "name": "Platformer", "type": "rss", "url": "https://www.platformer.news/rss/", "category": "tech" },
+    { "id": "canary", "name": "Canary Media", "type": "rss", "url": "https://www.canarymedia.com/rss.rss", "category": "future" },
+    { "id": "spacenews", "name": "SpaceNews", "type": "rss", "url": "https://spacenews.com/feed/", "category": "future" },
+
+    { "id": "fightaging", "name": "Fight Aging!", "type": "rss", "url": "https://www.fightaging.org/feed/", "category": "frontier" },
+    { "id": "lifespan", "name": "Lifespan.io", "type": "rss", "url": "https://www.lifespan.io/feed/", "category": "frontier" },
+    { "id": "transmitter", "name": "The Transmitter", "type": "rss", "url": "https://www.thetransmitter.org/feed/", "category": "frontier" },
+    { "id": "qcr", "name": "Quantum Computing Report", "type": "rss", "url": "https://quantumcomputingreport.com/feed/", "category": "frontier" }
+  ]
+}

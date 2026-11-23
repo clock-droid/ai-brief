@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Card from './Card.astro';
+import { groupByDay } from '../lib/format';
+
+interface Props {
+  cards: CollectionEntry<'cards'>[];
+}
+
+const sorted = [...Astro.props.cards].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const days = groupByDay(sorted);
+---
+
+{
+  days.length === 0 ? (
+    <p class="meta">아직 소식 없음</p>
+  ) : (
+    <div class="days">
+      {days.map((day) => (
+        <section aria-labelledby={`d-${day.key}`}>
+          <h1 class="day" id={`d-${day.key}`}>{day.label}</h1>
+          <div class="cards">
+            {day.items.map((card) => (
+              <Card card={card} />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .days {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-7);
+  }
+
+  .day {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: var(--s-5);
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+</style>

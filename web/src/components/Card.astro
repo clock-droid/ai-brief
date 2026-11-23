@@ -1,0 +1,101 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { CATEGORIES } from '../categories';
+import { href, timeLabel } from '../lib/format';
+
+interface Props {
+  card: CollectionEntry<'cards'>;
+}
+
+const { card } = Astro.props;
+const { title, date, category, sources, tweet, post } = card.data;
+const { Content } = await render(card);
+---
+
+<article class="card" id={card.id}>
+  <p class="meta">
+    <time datetime={date.toISOString()}>{timeLabel(date)}</time>
+    <span aria-hidden="true"> · </span>
+    <a class="category" href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
+  </p>
+  <h2>{title}</h2>
+  <div class="body">
+    <Content />
+  </div>
+  {
+    tweet && (
+      <figure class="tweet">
+        <blockquote cite={tweet.url}>{tweet.text}</blockquote>
+        <figcaption class="meta">
+          <a class="breakable" href={tweet.url} rel="noopener">
+            {tweet.author} @{tweet.handle}
+          </a>
+        </figcaption>
+      </figure>
+    )
+  }
+  <p class="sources">
+    출처{' '}
+    {sources.map((s, i) => (
+      <>
+        {i > 0 && <span aria-hidden="true"> · </span>}
+        <a href={s.url} rel="noopener">{s.name}</a>
+      </>
+    ))}
+  </p>
+  {post && <p class="more"><a href={href(`/posts/${post}/`)}>자세히 읽기</a></p>}
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .category {
+    color: var(--muted);
+  }
+
+  h2 {
+    font-size: var(--fs-title);
+    font-weight: 700;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  /* ▶ 줄 = 마크다운 목록. 줄이 넘어가도 ▶ 뒤에 맞춰 들여 쓴다 */
+  .body :global(ul) {
+    margin: 0;
+    padding-left: 1.2em;
+    list-style-type: '▶  ';
+  }
+
+  .body :global(li::marker) {
+    font-size: 0.8em;
+  }
+
+  .tweet {
+    margin: var(--s-2) 0 0;
+    padding-left: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .tweet blockquote {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .sources,
+  .more {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+</style>

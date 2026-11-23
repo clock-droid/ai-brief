@@ -1,0 +1,102 @@
+/* 값은 전부 DESIGN.md 스펙 시트에서 온다. 시트 밖 값을 여기 직접 넣지 않는다. */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation.css');
+
+:root {
+  --font: 'Freesentation', system-ui, -apple-system, sans-serif;
+
+  --fs-meta: 13px;
+  --fs-small: 15px;
+  --fs-body: 17px;
+  --fs-title: 20px;
+  --fs-display: 26px;
+
+  --lh-body: 1.7;
+  --lh-title: 1.4;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 48px;
+  --s-7: 72px;
+
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #5c5c5c;
+  --line: #e5e5e5;
+  --accent: #1f4fb8;
+
+  --measure: 680px;
+  --gutter: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141414;
+    --text: #ececec;
+    --muted: #a3a3a3;
+    --line: #2a2a2a;
+    --accent: #8daeff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: var(--lh-title);
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+.wrap {
+  max-width: calc(var(--measure) + var(--gutter) * 2);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.meta {
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+/* URL처럼 긴 토큰만 줄 중간에서 끊는다 */
+.breakable {
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { CATEGORIES } from '../../categories';
+import { dayLabel, href } from '../../lib/format';
+
+const posts = (await getCollection('posts')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Base title="긴 글" current="posts">
+  {
+    posts.length === 0 ? (
+      <p class="meta">아직 긴 글 없음</p>
+    ) : (
+      <ol class="list">
+        {posts.map((p) => (
+          <li>
+            <p class="meta">
+              {dayLabel(p.data.date)} · {p.data.format} · {CATEGORIES[p.data.category]}
+            </p>
+            <h2>
+              <a href={href(`/posts/${p.id}/`)}>{p.data.title}</a>
+            </h2>
+            <p class="lead">{p.data.summary[0]}</p>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+</Base>
+
+<style>
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  h2 {
+    font-size: var(--fs-title);
+    font-weight: 700;
+  }
+
+  h2 a {
+    color: var(--text);
+  }
+
+  .lead {
+    color: var(--muted);
+  }
+</style>

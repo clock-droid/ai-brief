@@ -1,0 +1,113 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { CATEGORIES } from '../../categories';
+import { dayLabel, href, timeLabel } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<'posts'> };
+const { title, date, category, format, summary, sources } = post.data;
+const { Content } = await render(post);
+---
+
+<Base title={title} description={summary[0]} current="posts">
+  <article>
+    <header class="head">
+      <p class="meta">
+        <time datetime={date.toISOString()}>{dayLabel(date)} {timeLabel(date)}</time> · {format} ·{' '}
+        <a href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
+      </p>
+      <h1>{title}</h1>
+    </header>
+
+    <section class="summary" aria-label="3줄 요약">
+      <ol>
+        {summary.map((line) => <li>{line}</li>)}
+      </ol>
+    </section>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <footer class="sources">
+      <p>출처</p>
+      <ul>
+        {
+          sources.map((s) => (
+            <li>
+              <a class="breakable" href={s.url} rel="noopener">{s.name}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--fs-display);
+    font-weight: 700;
+  }
+
+  .summary ol {
+    margin: 0;
+    padding-left: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    font-weight: 500;
+  }
+
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .prose :global(h2) {
+    font-size: var(--fs-title);
+    font-weight: 700;
+    margin-top: var(--s-5);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0;
+    padding-left: var(--s-5);
+  }
+
+  .prose :global(blockquote) {
+    margin: 0;
+    padding-left: var(--s-4);
+    color: var(--muted);
+  }
+
+  .sources {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .sources ul {
+    list-style: none;
+    margin: var(--s-1) 0 0;
+    padding: 0;
+  }
+</style>
