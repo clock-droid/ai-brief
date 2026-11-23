@@ -1,5 +1,5 @@
 {
-  "_comment": "수집 출처 목록. tier: 1=1차 원천(공식 발표·정부·연구), 2=전문 매체·전문가, 3=국내 2차 보도·대량 집계 (collector/rank.py가 점수에 씀). broad: 다루는 범위가 넓은 매체 — AI·기술 관련 글만 점수를 받는다. category는 web/src/categories.ts의 키와 같아야 한다. 근거: research/02-leading-sources.md (2026-11-23 접속 확인분만 등록).",
+  "_comment": "수집 출처 목록. tier: 1=1차 원천(공식 발표·정부·연구), 2=전문 매체·전문가, 3=국내 2차 보도·대량 집계 (collector/rank.py가 점수에 씀). video: 유튜브 영상(인터뷰·팟캐스트·발표). broad: 다루는 범위가 넓은 매체 — AI·기술 관련 글만 점수를 받는다. category는 web/src/categories.ts의 키와 같아야 한다. 근거: research/02-leading-sources.md (2026-11-23 접속 확인분만 등록).",
   "sources": [
     { "id": "dc-singularity-x", "tier": 2, "name": "특이점이 온다 갤러리 (X 링크 레이더)", "type": "dc_x_search", "gallery": "thesingularity", "category": "models" },
 
@@ -61,6 +61,31 @@
 
     { "id": "edsurge", "tier": 2, "name": "EdSurge", "type": "rss", "url": "https://www.edsurge.com/articles_rss", "category": "education" },
     { "id": "pew", "tier": 2, "name": "Pew Research", "type": "rss", "url": "https://www.pewresearch.org/internet/feed/", "category": "society" },
+
+    { "id": "yt-openai", "tier": 1, "video": true, "name": "OpenAI (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXZCJLdBC09xxGZ6gcdrc6A", "category": "models" },
+    { "id": "yt-deepmind", "tier": 1, "video": true, "name": "Google DeepMind (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCP7jMXSY2xbc3KCAE0MHQ-A", "category": "models" },
+    { "id": "yt-anthropic", "tier": 1, "video": true, "name": "Anthropic (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrDwWp7EBBv4NwvScIpBDOA", "category": "models" },
+    { "id": "yt-dwarkesh", "tier": 2, "video": true, "name": "Dwarkesh Patel", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZa18YV7qayTh-MRIrBhDpA", "category": "models" },
+    { "id": "yt-lex", "tier": 2, "video": true, "name": "Lex Fridman", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCJIfeSCssxSC_Dhc5s7woww", "category": "models" },
+    { "id": "yt-nopriors", "tier": 2, "video": true, "name": "No Priors", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCSI7h9hydQ40K5MJHnCrQvw", "category": "models" },
+    { "id": "yt-latentspace", "tier": 2, "video": true, "name": "Latent Space (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCxBcwypKK-W3GHd_RZ9FZrQ", "category": "agents" },
+    { "id": "yt-doac", "tier": 2, "broad": true, "video": true, "name": "The Diary Of A CEO", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCmsFvSE5HvooT18Tv1iLV2Q", "category": "economy" },
+    { "id": "yt-allin", "tier": 2, "broad": true, "video": true, "name": "All-In Podcast", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCESLZhusAkFfsNsApnjF_Cg", "category": "economy" },
+    { "id": "yt-20vc", "tier": 2, "video": true, "name": "20VC", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC9jkoB5oKe1eAGZ5zOW6iZA", "category": "economy" },
+    { "id": "yt-a16z", "tier": 2, "video": true, "name": "a16z", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ1VQj-37kl2yS_VUhfQHsw", "category": "economy" },
+    { "id": "yt-yc", "tier": 2, "video": true, "name": "Y Combinator", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCxIJaCMEptJjxmmQgGFsnCg", "category": "agents" },
+    { "id": "yt-sequoia", "tier": 2, "video": true, "name": "Sequoia Capital", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCWrF0oN6unbXrWsTN7RctTw", "category": "economy" },
+    { "id": "yt-cnbc", "tier": 2, "broad": true, "video": true, "name": "CNBC Television", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCvJJ_dzjViJCoLf5uKUTwoA", "category": "economy" },
+    { "id": "yt-hardfork", "tier": 2, "video": true, "name": "Hard Fork", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCqnbDFdCpuN8CMEg0VuEBqA", "category": "tech" },
+    { "id": "yt-bigtech", "tier": 2, "video": true, "name": "Big Technology", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCaKiCexVhZ459j9sZ2e7XdQ", "category": "tech" },
+    { "id": "yt-mlst", "tier": 2, "video": true, "name": "Machine Learning Street Talk", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZHmQk67mSJgfCCTn7xBfew", "category": "models" },
+    { "id": "yt-cogrev", "tier": 2, "video": true, "name": "Cognitive Revolution", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCoPTBQlwUm0m7gSbBW9wN6A", "category": "models" },
+    { "id": "yt-diamandis", "tier": 2, "broad": true, "video": true, "name": "Peter H. Diamandis", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCCpNQKYvrnWQNjZprabMJlw", "category": "future" },
+    { "id": "yt-aiexplained", "tier": 3, "video": true, "name": "AI Explained", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCNJ1Ymd5yFuUPtn21xtRbbw", "category": "models" },
+    { "id": "yt-2minpapers", "tier": 3, "video": true, "name": "Two Minute Papers", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCbfYPyITQ-7l4upoX8nvctg", "category": "models" },
+    { "id": "yt-berman", "tier": 3, "video": true, "name": "Matthew Berman", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCawZsQWqfGSbCI5yjkdVkTA", "category": "models" },
+    { "id": "yt-wesroth", "tier": 3, "video": true, "name": "Wes Roth", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCqcbQf6yw5KzRoDDcZ_wBSw", "category": "models" },
+    { "id": "yt-chester", "tier": 3, "video": true, "name": "AI Frontier Korea (노정석)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCz-BiVywYdO6iXhjXkw_Kgw", "category": "models" },
 
     { "id": "techmeme-x", "tier": 2, "name": "Techmeme X 토론", "type": "techmeme_x", "url": "https://www.techmeme.com/", "category": "tech" },
     { "id": "techmeme", "tier": 2, "name": "Techmeme", "type": "rss", "url": "https://www.techmeme.com/feed.xml", "category": "tech" },

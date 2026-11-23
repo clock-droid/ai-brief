@@ -32,7 +32,8 @@ DC_SIGNALS = DATA / "dc_signals.json"  # 특갤 X 링크 글의 최신 추천·�
 
 KST = dt.timezone(dt.timedelta(hours=9))
 USER_AGENT = "ai-brief-collector/0.1"  # URL을 덧붙이면 Techmeme이 휴대폰용 간이 페이지(기사별 X 토론 없음)를 준다
-MAX_AGE = dt.timedelta(days=2)        # 이보다 오래된 글은 후보로 넣지 않는다 (WRITING.md 2절 신선도 기준과 맞춤)
+MAX_AGE = dt.timedelta(days=2)
+VIDEO_MAX_AGE = dt.timedelta(days=4)   # 인터뷰·팟캐스트 영상은 퍼지는 데 며칠 걸려 더 넓게 본다        # 이보다 오래된 글은 후보로 넣지 않는다 (WRITING.md 2절 신선도 기준과 맞춤)
 SEEN_TTL = dt.timedelta(days=21)      # seen 기록 보존 기간
 SUMMARY_LIMIT = 600                   # 후보 요약 최대 글자 수 (원문 전체를 저장하지 않는다)
 DC_POSTS_PER_RUN = 20                 # 디시 본문 요청 상한 (과요청 차단 방지)
@@ -131,6 +132,9 @@ def parse_feed(text: str, naive_tz: dt.tzinfo = dt.timezone.utc) -> list[dict]:
         link = _atom_link(el) or _child_text(el, "link", "guid")
         date = parse_date(_child_text(el, "pubDate", "published", "updated", "date"), naive_tz)
         summary = clean_text(_child_text(el, "description", "summary", "content", "encoded"))
+        if not summary:  # 유튜브 피드는 설명이 media:group 안에 있다
+            desc = next((d.text for d in el.iter() if _local(d.tag) == "description" and d.text), None)
+            summary = clean_text(desc)
         if title and link:
             out.append({"title": title, "url": link.strip(), "published": date, "summary": summary})
     return out
@@ -139,10 +143,14 @@ def parse_feed(text: str, naive_tz: dt.tzinfo = dt.timezone.utc) -> list[dict]:
 def collect_rss(src: dict) -> list[dict]:
     items = []
     naive_tz = KST if src.get("timezone") == "KST" else dt.timezone.utc
+    max_age = VIDEO_MAX_AGE if src.get("video") else MAX_AGE
     for e in parse_feed(fetch(src["url"]), naive_tz):
-        if e["published"] and now_utc() - e["published"] > MAX_AGE:
+        if e["published"] and now_utc() - e["published"] > max_age:
             continue
-        items.append(make_item(src, e["title"], e["url"], e["published"], e["summary"]))
+        item = make_item(src, e["title"], e["url"], e["published"], e["summary"])
+        if src.get("video"):
+            item["video"] = True
+        items.append(item)
     return items
 
 

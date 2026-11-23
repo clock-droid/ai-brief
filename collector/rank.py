@@ -31,6 +31,7 @@ DATA = ROOT / "data"
 CONTENT = ROOT / "web" / "src" / "content"
 OUT = DATA / "shortlist.md"
 WINDOW_H = 48
+VIDEO_WINDOW_H = 96  # 인터뷰·팟캐스트 영상
 
 STOP = set("""the and for with from that this into over after about what will says said new how why are was has have its
 their your more than just only also amid via per using use used can not but you all one two now our out who which when
@@ -149,6 +150,8 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
     if (tr := r.get("trending")) is not None:
         score += 2 if tr >= 300 else 1 if tr >= 100 else 0
         why.append(f"HF 급상승{tr:.0f}")
+    if r.get("video"):
+        why.append("영상")
     if (ctx := r.get("context")) and ctx.get("headline_tweet"):
         score += 2
         why.append("Techmeme 헤드라인 트윗")
@@ -189,7 +192,7 @@ def main() -> int:
     written = written_urls()
     written_sets = written_token_sets()
 
-    fresh = [r for r in load_candidates() if age_hours(r) <= WINDOW_H]
+    fresh = [r for r in load_candidates() if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
     # 같은 URL 중복 제거
     fresh = list({r["url"].rstrip("/"): r for r in fresh}.values())
 
