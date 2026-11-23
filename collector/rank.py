@@ -71,6 +71,22 @@ def written_urls() -> set[str]:
     return urls
 
 
+def written_token_sets() -> list[set[str]]:
+    """이미 실린 글마다 고유명사 위주 토큰 묶음. URL이 달라도 같은 사건이면 '이미 다룸'으로 잡기 위해 쓴다."""
+    sets = []
+    for p in glob.glob(str(CONTENT / "*" / "*.md")):
+        text = re.sub(r"https?://\S+", " ", Path(p).read_text(encoding="utf-8"))
+        sets.append({w.lower() for w in re.findall(r"[A-Za-z][A-Za-z0-9.\-]{2,}|[0-9]+[A-Za-z][A-Za-z0-9.\-]*", text)} - STOP)
+    return sets
+
+
+def covered(tk: set[str], written_sets: list[set[str]]) -> bool:
+    latin = {t for t in tk if re.match(r"[a-z0-9]", t)}
+    if len(latin) < 3:
+        return False
+    return any(len(latin & w) >= 3 and len(latin & w) / len(latin) >= 0.3 for w in written_sets)
+
+
 def age_hours(r: dict) -> float:
     t = r.get("published") or r["collected"]
     return (now() - dt.datetime.fromisoformat(t)).total_seconds() / 3600
@@ -171,6 +187,7 @@ def main() -> int:
     dc_path = DATA / "dc_signals.json"
     dc_signals = json.loads(dc_path.read_text()) if dc_path.exists() else {}
     written = written_urls()
+    written_sets = written_token_sets()
 
     fresh = [r for r in load_candidates() if age_hours(r) <= WINDOW_H]
     # 같은 URL 중복 제거
@@ -183,11 +200,12 @@ def main() -> int:
         (best_score, why), lead = scored[0]
         sources = {r["source"] for r in g}
         bonus = min(3, len(sources) - 1)
-        done = any(r["url"].rstrip("/") in written for r in g)
+        done = any(r["url"].rstrip("/") in written for r in g) or covered(set().union(*(tokens(r) for r in g)), written_sets)
         total = best_score + bonus - (3 if done else 0)
         ranked.append({"score": total, "lead": lead, "members": [r for _, r in scored], "why": why,
                        "n_sources": len(sources), "done": done})
-    ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
+    # 이미 다룬 사건은 점수와 관계없이 뒤로 보낸다 (위쪽 자리를 새 소식에 쓰기 위해)
+    ranked.sort(key=lambda x: (x["done"], -x["score"], age_hours(x["lead"])))
 
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
              "", f"발표 {WINDOW_H}시간 이내 후보 {len(fresh)}개 → 사건 {len(ranked)}개로 묶음. 상위 {args.top}개.",
