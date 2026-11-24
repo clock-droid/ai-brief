@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props as { post: CollectionEntry<'posts'> };
-const { title, date, category, format, summary, sources } = post.data;
+const { title, date, updated, category, format, summary, sources } = post.data;
 const { Content } = await render(post);
 ---
 
@@ -18,7 +18,8 @@ const { Content } = await render(post);
   <article>
     <header class="head">
       <p class="meta">
-        <time datetime={date.toISOString()}>{dayLabel(date)} {timeLabel(date)}</time> · {format} ·{' '}
+        <time datetime={date.toISOString()}>{dayLabel(date)} {timeLabel(date)}</time>
+        {updated && <> · <time datetime={updated.toISOString()}>{dayLabel(updated)} {timeLabel(updated)} 갱신</time></>} · {format} ·{' '}
         <a href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
       </p>
       <h1>{title}</h1>

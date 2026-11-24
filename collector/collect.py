@@ -240,42 +240,51 @@ def collect_page_links(src: dict) -> list[dict]:
 # ---------- 유튜브 인물 검색 (YouTube Data API, 무료 할당량) ----------
 
 def collect_youtube_search(src: dict) -> list[dict]:
-    """핵심 인물 이름으로 최근 영상을 검색한다. 강연·인터뷰는 매번 다른 채널에 올라오므로 채널 구독으로는 못 따라간다.
-    YOUTUBE_API_KEY 환경변수가 없으면 건너뛴다. 검색 1회 = 100 단위 (하루 무료 10,000 단위)."""
+    """핵심 인물 이름으로 최근 영상을 한 명씩 검색한다. 강연·인터뷰는 매번 다른 채널에 올라와 채널 구독으로는 못 따라간다.
+    여러 명을 묶어 검색하면 상위 몇 개에 묻혀 놓친다(케임브리지·NTU 강연 등) — 그래서 한 명씩.
+    할당량: 검색 1회 = 100 단위, 하루 무료 10,000. 인물 12명 × 4시간마다(하루 6회) = 7,200 단위.
+    마지막 검색 후 3.5시간이 안 지났으면 건너뛴다 (수동 실행이 겹쳐도 한도를 넘지 않게).
+    YOUTUBE_API_KEY 환경변수가 없으면 건너뛴다."""
     key = os.environ.get("YOUTUBE_API_KEY")
     if not key:
         print("  (YOUTUBE_API_KEY 없음 — 유튜브 인물 검색 건너뜀)", file=sys.stderr)
         return []
+    state_path = DATA / "yt_state.json"
+    state = json.loads(state_path.read_text()) if state_path.exists() else {}
+    last = state.get("last_search")
+    if last and now_utc() - dt.datetime.fromisoformat(last) < dt.timedelta(hours=3, minutes=30):
+        print(f"  (유튜브 인물 검색: 마지막 검색 {last} — 3.5시간 안 지나 건너뜀)", file=sys.stderr)
+        return []
     after = (now_utc() - VIDEO_MAX_AGE).strftime("%Y-%m-%dT%H:%M:%SZ")
-    # 검색어에 든 인물 이름이 제목·설명에 실제로 나와야 후보로 받는다 (드라마·무관 영상 걸러내기)
-    names = [re.sub(r"\s+ai$", "", n.strip().lower()) for q in src["queries"] for n in q.split("|") if n.strip()]
-    found: dict[str, dict] = {}
-    for q in src["queries"]:
-        params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": q, "publishedAfter": after,
-                                         "order": "relevance", "maxResults": 15, "relevanceLanguage": "en",
-                                         "key": key})
+    found: dict[str, tuple[dict, str]] = {}
+    for person in src["people"]:
+        params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": f'"{person}"', "publishedAfter": after,
+                                         "order": "relevance", "maxResults": 8, "relevanceLanguage": "en", "key": key})
         for it in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/search?{params}")).get("items", []):
-            found.setdefault(it["id"]["videoId"], it["snippet"])
+            found.setdefault(it["id"]["videoId"], (it["snippet"], person))
+    if not DRY_RUN:
+        state["last_search"] = now_utc().isoformat()
+        state_path.write_text(json.dumps(state))
     if not found:
         return []
-    params = urllib.parse.urlencode({"part": "statistics,contentDetails", "id": ",".join(list(found)[:50]), "key": key})
-    stats = {v["id"]: v for v in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/videos?{params}")).get("items", [])}
+    stats: dict[str, dict] = {}
+    ids = list(found)
+    for k in range(0, len(ids), 50):
+        params = urllib.parse.urlencode({"part": "statistics,contentDetails", "id": ",".join(ids[k:k + 50]), "key": key})
+        stats.update({v["id"]: v for v in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/videos?{params}")).get("items", [])})
     items = []
-    for vid, sn in found.items():
+    for vid, (sn, person) in found.items():
         st = stats.get(vid, {})
-        dur = st.get("contentDetails", {}).get("duration", "")
-        if not re.search(r"\d+M|\d+H", dur):
+        if not re.search(r"\d+M|\d+H", st.get("contentDetails", {}).get("duration", "")):
             continue  # 1분 미만 쇼츠 제외
-        text = (sn.get("title", "") + " " + sn.get("description", "")).lower()
-        if not any(n in text for n in names):
-            continue
+        surname = person.split()[-1].lower()
+        if surname not in (sn.get("title", "") + " " + sn.get("description", "")).lower():
+            continue  # 이름이 실제로 나오지 않는 영상(드라마 등) 제외
         views = int(st.get("statistics", {}).get("viewCount", 0))
         url = f"https://www.youtube.com/watch?v={vid}"
-        summary = f"{sn.get('channelTitle', '')} · 조회 {views:,} · {clean_text(sn.get('description'), 400)}"
+        summary = f"{sn.get('channelTitle', '')} · 조회 {views:,} · 인물 {person} · {clean_text(sn.get('description'), 400)}"
         item = make_item(src, clean_text(sn.get("title"), 200), url, parse_date(sn.get("publishedAt")), summary)
-        item["video"] = True
-        item["views"] = views
-        item["channel"] = sn.get("channelTitle")
+        item.update({"video": True, "views": views, "channel": sn.get("channelTitle"), "person": person})
         items.append(item)
     return items
 

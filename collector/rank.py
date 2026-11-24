@@ -10,7 +10,7 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 특갤 화제: X 링크가 특갤 글에 올라왔으면 2, 그 글의 추천 10/20/40 이상이면 +1/+2/+3, 조회 3000 이상 +1
 - HF 논문 추천 수: 20 이상 +1, 50 이상 +2
 - 같은 사건을 다룬 출처 수: 출처 하나 늘 때마다 +1 (최대 +3)
-- 이미 다룬 사건(묶음 안에 이미 실린 URL이 있음): -3
+- 이미 다룬 사건은 감점하지 않고 "정리 글 갱신 후보"로 표시한다
 - 범위가 넓은 매체(sources.json broad)의 글이 AI·기술과 무관하면: -4
 - 핵심 인물(연구소 경영진·수석 과학자·튜링/필즈상 수상자 등)의 발언 +2
 - 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
@@ -225,11 +225,11 @@ def main() -> int:
         sources = {r["source"] for r in g}
         bonus = min(3, len(sources) - 1)
         done = any(r["url"].rstrip("/") in written for r in g) or covered(set().union(*(tokens(r) for r in g)), written_sets)
-        total = best_score + bonus - (3 if done else 0)
+        total = best_score + bonus  # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
         ranked.append({"score": total, "lead": lead, "members": [r for _, r in scored], "why": why,
                        "n_sources": len(sources), "done": done})
     # 이미 다룬 사건은 점수와 관계없이 뒤로 보낸다 (위쪽 자리를 새 소식에 쓰기 위해)
-    ranked.sort(key=lambda x: (x["done"], -x["score"], age_hours(x["lead"])))
+    ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
 
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
              "", f"발표 {WINDOW_H}시간 이내 후보 {len(fresh)}개 → 사건 {len(ranked)}개로 묶음. 상위 {args.top}개.",
@@ -240,7 +240,7 @@ def main() -> int:
         if x["n_sources"] > 1:
             flags.append(f"출처 {x['n_sources']}곳")
         if x["done"]:
-            flags.append("이미 다룸 — 큰 진전 있을 때만")
+            flags.append("이미 다룬 사건 — 새 사실이 있으면 정리 글 갱신(6-4)")
         flags += x["why"]
         lead_text = " ".join([lead["title"], lead.get("summary", "")[:300], (lead.get("tweet") or {}).get("author") or "",
                               (lead.get("signal") or {}).get("title", "")])

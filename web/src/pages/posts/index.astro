@@ -4,7 +4,8 @@ import Base from '../../layouts/Base.astro';
 import { CATEGORIES } from '../../categories';
 import { dayLabel, href } from '../../lib/format';
 
-const posts = (await getCollection('posts')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const latest = (p: { data: { date: Date; updated?: Date } }) => (p.data.updated ?? p.data.date).getTime();
+const posts = (await getCollection('posts')).sort((a, b) => latest(b) - latest(a));
 ---
 
 <Base title="긴 글" current="posts">
@@ -16,7 +17,7 @@ const posts = (await getCollection('posts')).sort((a, b) => b.data.date.getTime(
         {posts.map((p) => (
           <li>
             <p class="meta">
-              {dayLabel(p.data.date)} · {p.data.format} · {CATEGORIES[p.data.category]}
+              {p.data.updated ? `${dayLabel(p.data.updated)} 갱신` : dayLabel(p.data.date)} · {p.data.format} · {CATEGORIES[p.data.category]}
             </p>
             <h2>
               <a href={href(`/posts/${p.id}/`)}>{p.data.title}</a>
