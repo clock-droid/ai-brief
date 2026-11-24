@@ -6,6 +6,14 @@ sources:
   - name: The Decoder
     url: https://the-decoder.com/security-researchers-show-how-cheap-ai-inference-providers-steal-keys-and-snoop-on-users/
     published: 2026-11-22T12:07:56+00:00
+figure:
+  src: https://the-decoder.com/wp-content/uploads/2026/11/cybersecurity-Openrouter.png
+  alt: "오픈라우터가 사용자에게 보낸 메일. MiniMax 모델로 보낸 요청을 제3자가 읽었을 수 있다는 경고와 해당 계정의 요청 건수가 적혀 있음"
+  caption: "오픈라우터가 영향받은 사용자에게 보낸 경고 메일. MiniMax 모델로 보낸 요청을 제3자가 읽었을 수 있다고 알림"
+  credit: The Decoder
+  url: https://the-decoder.com/security-researchers-show-how-cheap-ai-inference-providers-steal-keys-and-snoop-on-users/
+  width: 714
+  height: 998
 ---
 
 - 보안업체 드라고스(Dragos)가 7~11월 가짜 자격증명을 넣은 AI 요청 약 200만 건을 보내 추론 중개 서비스를 시험함.

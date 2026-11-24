@@ -33,6 +33,17 @@ const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
     <main class="wrap">
       <slot />
     </main>
+    <script is:inline>
+      // X 공식 임베드: 사진·영상이 붙은 트윗(.twitter-tweet, Card.astro)이 있는 쪽에서만 X 위젯을 부른다.
+      if (document.querySelector('.twitter-tweet')) {
+        const theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.querySelectorAll('.twitter-tweet').forEach((el) => (el.dataset.theme = theme));
+        const widget = document.createElement('script');
+        widget.src = 'https://platform.twitter.com/widgets.js';
+        widget.async = true;
+        document.body.append(widget);
+      }
+    </script>
   </body>
 </html>
 

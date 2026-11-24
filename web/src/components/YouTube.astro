@@ -1,0 +1,28 @@
+---
+interface Props {
+  id: string;
+  title: string;
+}
+
+// 유튜브 공식 퍼가기 플레이어. youtube-nocookie: 재생 전에는 시청 기록용 쿠키를 남기지 않는다.
+const { id, title } = Astro.props;
+---
+
+<iframe
+  class="video"
+  src={`https://www.youtube-nocookie.com/embed/${id}`}
+  title={`영상: ${title}`}
+  loading="lazy"
+  allow="encrypted-media; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen></iframe>
+
+<style>
+  .video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-top: var(--s-2);
+    border: 0;
+  }
+</style>

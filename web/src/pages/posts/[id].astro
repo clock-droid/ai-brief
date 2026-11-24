@@ -2,7 +2,9 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { CATEGORIES } from '../../categories';
-import { dayLabel, href, timeLabel } from '../../lib/format';
+import Figure from '../../components/Figure.astro';
+import YouTube from '../../components/YouTube.astro';
+import { dayLabel, firstVideoId, href, timeLabel } from '../../lib/format';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -10,8 +12,9 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props as { post: CollectionEntry<'posts'> };
-const { title, date, updated, category, format, summary, sources } = post.data;
+const { title, date, updated, category, format, summary, sources, figure } = post.data;
 const { Content } = await render(post);
+const videoId = firstVideoId(sources);
 ---
 
 <Base title={title} description={summary[0]} current="posts">
@@ -30,6 +33,9 @@ const { Content } = await render(post);
         {summary.map((line) => <li>{line}</li>)}
       </ol>
     </section>
+
+    {figure && <Figure figure={figure} />}
+    {videoId && <YouTube id={videoId} title={title} />}
 
     <div class="prose">
       <Content />

@@ -1,16 +1,20 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../categories';
-import { dateTimeLabel, earliestSourceTime, href, timeLabel } from '../lib/format';
+import { dateTimeLabel, earliestSourceTime, firstVideoId, href, timeLabel, tweetHasMedia } from '../lib/format';
+import Figure from './Figure.astro';
+import YouTube from './YouTube.astro';
 
 interface Props {
   card: CollectionEntry<'cards'>;
 }
 
 const { card } = Astro.props;
-const { title, date, category, sources, tweet, post } = card.data;
+const { title, date, category, sources, tweet, post, figure } = card.data;
 const { Content } = await render(card);
 const sourceTime = earliestSourceTime(sources, tweet?.url);
+const videoId = firstVideoId(sources);
+const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
 ---
 
 <article class="card" id={card.id}>
@@ -31,15 +35,18 @@ const sourceTime = earliestSourceTime(sources, tweet?.url);
   <div class="body">
     <Content />
   </div>
+  {figure && <Figure figure={figure} />}
+  {videoId && <YouTube id={videoId} title={title} />}
   {
     tweet && (
-      <figure class="tweet">
-        <blockquote cite={tweet.url}>{tweet.text}</blockquote>
-        <figcaption class="meta">
-          <a class="breakable" href={tweet.url} rel="noopener">
+      <figure class:list={['tweet', { embed: embedTweet }]}>
+        {/* 사진·영상이 붙은 트윗은 X 공식 임베드로 바꿔 그린다 (Base.astro). 그 전·실패 시에는 이 인용이 그대로 보인다 */}
+        <blockquote class:list={{ 'twitter-tweet': embedTweet }} cite={tweet.url} data-dnt="true">
+          <p>{tweet.text}</p>
+          <a class="meta breakable" href={tweet.url} rel="noopener">
             {tweet.author} @{tweet.handle}
           </a>
-        </figcaption>
+        </blockquote>
       </figure>
     )
   }
@@ -96,8 +103,16 @@ const sourceTime = earliestSourceTime(sources, tweet?.url);
     gap: var(--s-1);
   }
 
+  /* X 임베드는 자체 테두리가 있어 들여 쓰지 않고 본문과 줄을 맞춘다 */
+  .tweet.embed {
+    padding-left: 0;
+  }
+
   .tweet blockquote {
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
     font-size: var(--fs-small);
     color: var(--muted);
   }

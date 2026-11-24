@@ -22,6 +22,18 @@ export function tweetTime(url: string): Date | undefined {
   return new Date(Number((BigInt(id) >> 22n) + 1288834974657n));
 }
 
+/** 유튜브 영상 주소에서 영상 id를 읽는다 */
+export function youtubeId(url: string): string | undefined {
+  return url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/)?.[1];
+}
+
+/** 출처 중 첫 유튜브 영상 id. 영상이 출처인 글은 영상을 함께 보여준다. */
+export const firstVideoId = (sources: { url: string }[]) =>
+  sources.map((s) => youtubeId(s.url)).find((id): id is string => Boolean(id));
+
+/** X 공식 oEmbed는 첨부한 사진·영상을 본문 끝의 pic.twitter.com 링크로 표시한다 */
+export const tweetHasMedia = (text: string) => /pic\.twitter\.com\//.test(text);
+
 /** 카드 출처 중 가장 이른 원문 시각. 트윗은 id에서 시각을 읽는다. */
 export function earliestSourceTime(sources: { published?: Date }[], tweetUrl?: string): Date | undefined {
   const times = sources.map((s) => s.published).filter((d): d is Date => d instanceof Date);

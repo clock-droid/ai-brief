@@ -1,0 +1,51 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+type FigureData = NonNullable<CollectionEntry<'cards'>['data']['figure']>;
+
+interface Props {
+  figure: FigureData;
+}
+
+// 원문 그림은 원본 주소를 그대로 가리킨다. 원문이 그림을 옮기거나 막으면 그림 칸을 통째로 숨기고 글만 남긴다.
+// no-referrer: 다른 사이트에서 부른 그림을 막는 서버가 대개 Referer로 판단한다.
+const { figure } = Astro.props;
+---
+
+<figure class="figure">
+  <img
+    src={figure.src}
+    alt={figure.alt}
+    width={figure.width}
+    height={figure.height}
+    loading="lazy"
+    decoding="async"
+    referrerpolicy="no-referrer"
+    onerror="this.parentElement.hidden = true"
+  />
+  <figcaption>
+    {figure.caption}
+    <span aria-hidden="true"> · </span>
+    그림 <a href={figure.url} rel="noopener">{figure.credit}</a>
+  </figcaption>
+</figure>
+
+<style>
+  .figure {
+    margin: var(--s-2) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  figcaption {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+</style>

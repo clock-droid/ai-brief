@@ -6,6 +6,14 @@ sources:
   - name: OpenAI
     url: https://openai.com/index/introducing-shirudo
     published: 2026-11-23T21:20:00+00:00
+figure:
+  src: https://images.ctfassets.net/kftzwdyauwt9/bScTLq9smNJq5XAlaHIQW/fab0e70b1aab8ca8dffb70a747056fd7/guardian-agent-desktop-light.png?w=1920&q=80&fm=webp
+  alt: "가디언 에이전트가 eBPF 계측으로 커널·네트워크를 관찰하고, eBPF 제어로 취약한 동작을 막는 흐름도"
+  caption: "에이전트가 eBPF로 실행 중인 시스템을 관찰하고, 필요한 차단 규칙을 그때그때 만들어 적용하는 구조"
+  credit: OpenAI
+  url: https://openai.com/index/introducing-shirudo
+  width: 1200
+  height: 728
 ---
 
 - 오픈AI와 시스코(Cisco)가 패치를 적용하기 전까지 실행 중인 리눅스 시스템을 보호하는 오픈소스 런타임 Shirudo(일본어로 "방패")를 11월 23일 공개함.
