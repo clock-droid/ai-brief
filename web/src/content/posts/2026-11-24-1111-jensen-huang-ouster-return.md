@@ -3,11 +3,11 @@ title: "젠슨 황 사임에서 복귀까지 11일, 무슨 일이 있었나"
 date: 2026-11-24T11:11:00+09:00
 category: economy
 format: 정리
-updated: 2026-11-25T01:12:00+09:00
+updated: 2026-11-25T03:12:00+09:00
 summary:
   - "젠슨 황은 중국 정보기관 연루 의혹 속에 11월 12일 엔비디아 CEO에서 물러났다가, 11일 뒤인 23일 이사회 만장일치로 복귀함. 같은 날 상무부는 메가스피드 등 동남아 7개사(알리바바 싱가포르 자회사 포함)를 수출 제한 명단에 올림."
   - "NYT는 트럼프가 정보당국 판단을 일축하고 복귀를 밀었다고, FT는 실리콘밸리 인사들이 로비했다고 보도함. 24일 지배구조 전문가들은 트럼프가 이사회 결정을 사실상 뒤집었다며 주주 소송 가능성을 지적함."
-  - "엔비디아 주가는 복귀 다음 날 6% 넘게 내려 전날 31% 상승분 일부를 반납함. 황은 12월 1일 하원 비공개 회의, 3일 상원 공개 증언을 앞두고 있음."
+  - "엔비디아 주가는 복귀 다음 날 6% 넘게 내려 전날 31% 상승분 일부를 반납함. 황은 복귀 후 첫 전체회의에서 행동강령 위반을 인정하고 사과했으며, 12월 1일 하원 비공개 회의, 3일 상원 공개 증언을 앞두고 있음."
 sources:
   - name: The Next Web — Jensen Huang resigns as Nvidia CEO
     url: https://thenextweb.com/news/jensen-huang-resigns-as-nvidia-ceo-after-33-years-effective-immediately
@@ -79,6 +79,12 @@ sources:
   - name: Techmeme (New York Times) — Experts say Trump effectively overrode Nvidia's board
     url: https://www.techmeme.com/261124/p23#a261124p23
     published: 2026-11-24T16:01:38+00:00
+  - name: Techmeme (Wired) — Huang apologizes at first all-hands
+    url: https://www.techmeme.com/261124/p28#a261124p28
+    published: 2026-11-24T18:01:27+00:00
+  - name: Techmeme (Financial Times) — Nvidia had no other options
+    url: https://www.techmeme.com/261124/p26#a261124p26
+    published: 2026-11-24T17:10:00+00:00
 ---
 
 엔비디아 창업자 젠슨 황(Jensen Huang)이 CEO 자리에서 물러났다가 11일 만에 돌아온 사건을 날짜순으로 모았어. 날짜는 현지(미국) 기준이야. 판단은 출처의 보도·발언으로만 전하고, 사이트가 따로 전망하지는 않아.
@@ -186,3 +192,13 @@ sources:
    - ▶ 같은 날 — 상장 닷새째인 앤트로픽 주가는 8% 넘게 내려 공모가 83달러를 밑돌았다고 로이터가 보도함(Techmeme 헤드라인 기준).
 
 다만 16·17번은 원문(CNBC·NYT, 일부 유료)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
+
+## 11월 25일 03시
+
+18. **황, 첫 전체회의서 "행동강령 위반" 인정 (11월 24일, 와이어드 인용 Techmeme)**
+   와이어드(Wired)는 황이 복귀 후 처음 연 전 직원 회의에서 엔비디아 행동강령을 어긴 데 대해 사과하고, "매우 심각한 개인적 실수"를 했다고 말했다고 보도함. 23일 본사 로비에서 직원들에게 한 사과(디일렉 보도)에 이어 위반 사실을 직접 인정한 것임.
+
+19. **FT "엔비디아엔 다른 선택지가 없었다" (11월 24일, FT 인용 Techmeme)**
+   파이낸셜타임스(FT) 칼럼니스트 로버트 암스트롱(Robert Armstrong)은 황이 회사 규모에 맞는 경영 구조를 만들지 못했고, 여기에 트럼프 대통령의 지지가 더해져 엔비디아가 그를 다시 데려올 수밖에 없었다고 분석함.
+
+다만 18·19번은 원문(와이어드·FT, 유료)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
