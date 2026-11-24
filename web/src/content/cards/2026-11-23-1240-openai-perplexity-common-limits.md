@@ -11,6 +11,7 @@ tweet:
   handle: sama
   text: "\"I believe frontier model developers should jointly endeavour to establish shared norms for how to evaluate such models and red-team safety cases for them by the time they are first used, including shared transparency standards. I further propose common limits, based on…"
   url: https://x.com/sama/status/2124551883130114403
+post: 2026-11-24-1111-pachocki-perplexity-intelligence
 ---
 
 - 오픈AI 수석 과학자 야쿠프 파호츠키(Jakub Pachocki)가 11월 22일 "퍼플렉시티와 지능"을 공개함.
