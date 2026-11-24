@@ -1,16 +1,21 @@
 ---
 import '../styles/global.css';
+import Rail from '../components/Rail.astro';
+import { CATEGORIES, CATEGORY_KEYS, type CategoryKey } from '../categories';
 import { href } from '../lib/format';
 
 interface Props {
   title?: string;
   description?: string;
   current?: 'cards' | 'posts';
+  category?: CategoryKey; // 분류 페이지일 때 왼쪽 메뉴에서 현재 위치로 표시
+  railPosts?: boolean; // 곁줄의 긴 글 목록. 긴 글 목록 페이지에서는 본문과 겹치므로 끈다
 }
 
 const SITE_NAME = 'AI 브리핑'; // 가제
-const { title, description = 'AI와 미래 산업 소식을 빠르고 깊게.', current } = Astro.props;
+const { title, description = 'AI와 미래 산업 소식을 빠르고 깊게.', current, category, railPosts = true } = Astro.props;
 const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+const here = (on: boolean) => (on ? 'page' : undefined);
 ---
 
 <!doctype html>
@@ -23,16 +28,30 @@ const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
     <title>{pageTitle}</title>
   </head>
   <body>
-    <header class="wrap site-header">
-      <a class="site-name" href={href('/')}>{SITE_NAME}</a>
-      <nav aria-label="주요 메뉴">
-        <a href={href('/')} aria-current={current === 'cards' ? 'page' : undefined}>속보</a>
-        <a href={href('/posts/')} aria-current={current === 'posts' ? 'page' : undefined}>긴 글</a>
-      </nav>
-    </header>
-    <main class="wrap">
-      <slot />
-    </main>
+    <div class="shell">
+      <header class="side">
+        <a class="site-name" href={href('/')}>{SITE_NAME}</a>
+        <nav aria-label="주요 메뉴">
+          <a href={href('/')} aria-current={here(current === 'cards' && !category)}>속보</a>
+          <a href={href('/posts/')} aria-current={here(current === 'posts')}>긴 글</a>
+        </nav>
+        <nav class="categories" aria-label="분류">
+          {
+            CATEGORY_KEYS.map((key) => (
+              <a href={href(`/c/${key}/`)} aria-current={here(category === key)}>
+                {CATEGORIES[key]}
+              </a>
+            ))
+          }
+        </nav>
+      </header>
+      <main>
+        <slot />
+      </main>
+      <div class="rail-col">
+        <Rail posts={railPosts} />
+      </div>
+    </div>
     <script is:inline>
       // X 공식 임베드: 사진·영상이 붙은 트윗(.twitter-tweet, Card.astro)이 있는 쪽에서만 X 위젯을 부른다.
       if (document.querySelector('.twitter-tweet')) {
@@ -48,7 +67,14 @@ const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
 </html>
 
 <style>
-  .site-header {
+  /* 900 미만: 1단. 사이트 이름 + 속보·긴 글 머리줄, 분류 메뉴·곁줄은 숨김 */
+  .shell {
+    max-width: calc(var(--col-feed) + var(--gutter) * 2);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  .side {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -65,7 +91,6 @@ const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
   nav {
     display: flex;
     gap: var(--s-4);
-    font-size: var(--fs-small);
   }
 
   nav a {
@@ -79,7 +104,76 @@ const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
     font-weight: 500;
   }
 
+  .categories,
+  .rail-col {
+    display: none;
+  }
+
   main {
+    min-width: 0;
     padding-bottom: var(--s-7);
+  }
+
+  /* 900 이상: 왼쪽 메뉴 + 피드 2단 */
+  @media (min-width: 900px) {
+    .shell {
+      max-width: none;
+      display: grid;
+      grid-template-columns: var(--col-side) var(--col-feed);
+      justify-content: center;
+      column-gap: var(--col-gap);
+    }
+
+    .side {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow-y: auto;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: var(--s-5);
+      padding-bottom: var(--s-5);
+    }
+
+    nav {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    nav a {
+      padding: var(--s-2) 0;
+    }
+
+    .categories {
+      display: flex;
+      font-size: var(--fs-small);
+    }
+
+    .categories a {
+      padding: var(--s-1) 0;
+    }
+
+    main {
+      padding-top: var(--s-5);
+    }
+  }
+
+  /* 1240 이상: 오른쪽 곁줄까지 3단 */
+  @media (min-width: 1240px) {
+    .shell {
+      grid-template-columns: var(--col-side) var(--col-feed) var(--col-rail);
+    }
+
+    .rail-col {
+      display: block;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: var(--s-5) 0;
+    }
   }
 </style>

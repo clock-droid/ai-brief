@@ -8,7 +8,7 @@ const latest = (p: { data: { date: Date; updated?: Date } }) => (p.data.updated 
 const posts = (await getCollection('posts')).sort((a, b) => latest(b) - latest(a));
 ---
 
-<Base title="긴 글" current="posts">
+<Base title="긴 글" current="posts" railPosts={false}>
   {
     posts.length === 0 ? (
       <p class="meta">아직 긴 글 없음</p>
@@ -37,13 +37,22 @@ const posts = (await getCollection('posts')).sort((a, b) => latest(b) - latest(a
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--s-6);
   }
 
   li {
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
+    padding: var(--s-5) 0;
+  }
+
+  li:first-child {
+    padding-top: 0;
+  }
+
+  /* 글 사이 옅은 선 한 줄 (속보 피드와 같은 문법) */
+  li + li {
+    border-top: 1px solid var(--line);
   }
 
   h2 {

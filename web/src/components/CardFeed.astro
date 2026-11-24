@@ -34,7 +34,7 @@ const days = groupByDay(sorted);
   .days {
     display: flex;
     flex-direction: column;
-    gap: var(--s-7);
+    gap: var(--s-6);
   }
 
   .day {
@@ -47,6 +47,18 @@ const days = groupByDay(sorted);
   .cards {
     display: flex;
     flex-direction: column;
-    gap: var(--s-6);
+  }
+
+  /* 글 사이 옅은 선 한 줄 (X식 타임라인) */
+  .cards > :global(.card) {
+    padding: var(--s-5) 0;
+  }
+
+  .cards > :global(.card:first-child) {
+    padding-top: 0;
+  }
+
+  .cards > :global(.card + .card) {
+    border-top: 1px solid var(--line);
   }
 </style>

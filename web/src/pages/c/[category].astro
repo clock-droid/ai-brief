@@ -12,7 +12,7 @@ const category = Astro.params.category as CategoryKey;
 const cards = await getCollection('cards', (c) => c.data.category === category);
 ---
 
-<Base title={CATEGORIES[category]} current="cards">
+<Base title={CATEGORIES[category]} current="cards" category={category}>
   <h1 class="page-title">{CATEGORIES[category]}</h1>
   <CardFeed cards={cards} />
 </Base>

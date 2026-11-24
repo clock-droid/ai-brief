@@ -59,8 +59,60 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
       </>
     ))}
   </p>
-  {post && <p class="more"><a href={href(`/posts/${post}/`)}>자세히 읽기</a></p>}
+  {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
 </article>
+
+<script>
+  // ▶ 목록만 3줄 안팎까지 보이고 "더 보기"로 그 자리에서 펼친다. 한 줄 요약·※ 단서는 접지 않는다.
+  // JS가 없으면 접지 않은 채로 보인다. 웹폰트가 늦게 와서 줄 수가 바뀌므로 폰트가 다 온 뒤에 잰다.
+
+  /** 줄 중간에서 자르면 문장이 끝난 것처럼 읽히므로 ▶ 항목 경계에서 자른다:
+   *  3줄 안에 들어가는 항목까지, 첫 항목부터 3줄을 넘으면 첫 항목까지. 접을 게 없으면 undefined. */
+  function cutHeight(list: HTMLElement): number | undefined {
+    const top = list.getBoundingClientRect().top;
+    const limit = parseFloat(getComputedStyle(list).lineHeight) * 3 + 1;
+    const bottoms = [...list.children].map((li) => li.getBoundingClientRect().bottom - top);
+    const fit = bottoms.filter((b) => b <= limit).at(-1) ?? bottoms[0];
+    return fit !== undefined && fit < bottoms.at(-1)! - 1 ? fit : undefined;
+  }
+
+  function fold(list: HTMLElement) {
+    list.style.maxHeight = '';
+    const cut = cutHeight(list);
+    list.classList.toggle('clamped', cut !== undefined);
+    if (cut !== undefined) list.style.maxHeight = `${cut}px`;
+    return cut !== undefined;
+  }
+
+  function clampLists() {
+    for (const list of document.querySelectorAll<HTMLElement>('.card .body > ul:not([data-clamp])')) {
+      list.dataset.clamp = 'folded';
+      if (!fold(list)) continue;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'expand';
+      button.textContent = '더 보기';
+      button.addEventListener('click', () => {
+        list.dataset.clamp = 'open';
+        list.classList.remove('clamped');
+        list.style.maxHeight = '';
+        button.remove();
+      });
+      list.after(button);
+    }
+  }
+
+  // 창 폭이 바뀌면 줄 수가 달라지므로 접힌 목록만 다시 잰다
+  let resizeFrame = 0;
+  addEventListener('resize', () => {
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => {
+      document.querySelectorAll<HTMLElement>('.card .body > ul.clamped').forEach(fold);
+    });
+  });
+
+  document.fonts.ready.then(clampLists);
+</script>
 
 <style>
   .card {
@@ -93,6 +145,29 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
 
   .body :global(li::marker) {
     font-size: 0.8em;
+  }
+
+  /* 높이는 스크립트가 항목 경계에 맞춰 정한다 */
+  .body :global(ul.clamped) {
+    overflow: hidden;
+  }
+
+  /* 그 자리에서 펼치는 글자 단추. 다른 쪽으로 넘어가는 "긴 글로 읽기" 링크와 말로 구분한다 */
+  .body :global(.expand) {
+    align-self: flex-start;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: var(--fs-small);
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .body :global(.expand:hover) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .tweet {

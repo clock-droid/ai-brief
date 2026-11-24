@@ -1,0 +1,105 @@
+---
+import { getCollection } from 'astro:content';
+import { CATEGORIES, type CategoryKey } from '../categories';
+import { dayKey, dayLabel, href } from '../lib/format';
+
+interface Props {
+  posts?: boolean;
+}
+
+// 오른쪽 곁줄: 최신 긴 글, 가장 최근 날짜의 분류별 소식 수. 실제 글에서만 뽑는다.
+// "오늘"은 빌드 시각이 아니라 가장 최근 카드의 KST 날짜다 (정적 빌드라 빌드 시각과 화면 시각이 다르다).
+const latest = (p: { data: { date: Date; updated?: Date } }) => (p.data.updated ?? p.data.date).getTime();
+const posts = Astro.props.posts === false ? [] : (await getCollection('posts')).sort((a, b) => latest(b) - latest(a)).slice(0, 5);
+
+const cards = (await getCollection('cards')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const newest = cards[0]?.data.date;
+const counts = new Map<CategoryKey, number>();
+if (newest) {
+  const key = dayKey(newest);
+  for (const c of cards) {
+    if (dayKey(c.data.date) !== key) break;
+    counts.set(c.data.category, (counts.get(c.data.category) ?? 0) + 1);
+  }
+}
+const byCount = [...counts].sort((a, b) => b[1] - a[1]);
+---
+
+<aside class="rail" aria-label="곁줄">
+  {
+    posts.length > 0 && (
+      <section aria-labelledby="rail-posts">
+        <h2 id="rail-posts">긴 글</h2>
+        <ol>
+          {posts.map((p) => (
+            <li>
+              <a href={href(`/posts/${p.id}/`)}>{p.data.title}</a>
+              <span class="meta">{p.data.format} · {CATEGORIES[p.data.category]}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+  {
+    newest && (
+      <section aria-labelledby="rail-today">
+        <h2 id="rail-today">{dayLabel(newest)}</h2>
+        <ol class="counts">
+          {byCount.map(([key, n]) => (
+            <li>
+              <a href={href(`/c/${key}/`)}>{CATEGORIES[key]}</a>
+              <span class="meta">{n}건</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+</aside>
+
+<style>
+  .rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  h2 {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: var(--s-3);
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    font-size: var(--fs-small);
+    line-height: var(--lh-title);
+  }
+
+  li a {
+    color: var(--text);
+  }
+
+  .counts {
+    gap: var(--s-2);
+  }
+
+  .counts li {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+</style>

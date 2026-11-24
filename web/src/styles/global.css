@@ -27,7 +27,10 @@
   --line: #e5e5e5;
   --accent: #1f4fb8;
 
-  --measure: 680px;
+  --col-side: 220px;
+  --col-feed: 600px;
+  --col-rail: 300px;
+  --col-gap: 48px;
   --gutter: 20px;
 }
 
@@ -83,12 +86,6 @@ h3 {
 
 p {
   margin: 0;
-}
-
-.wrap {
-  max-width: calc(var(--measure) + var(--gutter) * 2);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
 }
 
 .meta {
