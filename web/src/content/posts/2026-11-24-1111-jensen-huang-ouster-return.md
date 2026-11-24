@@ -3,11 +3,11 @@ title: "젠슨 황 사임에서 복귀까지 11일, 무슨 일이 있었나"
 date: 2026-11-24T11:11:00+09:00
 category: economy
 format: 정리
-updated: 2026-11-25T03:12:00+09:00
+updated: 2026-11-25T05:11:00+09:00
 summary:
   - "젠슨 황은 중국 정보기관 연루 의혹 속에 11월 12일 엔비디아 CEO에서 물러났다가, 11일 뒤인 23일 이사회 만장일치로 복귀함. 같은 날 상무부는 메가스피드 등 동남아 7개사(알리바바 싱가포르 자회사 포함)를 수출 제한 명단에 올림."
   - "NYT는 트럼프가 정보당국 판단을 일축하고 복귀를 밀었다고, FT는 실리콘밸리 인사들이 로비했다고 보도함. 24일 지배구조 전문가들은 트럼프가 이사회 결정을 사실상 뒤집었다며 주주 소송 가능성을 지적함."
-  - "엔비디아 주가는 복귀 다음 날 6% 넘게 내려 전날 31% 상승분 일부를 반납함. 황은 복귀 후 첫 전체회의에서 행동강령 위반을 인정하고 사과했으며, 12월 1일 하원 비공개 회의, 3일 상원 공개 증언을 앞두고 있음."
+  - "엔비디아 주가는 복귀 다음 날 6% 넘게 내림. 황은 첫 전체회의에서 행동강령 위반을 인정했고, 24일 블랜치 법무장관·파텔 FBI 국장은 황 수사 여부에 답하지 않음. 황은 12월 1일 하원 비공개 면담, 3일 상원 은행위 공개 청문회에 단독 증인으로 나섬."
 sources:
   - name: The Next Web — Jensen Huang resigns as Nvidia CEO
     url: https://thenextweb.com/news/jensen-huang-resigns-as-nvidia-ceo-after-33-years-effective-immediately
@@ -85,6 +85,15 @@ sources:
   - name: Techmeme (Financial Times) — Nvidia had no other options
     url: https://www.techmeme.com/261124/p26#a261124p26
     published: 2026-11-24T17:10:00+00:00
+  - name: CNBC — AG Blanche, FBI's Patel dodge questions about Jensen Huang investigation
+    url: https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-fbi-doj-patel-blanche.html
+    published: 2026-11-24T17:06:00+00:00
+  - name: CNBC — Jensen Huang to face DC grilling the same day Nvidia releases new products at GTC
+    url: https://www.cnbc.com/2026/11/24/jensen-huang-nvidia-congress-gtc.html
+    published: 2026-11-24T15:44:00+00:00
+  - name: Techmeme (CNBC) — Trump finds himself isolated in DC
+    url: https://www.techmeme.com/261124/p32#a261124p32
+    published: 2026-11-24T19:35:01+00:00
 ---
 
 엔비디아 창업자 젠슨 황(Jensen Huang)이 CEO 자리에서 물러났다가 11일 만에 돌아온 사건을 날짜순으로 모았어. 날짜는 현지(미국) 기준이야. 판단은 출처의 보도·발언으로만 전하고, 사이트가 따로 전망하지는 않아.
@@ -202,3 +211,17 @@ sources:
    파이낸셜타임스(FT) 칼럼니스트 로버트 암스트롱(Robert Armstrong)은 황이 회사 규모에 맞는 경영 구조를 만들지 못했고, 여기에 트럼프 대통령의 지지가 더해져 엔비디아가 그를 다시 데려올 수밖에 없었다고 분석함.
 
 다만 18·19번은 원문(와이어드·FT, 유료)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
+
+## 11월 25일 05시
+
+20. **법무장관·FBI 국장, 황 수사 질문에 답 피해 (11월 24일, CNBC)**
+   토드 블랜치(Todd Blanche) 법무장관은 법무부 기자회견에서 황을 수사했는지, 결과가 무엇인지 묻는 질문에 직접 답하지 않고 "대통령과 나눈 대화는 말하지 않겠다"고 함. 엔비디아를 "좋은 기업 시민"이라 부르며, 수사 대상이었다면 대통령이 그런 말을 하지 않았을 거라고 함. 법무부엔 늘 "수백 건 이상"의 수출 관련 수사가 있다고도 말함. 캐시 파텔(Kash Patel) FBI 국장은 FBI가 황과 접촉했는지, 앨리스 황에 대한 정보당국 판단을 알았는지에 답하지 않음.
+   - ▶ 하루 전 — 트럼프는 CNBC 인터뷰에서 "매우 철저히 조사했다", 황은 "잘못한 게 없다"(판단은 나빴다)고 했고, 트루스소셜에선 블랜치가 불법 행위 증거가 없다고 확인해 줬다고 썼음.
+
+21. **"워싱턴에서 트럼프 홀로 환호" (11월 24일, CNBC 인용 Techmeme)**
+   CNBC는 트럼프가 황 복귀를 밀어붙였지만 워싱턴에서 고립되고 있으며, 그의 가장 확고한 우군 일부까지 황과 엔비디아를 조사하겠다고 나섰다고 보도함.
+
+22. **의회 일정 확정, GTC 기조연설은 대타 (11월 24일, CNBC)**
+   황은 12월 1일 하원 외교위·중국공산당 특위·정보위 비공개 면담(속기록 작성)에, 3일 상원 은행위 '미국의 AI 우위 보호: 수출 통제 감독' 청문회에 단독 증인으로 나섬. 같은 주 워싱턴 GTC의 1일 기조연설은 원래 황이 맡기로 했지만 지금은 이언 벅(Ian Buck) 부사장이 맡고 있고, 엔비디아는 황의 등장 여부를 밝히지 않음. 예일대 제프 소넨펠드(Jeff Sonnenfeld)는 조사가 겹친 상황에서 "어떻게 일을 할 수 있겠냐"고 지적함.
+
+다만 21번은 원문(CNBC)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
