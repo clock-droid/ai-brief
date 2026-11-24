@@ -3,11 +3,11 @@ title: "젠슨 황 사임에서 복귀까지 11일, 무슨 일이 있었나"
 date: 2026-11-24T11:11:00+09:00
 category: economy
 format: 정리
-updated: 2026-11-24T17:11:00+09:00
+updated: 2026-11-24T21:11:00+09:00
 summary:
   - "젠슨 황은 중국 정보기관 연루 의혹 속에 11월 12일 엔비디아 CEO에서 물러났다가, 11일 뒤인 23일 이사회 만장일치로 복귀함."
-  - "복귀 당일 상무부가 메가스피드 등 동남아 7개사를 수출 제한 명단에 올렸고, 양당 의원들은 칩 보안법 등 수출통제 법안 처리를 요구함."
-  - "24일 싱가포르 웡 총리는 메가스피드 자체 조사를 이어가겠다고 했고, 말레이시아는 제재 대상 7개사에 데이터센터 서비스를 주지 말라고 자국 업계에 권고함. 황은 12월 1일 하원 비공개 회의, 3일 상원 공개 증언을 앞두고 있음."
+  - "복귀 당일 상무부가 메가스피드 등 동남아 7개사를 수출 제한 명단에 올렸고, 24일 블룸버그는 그중 한 곳이 알리바바 싱가포르 자회사라고 보도함. 싱가포르·말레이시아도 후속 대응에 나섬."
+  - "NYT는 트럼프가 정보당국 판단을 일축하고 시장 손실을 멈추려 복귀를 밀었다고, FT는 실리콘밸리 인사들이 로비했다고 보도함. 황은 12월 1일 하원 비공개 회의, 3일 상원 공개 증언을 앞두고 있음."
 sources:
   - name: The Next Web — Jensen Huang resigns as Nvidia CEO
     url: https://thenextweb.com/news/jensen-huang-resigns-as-nvidia-ceo-after-33-years-effective-immediately
@@ -58,6 +58,21 @@ sources:
   - name: AI타임스 — 말레이시아, 미국 제재 기업 데이터센터 제한
     url: https://www.aitimes.com/news/articleView.html?idxno=217748
     published: 2026-11-24T07:33:29+00:00
+  - name: Techmeme (Financial Times)
+    url: https://www.techmeme.com/261124/p6#a261124p6
+    published: 2026-11-24T10:35:02+00:00
+  - name: Techmeme (New York Times)
+    url: https://www.techmeme.com/261124/p9#a261124p9
+    published: 2026-11-24T11:00:59+00:00
+  - name: Techmeme (Bloomberg)
+    url: https://www.techmeme.com/261124/p10#a261124p10
+    published: 2026-11-24T11:10:03+00:00
+  - name: Stratechery — The Individual Exception
+    url: https://stratechery.com/2026/the-individual-exception/
+    published: 2026-11-24T11:00:00+00:00
+  - name: ChinaTalk — Remote Access Buys Six Months of AI Lead
+    url: https://www.chinatalk.media/p/the-remote-access-rule-will-slow
+    published: 2026-11-24T10:58:57+00:00
 ---
 
 엔비디아 창업자 젠슨 황(Jensen Huang)이 CEO 자리에서 물러났다가 11일 만에 돌아온 사건을 날짜순으로 모았어. 날짜는 현지(미국) 기준이야. 판단은 출처의 보도·발언으로만 전하고, 사이트가 따로 전망하지는 않아.
@@ -139,3 +154,18 @@ sources:
 
 12. **복귀 당일 앤트로픽 주가는 하락 (11월 23일, 블룸버그 인용 AI타임스)**
    엔비디아가 31.48% 오른 날 앤트로픽 주가는 1.43% 내린 87.64달러로 마감해 상장 뒤 이틀 연속 하락함. 공모가 83달러와의 격차는 5.6%로 줄었음. AI타임스는 엔비디아가 키워 온 오픈웨이트 모델 생태계가 폐쇄형 모델로 돈을 버는 앤트로픽에 부담이 될 수 있다는 분석을 전하면서도, 하루 주가만으로 황 복귀가 직접 원인이라 단정하긴 어렵다고 덧붙임. 엔비디아는 앤트로픽에 칩을 공급하고 IPO와 함께 100억 달러를 투자했지만, 대중국 칩 수출 규제에서는 다리오 아모데이(Dario Amodei) CEO와 황의 입장이 엇갈려 왔음.
+
+## 11월 24일 21시
+
+13. **"트럼프, 정보당국 판단 일축" (11월 24일, NYT 인용 Techmeme)**
+   뉴욕타임스(NYT)는 트럼프 대통령이 미 정보당국의 판단을 일축하고 황 복귀를 밀어붙였다고 보도함. 트럼프는 CNBC에서 시장 손실을 멈춰야 했다고 말했다고 함. NYT는 트럼프가 2025년 엔비디아 주식을 1,200만 달러 넘게 보유했다고 전함.
+   - ▶ 같은 날 — 파이낸셜타임스(FT)는 트래비스 캘러닉(Travis Kalanick)·개빈 베이커(Gavin Baker)·브래드 거스트너(Brad Gerstner)·마크 앤드리슨(Marc Andreessen) 등 실리콘밸리 인사들이 '워룸'을 꾸려 트럼프와 밴스 부통령에게 복귀를 로비했다고 보도함.
+
+14. **제재 7개사 중 하나는 알리바바 자회사 (11월 24일, 블룸버그 인용 Techmeme)**
+   블룸버그는 23일 수출 제한 명단에 오른 싱가포르 회사 Apex Enterprise Solutions가 알리바바(Alibaba)의 싱가포르 자회사라고 연방관보 공고를 근거로 보도함. 중국 최대 기술기업 중 하나가 칩 우회 단속에 직접 엮인 셈임.
+
+15. **분석가들의 해석 (11월 24일)**
+   - 스트래터커리(Stratechery)의 벤 톰프슨(Ben Thompson)은 황 복귀를, 경영자 계급이 회사를 움직인다는 85년 흐름 속에서 한 개인에게 예외가 주어진 사건으로 봤음. 자신은 황이 돌아오지 못할 거라 예측했지만 틀렸다고 인정함. AI 시대엔 이런 '개인 예외'가 늘 거라고 주장함.
+   - ChinaTalk의 퀸 에니스(Quinn Ennis)·아킵 자카리아(Aqib Zakaria)는 11월 19일 시행된 원격 접속 규정이 제대로 집행되면 중국의 최첨단 컴퓨트를 2028년 말까지 약 6개월 늦춘다고 추정했지만, 집행은 러트닉 장관과 트럼프 대통령의 의지에 달렸다고 봤음. 대통령의 최근 발언은 판매자 책임을 약하게 볼 수 있다는 신호라고 지적함.
+
+다만 13·14번은 원문(NYT·FT·블룸버그, 유료)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
