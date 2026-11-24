@@ -737,3 +737,49 @@
 {"url": "https://www.thetransmitter.org/thalamus/shine-haas-hidden-connections-in-the-thalamus/", "reason": "이미 다룬 사건, 24시간 초과", "at": "2026-11-24T23:16:00+09:00"}
 {"url": "https://www.aitimes.com/news/articleView.html?idxno=217680", "reason": "이미 다룬 사건, 24시간 초과", "at": "2026-11-24T23:16:00+09:00"}
 {"url": "https://huggingface.co/inclusionAI/Ling-3.2-air", "reason": "이미 다룬 사건", "at": "2026-11-24T23:16:00+09:00"}
+{"url": "https://x.com/elonmusk/status/2125182397918416965", "reason": "핵심 인물 발언이나 무엇에 대한 답글인지 맥락 확인 불가, 한 줄 농담성", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/vincent_koc/status/2125209543894614117", "reason": "이미 다룬 사건(ShellBench 카드·긴 글), 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.techmeme.com/261124/p18#a261124p18", "reason": "이미 다룬 사건(ShellBench 카드·긴 글), 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/madisonmills22/status/2125194635534369145", "reason": "이미 다룬 사건(악시오스 내부 모델 카드), 반응 트윗 외 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/brianschatz/status/2125240052536279278", "reason": "이미 다룬 사건(악시오스 내부 모델 카드), 반응 트윗 외 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/xeophon/status/2125239289533583455", "reason": "이미 다룬 사건(악시오스 내부 모델 카드), 반응 트윗 외 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/andrewcurran_/status/2125236718941143218", "reason": "이미 다룬 사건(악시오스 내부 모델 카드), 반응 트윗 외 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/joepostingg/status/2125236046023606396", "reason": "이미 다룬 사건(악시오스 내부 모델 카드), 반응 트윗 외 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://the-decoder.com/dozens-of-insiders-say-openai-and-anthropics-unreleased-models-have-outgrown-their-safety-measures/", "reason": "이미 다룬 사건(악시오스 내부 모델 카드), 반응 트윗 외 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/kevin_t_ngo/status/2125119969109418333", "reason": "사소함 — 개인 데모", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/ericjackson/status/2125241563810787642", "reason": "카드로 씀 — 나머지는 논평가 반응 트윗", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/kenwattana/status/2125241083399458961", "reason": "카드로 씀 — 나머지는 논평가 반응 트윗", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/matthewstoller/status/2125239650067591352", "reason": "카드로 씀 — 나머지는 논평가 반응 트윗", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/danprimack/status/2125237850673123475", "reason": "카드로 씀 — 나머지는 논평가 반응 트윗", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/danprimack/status/2125236180438356050", "reason": "카드로 씀 — 나머지는 논평가 반응 트윗", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://the-decoder.com/anthropic-researcher-stands-by-his-ai-assisted-riemann-proof-but-owns-up-to-stupid-things-in-the-rollout/", "reason": "이미 다룬 사건(알푀게 25만 쪽 농담 카드), 새 사실 없음", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.youtube.com/watch?v=tRaFbDFBl_A", "reason": "이미 다룬 사건(노엄 브라운 카드)", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/via00via/status/2125212845277102575", "reason": "사소한 잡담", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/gdb/status/2125115240690201049", "reason": "이미 다룬 사건(GPT-6.2 Astra 로봇 제어 카드)", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://blog.google/products-and-platforms/products/gemini/gemini-golden-state/", "reason": "홍보성", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.techmeme.com/261124/p16#a261124p16", "reason": "이미 다룬 사건(알푀게 인물 카드·긴 글)", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/__alpoge__/status/2125062170207457583", "reason": "이미 다룬 사건(알푀게 인물 카드·긴 글)", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/mathandcobb/status/2125017282925457440", "reason": "이미 다룬 사건(알푀게 인물 카드·긴 글)", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/HAL2400_AI/status/2125122491630903313", "reason": "사소함", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://github.blog/news-insights/company-news/these-are-the-gifts-developers-will-actually-want/", "reason": "홍보성", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://spacenews.com/simera-sense-spacemanic-zaitra-and-world-from-space-join-forces-on-an-end-to-end-dual-use-mission-solution/", "reason": "홍보성·사소함", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.pewresearch.org/short-reads/2026/11/24/the-median-wealth-of-black-us-households-has-fallen-by-a-quarter-since-2022/", "reason": "AI 무관", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.techmeme.com/261124/p20#a261124p20", "reason": "AI 무관 핀테크 기업가치 보도", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.statnews.com/2026/11/24/alaskan-hospitals-using-ai-rsna-2026-peptides-health-tech/?utm_campaign=rss", "reason": "이미 다룬 사건", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/mmazarr/status/2125224491802599457", "reason": "이미 다룬 사건(젠슨 황 정리 글 13번)", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.techmeme.com/261124/p17#a261124p17", "reason": "이미 다룬 사건", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://the-decoder.com/german-researchers-call-for-computer-science-to-reinvent-itself-as-computer-and-ai-science/", "reason": "이미 다룬 사건", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/_ankurdeka_/status/2125009419352318046", "reason": "확인 불가·사소함", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/patrickmcgee_/status/2125095151777501464", "reason": "이미 다룬 사건", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://news.hada.io/topic?id=37779&utm_source=geeknews&utm_medium=rss&utm_campaign=news", "reason": "홍보성", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://news.hada.io/topic?id=37778&utm_source=geeknews&utm_medium=rss&utm_campaign=news", "reason": "개인 블로그 일화, 사소함", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://huggingface.co/baidu/ERNIE-5.5-Flash-Preview", "reason": "이미 다룬 사건", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.aitimes.com/news/articleView.html?idxno=217678", "reason": "이미 다룬 사건, 24시간 초과", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.aitimes.com/news/articleView.html?idxno=217675", "reason": "24시간 초과, 이미 정리 글에서 다룬 흐름", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.techmeme.com/261122/p15#a261122p15", "reason": "24시간 초과, 대형 사건 아님", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://simonwillison.net/2026/Nov/23/datasette-charts/", "reason": "24시간 초과, 사소함", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://www.edsurge.com/news/if-representation-matters-then-authenticity-does-too", "reason": "AI 무관", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://simonwillison.net/2026/Nov/22/select-styling/", "reason": "사소함", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://x.com/mayfer/status/2124585646803329328", "reason": "24시간 초과, 이미 다룬 인물 기사", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://huggingface.co/papers/2611.30989", "reason": "24시간 초과, 대형 사건 아님", "at": "2026-11-25T01:12:00+09:00"}
+{"url": "https://huggingface.co/papers/2611.30771", "reason": "24시간 초과, 대형 사건 아님", "at": "2026-11-25T01:12:00+09:00"}
