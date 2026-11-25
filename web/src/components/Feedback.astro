@@ -1,0 +1,36 @@
+---
+import { feedbackUrl, type Vote } from '../lib/format';
+
+interface Props {
+  /** cards/<id> 또는 posts/<id> */
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+const votes: Vote[] = ['관심 있음', '관심 없음'];
+---
+
+<p class="feedback">
+  {votes.map((v, i) => (
+    <>
+      {i > 0 && <span aria-hidden="true"> · </span>}
+      <a href={feedbackUrl(v, id, title)} target="_blank" rel="noopener">{v}</a>
+    </>
+  ))}
+</p>
+
+<style>
+  .feedback {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .feedback a {
+    color: inherit;
+  }
+
+  .feedback a:hover {
+    color: var(--text);
+  }
+</style>

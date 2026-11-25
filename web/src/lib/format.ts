@@ -59,3 +59,18 @@ export function groupByDay<T extends { data: { date: Date } }>(entries: T[]) {
 
 /** base 경로를 붙인 내부 링크 */
 export const href = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${path}`;
+
+/** 반응을 받는 저장소. collector/collect.py의 FEEDBACK_REPO와 같아야 한다 (주인이 쓴 이슈만 순위표에 반영). */
+const FEEDBACK_REPO = 'clock-droid/ai-brief';
+
+export type Vote = '관심 있음' | '관심 없음';
+
+/** 글 반응: 내용이 채워진 GitHub 이슈 작성 화면. 제출하면 다음 수집 때 순위표 관심 점수에 들어간다. */
+export function feedbackUrl(vote: Vote, id: string, title: string): string {
+  const q = new URLSearchParams({
+    labels: 'feedback',
+    title: `${vote}: ${title}`,
+    body: `id: ${id}\n\n`,
+  });
+  return `https://github.com/${FEEDBACK_REPO}/issues/new?${q}`;
+}

@@ -15,6 +15,7 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 핵심 인물(연구소 경영진·수석 과학자·튜링/필즈상 수상자 등)의 발언 +2
 - 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
 - 급상승 지표: GitHub 오늘 별 500/1000 이상 +1/+2, 허깅페이스 급상승 점수 100/300 이상 +1/+2
+- 사용자 관심: 직접 지정(collector/interests.json)과 사이트 반응(data/feedback.json)으로 -4~+4 (collector/preferences.py)
 
 사용: python3 collector/rank.py [--top 60]
 이미 검토하고 건너뛴 후보(data/skipped.jsonl)는 빠진다.
@@ -28,6 +29,7 @@ import json
 import re
 from pathlib import Path
 
+import preferences
 import transcript_queue as tq
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -228,6 +230,8 @@ def main() -> int:
     written_sets = written_token_sets()
     transcripts = ROOT.parent / "ai-brief-transcripts"  # Mac이 받아 둔 자막 (글쓰기 작업이 함께 clone)
     t_index = tq.load_index(transcripts)
+    interests = preferences.load_interests()
+    pref_weights = preferences.learned_weights(KEY_PEOPLE)
 
     fresh = [r for r in load_candidates() if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
     # 같은 URL 중복 제거
@@ -243,8 +247,9 @@ def main() -> int:
         sources = {r["source"] for r in g}
         bonus = min(3, len(sources) - 1)
         done = any(r["url"].rstrip("/") in written for r in g) or covered(set().union(*(tokens(r) for r in g)), written_sets)
-        total = best_score + bonus  # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
-        ranked.append({"score": total, "lead": lead, "members": [r for _, r in scored], "why": why,
+        pref, pref_why = preferences.score(g, interests, pref_weights, KEY_PEOPLE)
+        total = best_score + bonus + pref  # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
+        ranked.append({"score": total, "lead": lead, "members": [r for _, r in scored], "why": why + pref_why,
                        "n_sources": len(sources), "done": done})
     # 이미 다룬 사건은 점수와 관계없이 뒤로 보낸다 (위쪽 자리를 새 소식에 쓰기 위해)
     ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))

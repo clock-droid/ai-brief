@@ -2,6 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../categories';
 import { dateTimeLabel, earliestSourceTime, firstVideoId, href, timeLabel, tweetHasMedia } from '../lib/format';
+import Feedback from './Feedback.astro';
 import Figure from './Figure.astro';
 import YouTube from './YouTube.astro';
 
@@ -60,6 +61,7 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
     ))}
   </p>
   {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
+  <Feedback id={`cards/${card.id}`} title={title} />
 </article>
 
 <script>

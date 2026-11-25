@@ -1,0 +1,5 @@
+{
+  "_설명": "순위표 관심 점수(collector/preferences.py). more = 더 보고 싶은 것(+2), less = 덜 보고 싶은 것(-3). categories는 web/src/categories.ts 키, sources는 collector/sources.json id 또는 도메인(예: techmeme.com, x.com/openai), keywords는 제목·요약에 들어가면 걸리는 낱말.",
+  "more": {"categories": [], "sources": [], "keywords": []},
+  "less": {"categories": [], "sources": [], "keywords": []}
+}
