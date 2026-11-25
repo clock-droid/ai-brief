@@ -1,70 +1,86 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Disclosure from '../../components/Disclosure.astro';
+import Feedback from '../../components/Feedback.astro';
 import { CATEGORIES } from '../../categories';
-import { dayLabel, href } from '../../lib/format';
+import { groupByDay, href } from '../../lib/format';
 
-const latest = (p: { data: { date: Date; updated?: Date } }) => (p.data.updated ?? p.data.date).getTime();
-const posts = (await getCollection('posts')).sort((a, b) => latest(b) - latest(a));
+// 갱신된 정리 글은 갱신 시각으로 줄을 세운다 (연재가 위로 올라오도록)
+const posts = (await getCollection('posts'))
+  .map((p) => ({ post: p, data: { date: p.data.updated ?? p.data.date } }))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const days = groupByDay(posts);
 ---
 
 <Base title="긴 글" current="posts" railPosts={false}>
   {
-    posts.length === 0 ? (
+    days.length === 0 ? (
       <p class="meta">아직 긴 글 없음</p>
     ) : (
-      <ol class="list">
-        {posts.map((p) => (
-          <li>
-            <p class="meta">
-              {p.data.updated ? `${dayLabel(p.data.updated)} 갱신` : dayLabel(p.data.date)} · {p.data.format} · {CATEGORIES[p.data.category]}
-            </p>
-            <h2>
-              <a href={href(`/posts/${p.id}/`)}>{p.data.title}</a>
-            </h2>
-            <p class="lead">{p.data.summary[0]}</p>
-          </li>
+      <div class="days">
+        {days.map((day) => (
+          <section aria-labelledby={`d-${day.key}`}>
+            <h1 class="day" id={`d-${day.key}`}>{day.label}</h1>
+            <div class="rows">
+              {day.items.map(({ post: p, data }) => (
+                <Disclosure id={p.id} time={data.date} title={p.data.title}>
+                  <p class="meta">
+                    {p.data.updated && <>갱신 · </>}
+                    {p.data.format} · <a class="category" href={href(`/c/${p.data.category}/`)}>{CATEGORIES[p.data.category]}</a>
+                  </p>
+                  <ol class="summary" aria-label="3줄 요약">
+                    {p.data.summary.map((line) => <li>{line}</li>)}
+                  </ol>
+                  <p class="more"><a href={href(`/posts/${p.id}/`)}>전문 읽기</a></p>
+                  <Feedback id={`posts/${p.id}`} title={p.data.title} />
+                </Disclosure>
+              ))}
+            </div>
+          </section>
         ))}
-      </ol>
+      </div>
     )
   }
 </Base>
 
 <style>
-  .list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  /* 날짜 묶음·줄 사이 선은 속보 목록(CardFeed.astro)과 같은 문법 */
+  .days {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .day {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .rows {
     display: flex;
     flex-direction: column;
   }
 
-  li {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    padding: var(--s-5) 0;
-  }
-
-  li:first-child {
-    padding-top: 0;
-  }
-
-  /* 글 사이 옅은 선 한 줄 (속보 피드와 같은 문법) */
-  li + li {
+  .rows > :global(.row ~ .row) {
     border-top: 1px solid var(--line);
   }
 
-  h2 {
-    font-size: var(--fs-title);
-    font-weight: 700;
-  }
-
-  h2 a {
-    color: var(--text);
-  }
-
-  .lead {
+  .category {
     color: var(--muted);
+  }
+
+  .summary {
+    margin: 0;
+    padding-left: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .more {
+    font-size: var(--fs-small);
   }
 </style>

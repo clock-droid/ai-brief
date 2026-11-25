@@ -1,7 +1,8 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../categories';
-import { dateTimeLabel, earliestSourceTime, firstVideoId, href, timeLabel, tweetHasMedia } from '../lib/format';
+import { dateTimeLabel, earliestSourceTime, firstVideoId, href, tweetHasMedia } from '../lib/format';
+import Disclosure from './Disclosure.astro';
 import Feedback from './Feedback.astro';
 import Figure from './Figure.astro';
 import YouTube from './YouTube.astro';
@@ -18,115 +19,50 @@ const videoId = firstVideoId(sources);
 const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
 ---
 
-<article class="card" id={card.id}>
-  {/* 목록에는 시각과 제목만. 제목을 누르면 그 자리 아래로 카드 전체가 열린다. 여러 개를 함께 열어 둘 수 있다. */}
-  <details>
-    <summary>
-      <time datetime={date.toISOString()}>{timeLabel(date)}</time>
-      <h2>{title}</h2>
-    </summary>
-    <div class="content">
-      <p class="meta">
-        {
-          sourceTime && (
-            <>
-              원문 <time datetime={sourceTime.toISOString()}>{dateTimeLabel(sourceTime)}</time>
-              <span aria-hidden="true"> · </span>
-            </>
-          )
-        }
-        <a class="category" href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
-      </p>
-      <div class="body">
-        <Content />
-      </div>
-      {figure && <Figure figure={figure} />}
-      {videoId && <YouTube id={videoId} title={title} />}
-      {
-        tweet && (
-          <figure class:list={['tweet', { embed: embedTweet }]}>
-            {/* 사진·영상이 붙은 트윗은 카드를 열 때 X 공식 임베드로 바꿔 그린다 (Base.astro). 그 전·실패 시에는 이 인용이 그대로 보인다 */}
-            <blockquote class:list={{ 'twitter-tweet': embedTweet }} cite={tweet.url} data-dnt="true">
-              <p>{tweet.text}</p>
-              <a class="meta breakable" href={tweet.url} target="_blank" rel="noopener">
-                {tweet.author} @{tweet.handle}
-              </a>
-            </blockquote>
-          </figure>
-        )
-      }
-      <p class="sources">
-        출처{' '}
-        {sources.map((s, i) => (
-          <>
-            {i > 0 && <span aria-hidden="true"> · </span>}
-            <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
-          </>
-        ))}
-      </p>
-      {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
-      <Feedback id={`cards/${card.id}`} title={title} />
-    </div>
-  </details>
-</article>
-
-<script>
-  // 주소가 카드를 가리키면(#카드-id) 그 카드를 열어 둔다
-  function openTarget() {
-    const id = decodeURIComponent(location.hash.slice(1));
-    const details = id ? document.getElementById(id)?.querySelector('details') : null;
-    if (details) details.open = true;
+<Disclosure id={card.id} time={date} title={title}>
+  <p class="meta">
+    {
+      sourceTime && (
+        <>
+          원문 <time datetime={sourceTime.toISOString()}>{dateTimeLabel(sourceTime)}</time>
+          <span aria-hidden="true"> · </span>
+        </>
+      )
+    }
+    <a class="category" href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
+  </p>
+  <div class="body">
+    <Content />
+  </div>
+  {figure && <Figure figure={figure} />}
+  {videoId && <YouTube id={videoId} title={title} />}
+  {
+    tweet && (
+      <figure class:list={['tweet', { embed: embedTweet }]}>
+        {/* 사진·영상이 붙은 트윗은 카드를 열 때 X 공식 임베드로 바꿔 그린다 (Base.astro). 그 전·실패 시에는 이 인용이 그대로 보인다 */}
+        <blockquote class:list={{ 'twitter-tweet': embedTweet }} cite={tweet.url} data-dnt="true">
+          <p>{tweet.text}</p>
+          <a class="meta breakable" href={tweet.url} target="_blank" rel="noopener">
+            {tweet.author} @{tweet.handle}
+          </a>
+        </blockquote>
+      </figure>
+    )
   }
-  openTarget();
-  addEventListener('hashchange', openTarget);
-</script>
+  <p class="sources">
+    출처{' '}
+    {sources.map((s, i) => (
+      <>
+        {i > 0 && <span aria-hidden="true"> · </span>}
+        <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
+      </>
+    ))}
+  </p>
+  {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
+  <Feedback id={`cards/${card.id}`} title={title} />
+</Disclosure>
 
 <style>
-  summary {
-    display: grid;
-    grid-template-columns: var(--time-col) 1fr;
-    column-gap: var(--s-3);
-    align-items: baseline;
-    padding: var(--s-3) 0;
-    cursor: pointer;
-    list-style: none;
-  }
-
-  /* 기본 삼각형 표시를 쓰지 않는다 (아이콘 없음 원칙). 열림은 아래로 펼쳐지는 내용이 말한다 */
-  summary::-webkit-details-marker {
-    display: none;
-  }
-
-  summary time {
-    font-size: var(--fs-meta);
-    color: var(--muted);
-  }
-
-  h2 {
-    font-size: var(--fs-body);
-    font-weight: 500;
-    line-height: var(--lh-title);
-  }
-
-  summary:hover h2 {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  summary:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  /* 펼친 내용은 제목 첫 글자에 맞춘다 */
-  .content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    margin-left: calc(var(--time-col) + var(--s-3));
-    padding-bottom: var(--s-5);
-  }
-
   .category {
     color: var(--muted);
   }

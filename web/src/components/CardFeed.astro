@@ -50,7 +50,7 @@ const days = groupByDay(sorted);
   }
 
   /* 제목 줄 사이 옅은 선 한 줄. 줄 위아래 여백은 Card.astro의 제목 줄이 갖는다 */
-  .cards > :global(.card + .card) {
+  .cards > :global(.row ~ .row) {
     border-top: 1px solid var(--line);
   }
 </style>
