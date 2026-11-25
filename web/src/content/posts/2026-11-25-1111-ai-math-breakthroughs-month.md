@@ -3,10 +3,11 @@ title: "AI가 한 달 새 건드린 수학·이론CS 난제 정리 (11월 25일 
 date: 2026-11-25T11:11:00+09:00
 category: science
 format: 정리
+updated: 2026-11-25T15:11:00+09:00
 summary:
   - "OpenAI가 11월 24일 논문 9편을 한꺼번에 올리며 행렬 곱셈 지수 9/4 확정, 스메일 9번 문제(강다항 LP) 해결, 다항 허쉬 추측 반증, VP≠VNP 위계 전체 분리를 주장했다."
   - "앤트로픽은 11월 23일 VP≠VNP를 먼저 공개했고, 같은 날 OpenAI도 같은 결론을 냈다. 10월엔 OpenAI가 지수 시간 가설(ETH) 반증을 내놓은 바 있다."
-  - "대부분 AI가 쓰고 일부만 Lean으로 형식화됐으며, 학계의 사람 검토는 이제 시작 단계다. OpenAI는 이 결과들을 '가공 전 연구 데이터'라고 부른다."
+  - "대부분 AI가 쓰고 일부만 Lean으로 형식화됐으며, 사람 검토는 이제 시작 단계다. 24일엔 수학자들이 알푀게의 리만 증명을 사람이 읽을 판으로 풀어내자는 공개 협업(폴리매스)을 테렌스 타오 블로그에서 제안했다."
 sources:
   - name: OpenAI Math — 공개 이력(history)
     url: https://github.com/openai/math/blob/main/history.md
@@ -32,6 +33,17 @@ sources:
   - name: Shtetl-Optimized (Scott Aaronson)
     url: https://scottaaronson.blog/?p=10362
     published: 2026-11-24T23:17:20+00:00
+  - name: Terence Tao 블로그 — G.R.H. Polymath (Sahai·Sawin·Silberman 기고)
+    url: https://terrytao.wordpress.com/2026/11/24/g-r-h-polymath/
+    published: 2026-11-25T05:29:41+00:00
+  - name: X (@1337isnot1337) — Caiolo–Ferroni–Hoster conjecture is false
+    url: https://x.com/1337isnot1337/status/2125235237471080565
+    published: 2026-11-24T14:29:00+00:00
+  - name: itsdavis.com — Solved mathematical conjectures
+    url: https://itsdavis.com/solved-conjectures/
+  - name: arXiv — Dual Chow polynomials of matroids and posets
+    url: https://arxiv.org/abs/2605.28474
+    published: 2026-05-27T00:00:00+00:00
 ---
 
 주) 10월 초부터 11월 24일까지 AI 연구소가 공개한 수학·이론 컴퓨터과학 결과 가운데, 오래된 공개 난제를 건드린 것만 날짜순으로 모았어. 전부 "주장" 단계이고, 사람 전문가의 검토가 끝난 건 아직 없어.
@@ -70,3 +82,16 @@ sources:
 - OpenAI는 이 원고들을 "다듬은 논문이 아니라 가공 전 연구 데이터"로 봐 달라고 하고, 형식화 안 된 결과엔 오류가 있을 수 있다고 미리 밝혔어. 공로와 선후 문제는 수학계 판단에 전부 맡긴다고 했고.
 - Lean 검증은 "코드로 옮긴 명제"를 검사할 뿐이라, 그 명제가 논문 주장과 정확히 같은지는 사람이 따로 봐야 해. 앤트로픽 VP≠VNP 저장소도 이 대응표를 부록으로 따로 정리했어.
 - 애런슨은 다음 차례로 P≠NP 자체가 나올 가능성을 "AI 회사들도 당연히 알고 있다"고 썼어. 시점은 아무도 모른다고 했고.
+
+## 11월 25일 15시
+
+8. **리만 증명을 '사람이 읽을 판'으로 — 폴리매스 제안** (11월 24일, 테렌스 타오 블로그)
+   아누라그 사하이(Anurag Sahai), 윌 소윈(Will Sawin), 리오르 실버만(Lior Silberman)이 타오 블로그 기고로, 알푀게가 공개한 일반화 리만 가설(GRH) Lean 인증서를 여럿이 공개적으로 풀어 보자고 제안했어요. 컴퓨터가 맞다고 확인한 증명을 수학자가 이해할 수 있는 글로 옮기는 게 목표인데요. 따로 흩어진 작업을 모으고, 관련 문헌을 정리하고, 증명 속 새 수학을 더 일반적인 형태로 넓혀 보자는 것까지 네 가지를 내걸었어요. 증명이 정수론 안팎의 여러 분야에 걸쳐 있어 하위 과제로 나눌 거라고 했지만, 구조는 "아직 이르다"며 밝히지 않았어요.
+   ▶ 4일 후 — 3번 항목의 "사람이 읽을 짧은 판은 아직 없다"는 상태를 풀기 위한 첫 공개 조직이 생긴 셈이에요.
+
+9. **숫자 두 개로 "매트로이드 추측 반증" 주장** (11월 24일, X)
+   신나 데이비스(Cinna Davis)는 51~53자리 음수 두 개를 올리며 카이올로·페로니·호스터가 5월에 낸 쌍대 차우 다항식(dual Chow polynomial) 추측이 틀렸다고 주장했어요. 본인 사이트엔 계수 5짜리 매트로이드에서 이 다항식이 실근을 갖지 않는다는 "제안된 반증"으로 올라 있어요. 다만 사람 수학자의 검토는 아직 없어요.
+
+**현황 추가 (11월 25일 15시)**
+- 알푀게 증명은 Lean 검증과 커뮤니티 성명까지 나왔지만, 사람이 읽을 증명은 폴리매스가 이제 만들기 시작하는 단계예요.
+- X에 숫자만 올리는 식의 반증 주장도 나오고 있어, 결과마다 사람 검토와 Lean 형식화 여부를 따로 확인해야 해요.
