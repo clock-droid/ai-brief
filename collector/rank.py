@@ -28,6 +28,8 @@ import json
 import re
 from pathlib import Path
 
+import transcript_queue as tq
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 CONTENT = ROOT / "web" / "src" / "content"
@@ -198,6 +200,20 @@ def cluster(rows: list[dict]) -> list[list[dict]]:
     return [g[1] for g in groups]
 
 
+def transcript_note(r: dict, transcripts: Path, index: dict, tiers: dict) -> str:
+    """영상 후보 아래에 붙는 자막 상태 한 줄. 글쓰기 작업이 상태마다 할 일은 WRITING.md 1절 5."""
+    st = tq.status(r, index, transcripts, now(), tiers, KEY_PEOPLE)
+    vid = tq.video_id(r["url"]) or "-"
+    if st == "have":
+        return f"자막 있음: {transcripts / (vid + '.txt')}"
+    if st == "wait":
+        entry = index.get(vid)
+        tries = f" (실패 {entry.get('attempts', 1)}회, 재시도 예정)" if entry and entry.get("error") else ""
+        return f"자막 대기{tries} — Mac이 받는 중. 내용으로 건너뛸 게 아니면 skipped에 적지 말고 다음 실행으로 넘긴다"
+    why = "자막 못 받음" if st == "gave_up" else "자막 수집 대상 아님"
+    return f"{why} — 영상 설명·같은 발언을 다룬 보도로 확인한다"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--top", type=int, default=60)
@@ -210,6 +226,8 @@ def main() -> int:
     dc_signals = json.loads(dc_path.read_text()) if dc_path.exists() else {}
     written = written_urls()
     written_sets = written_token_sets()
+    transcripts = ROOT.parent / "ai-brief-transcripts"  # Mac이 받아 둔 자막 (글쓰기 작업이 함께 clone)
+    t_index = tq.load_index(transcripts)
 
     fresh = [r for r in load_candidates() if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
     # 같은 URL 중복 제거
@@ -252,12 +270,7 @@ def main() -> int:
         for m in x["members"]:
             lines.append(f"   - {m['source']}: {m['url']}")
             if m.get("video"):
-                vid = re.search(r"v=([\w-]{11})", m["url"])
-                shared = ROOT.parent / "ai-brief-transcripts" / f"{vid.group(1) if vid else '-'}.txt"
-                if shared.exists():
-                    lines.append(f"     자막 있음: {shared}")
-                else:
-                    lines.append(f"     자막 확인 필수: python3 collector/transcript.py '{m['url']}'")
+                lines.append("     " + transcript_note(m, transcripts, t_index, tiers))
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0
