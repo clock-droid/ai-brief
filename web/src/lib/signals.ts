@@ -7,7 +7,7 @@
  */
 
 /** 신호를 받는 비공개 저장소. collector/preferences.py의 SIGNALS 경로와 같아야 한다 */
-const SIGNAL_REPO = 'clock-droid/ai-brief-transcripts';
+const SIGNAL_REPO = 'clock-droid/ai-brief-taste';
 const SIGNAL_DIR = 'signals';
 const KEEPALIVE_LIMIT = 60_000;
 

@@ -4,7 +4,7 @@
 1. 직접 지정 (collector/interests.json): "더 보고 싶은 것 / 덜 보고 싶은 것"으로 적은 분야·출처·낱말. 항목마다 +2 / -3.
 2. 내용 유사도 (taste.py): 사이트 주인의 반응과 읽은 기록이 붙은 글을 라벨로 삼아, 새 후보가 좋아한 글과 닮았으면 +,
    싫어한 글과 닮았으면 -. -4 ~ +4.
-   신호는 사이트(web/src/lib/signals.ts)가 비공개 저장소 ai-brief-transcripts의 signals/ 아래 JSON 파일로 올린다.
+   신호는 사이트(web/src/lib/signals.ts)가 비공개 저장소 ai-brief-taste의 signals/ 아래 JSON 파일로 올린다.
    글쓰기 작업이 이 저장소를 옆 폴더에 받아 두므로 여기서는 파일만 읽는다. 공개 저장소(data/)로 옮기지 않는다.
 3. 탐색 몫: 취향에 갇히지 않도록, 화제성은 높은데 아직 반응이 거의 없는 영역의 후보를 순위표 위에 따로 보여준다.
    (싫어요가 분명히 쌓인 영역은 다시 권하지 않는다. 반응이 적어 판단이 약한 영역만 고른다.)
@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INTERESTS = ROOT / "collector" / "interests.json"
 CONTENT = ROOT / "web" / "src" / "content"
 INBOX = ROOT / "data" / "inbox"
-SIGNALS = ROOT.parent / "ai-brief-transcripts" / "signals"  # 사이트 쪽 경로는 web/src/lib/signals.ts의 SIGNAL_REPO·SIGNAL_DIR
+SIGNALS = ROOT.parent / "ai-brief-taste" / "signals"  # 사이트 쪽 경로는 web/src/lib/signals.ts의 SIGNAL_REPO·SIGNAL_DIR
 
 MORE_PTS, LESS_PTS = 2, -3
 CONTENT_PTS = 4          # 내용 유사도 -1~+1을 점수로 옮기는 배율
