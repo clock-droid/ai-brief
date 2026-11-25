@@ -13,8 +13,9 @@
 신호 → 라벨 (글마다 하나, y는 -1 ~ +1):
 - 좋아요/싫어요를 눌렀으면 그것이 전부다: +1 / -1 (같은 글에 여러 번 눌렀으면 마지막 것, 취소했으면 없음).
   싫어요 이유가 글 품질 쪽(너무 뻔함·과장)뿐이면 주제 자체가 싫은 건 아니므로 -0.5.
-- 누르지 않았으면 읽은 기록으로 약하게: 펼침 +0.15, 읽은 시간 20초 +0.15·60초 +0.15 더, 원문 클릭 +0.25,
-  긴 글을 70% 넘게 내려 읽음 +0.15 (최대 +0.6). 펼치지도 클릭하지도 않고 제목만 보고 지나친 날마다 -0.1 (최대 -0.3).
+- 누르지 않았으면 읽은 기록으로 아주 약하게 (최대 +0.15, 좋아요의 7분의 1 남짓):
+  펼침 +0.03, 읽은 시간 20초 +0.03·60초 +0.03 더, 긴 글을 70% 넘게 내려 읽음 +0.03, 원문 클릭 +0.1.
+  별로인 글도 오래 펼쳐 둘 때가 있어 펼침·읽은 시간은 거의 믿지 않는다 (2026-11-25 사용자 판단). 원문 클릭은 의도가 더 분명해 조금 더 쳐 준다. 펼치지도 클릭하지도 않고 제목만 보고 지나친 날마다 -0.1 (최대 -0.3).
 - 오래된 신호일수록 덜 믿는다: 무게 = 0.5 ^ (지난 날수 / 60).
 """
 from __future__ import annotations
@@ -37,10 +38,11 @@ MORE_PTS, LESS_PTS = 2, -3
 CONTENT_PTS = 4          # 내용 유사도 -1~+1을 점수로 옮기는 배율
 CLAMP = 4
 HALF_LIFE_DAYS = 60
-EXPLORE_MIN_LABELS = 8   # 반응·읽은 글이 이만큼 쌓이기 전에는 모든 후보가 '모르는 영역'이라 탐색 몫이 뜻이 없다
+EXPLORE_MIN_LABELS = 8   # 좋아요·싫어요를 누른 글이 이만큼 쌓이기 전에는 모든 후보가 '모르는 영역'이라 탐색 몫이 뜻이 없다
 EXPLORE_POOL = 40        # 화제성(관심 점수 뺀 점수) 상위 몇 개 안에서 고르나
 EXPLORE_N = 3
 EXPLORE_SUPPORT = 0.1    # 닮은 라벨의 무게 합이 이보다 작으면 '아직 잘 모르는 영역'
+READ_MAX = 0.15         # 버튼 없이 읽기만 한 글의 최대 y
 QUALITY_REASONS = {"너무 뻔함", "과장"}  # 주제가 아니라 그 글이 별로라는 이유 (web/src/lib/signals.ts의 DISLIKE_REASONS 중)
 
 
@@ -128,8 +130,8 @@ def label_values(events: list[dict], now: dt.datetime) -> dict[str, tuple[float,
         sec = sum(e.get("sec", 0) for e in evs if e["t"] == "dwell")
         depth = max([e.get("depth", 0) for e in evs if e["t"] == "dwell"] or [0])
         if opened or clicked or sec:
-            y = 0.15 * opened + 0.15 * (sec >= 20) + 0.15 * (sec >= 60) + 0.25 * clicked + 0.15 * (depth >= 0.7)
-            out[pid] = (min(0.6, y), weight, f"읽음 {sec}초" + (" ·원문 클릭" if clicked else ""))
+            y = 0.03 * (opened + (sec >= 20) + (sec >= 60) + (depth >= 0.7)) + 0.1 * clicked
+            out[pid] = (min(READ_MAX, y), weight, f"읽음 {sec}초" + (" ·원문 클릭" if clicked else ""))
         else:
             days = len({e["at"][:10] for e in evs if e["t"] == "seen"})
             if days:
@@ -193,7 +195,7 @@ class Preferences:
                 title = texts[0].split("\n", 1)[0]
                 labels.append(taste.Label(pid, texts, y, w, f"'{short(title)}' {note}"))
         self.n_labels = len(labels)
-        self.n_strong = sum(abs(l.y) >= 0.15 for l in labels)  # 보고 지나침만 있는 글은 빼고 센다
+        self.n_strong = sum(abs(l.y) >= 0.5 for l in labels)  # 좋아요·싫어요를 누른 글만 센다
         self.taste = taste.Taste(labels, embedder)
 
     def status(self) -> str:
