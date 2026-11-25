@@ -24,7 +24,7 @@ const days = groupByDay(posts);
             <h1 class="day" id={`d-${day.key}`}>{day.label}</h1>
             <div class="rows">
               {day.items.map(({ post: p, data }) => (
-                <Disclosure id={p.id} time={data.date} title={p.data.title}>
+                <Disclosure id={p.id} signal={`posts/${p.id}`} time={data.date} title={p.data.title}>
                   <p class="meta">
                     {p.data.updated && <>갱신 · </>}
                     {p.data.format} · <a class="category" href={href(`/c/${p.data.category}/`)}>{CATEGORIES[p.data.category]}</a>
@@ -33,7 +33,7 @@ const days = groupByDay(posts);
                     {p.data.summary.map((line) => <li>{line}</li>)}
                   </ol>
                   <p class="more"><a href={href(`/posts/${p.id}/`)}>전문 읽기</a></p>
-                  <Feedback id={`posts/${p.id}`} title={p.data.title} />
+                  <Feedback id={`posts/${p.id}`} />
                 </Disclosure>
               ))}
             </div>

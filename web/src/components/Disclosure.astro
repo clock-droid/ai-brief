@@ -4,16 +4,18 @@ import { timeLabel } from '../lib/format';
 interface Props {
   /** 주소 #id로 열 수 있게 붙는 id */
   id: string;
+  /** 취향 신호에 쓰는 글 id (cards/<id>, posts/<id>). 펼침·읽은 시간·원문 클릭을 기록한다 (Signals.astro) */
+  signal?: string;
   time: Date;
   title: string;
 }
 
 // 목록의 한 줄: 시각과 제목만 보이고, 제목을 누르면 그 자리 아래로 내용(slot)이 열린다.
 // 여러 개를 함께 열어 둘 수 있다. 속보 카드(Card.astro)와 긴 글 목록이 같이 쓴다.
-const { id, time, title } = Astro.props;
+const { id, signal, time, title } = Astro.props;
 ---
 
-<article class="row" id={id}>
+<article class="row" id={id} data-signal={signal}>
   <details>
     <summary>
       <time datetime={time.toISOString()}>{timeLabel(time)}</time>

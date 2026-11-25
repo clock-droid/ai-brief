@@ -1,0 +1,124 @@
+---
+// 읽은 기록: 토큰이 있는 브라우저(주인)에서만 동작한다 (lib/signals.ts).
+// - 펼침(open): 목록에서 글을 펼침
+// - 읽은 시간(dwell): 펼친 글이 화면에 보이는 동안의 초. 긴 글 페이지는 페이지가 보이는 동안의 초 + 어디까지 내려 읽었는지(depth)
+// - 원문 클릭(click): 출처·트윗·"긴 글로 읽기" 링크
+// - 보고 지나침(seen): 제목이 1초 넘게 화면에 있었는데 펼치지 않음. 하루에 글마다 한 번만
+// 화면이 가려질 때(탭 전환·닫기) 모아 둔 기록을 보낸다.
+---
+
+<script>
+  import { enabled, flush, record } from '../lib/signals';
+
+  const SEEN_KEY = 'aib.seen';
+  const MIN_DWELL = 3;
+
+  if (enabled()) {
+    const today = new Date().toISOString().slice(0, 10);
+    const rows = [...document.querySelectorAll<HTMLElement>('article[data-signal]:not([data-signal-page])')];
+    const page = document.querySelector<HTMLElement>('article[data-signal-page]');
+    const dwell = new Map<string, number>(); // 아직 보내지 않은 읽은 시간(초)
+    const onScreen = new Set<HTMLElement>();
+    const titleSince = new Map<string, number>(); // 제목이 화면에 들어온 시각
+    const passed = new Set<string>(); // 1초 넘게 보였던 제목
+    const opened = new Set<string>();
+    let pageDepth = 0;
+
+    const idOf = (el: HTMLElement) => el.dataset.signal!;
+    const add = (id: string, sec: number) => dwell.set(id, (dwell.get(id) ?? 0) + sec);
+
+    // 펼친 글이 화면에 보이는 동안 1초씩 센다
+    setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      onScreen.forEach((el) => el.querySelector('details')?.open && add(idOf(el), 1));
+      if (page) add(idOf(page), 1);
+    }, 1000);
+
+    const rowObserver = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (e.isIntersecting ? onScreen.add(e.target as HTMLElement) : onScreen.delete(e.target as HTMLElement)));
+    });
+    const titleObserver = new IntersectionObserver(
+      (entries) => {
+        const now = Date.now();
+        entries.forEach((e) => {
+          const id = idOf(e.target.closest('article') as HTMLElement);
+          if (e.isIntersecting) titleSince.set(id, now);
+          else if (titleSince.has(id)) {
+            if (now - titleSince.get(id)! >= 1000) passed.add(id);
+            titleSince.delete(id);
+          }
+        });
+      },
+      { threshold: 1 },
+    );
+
+    rows.forEach((el) => {
+      rowObserver.observe(el);
+      const summary = el.querySelector('summary');
+      if (summary) titleObserver.observe(summary);
+      el.querySelector('details')?.addEventListener('toggle', (e) => {
+        if ((e.target as HTMLDetailsElement).open) {
+          opened.add(idOf(el));
+          record({ t: 'open', id: idOf(el) });
+        }
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      const a = (e.target as HTMLElement).closest('a');
+      const host = a?.closest<HTMLElement>('article[data-signal]');
+      if (!a || !host || a.classList.contains('category')) return;
+      if (a.target === '_blank' || a.pathname.includes('/posts/')) record({ t: 'click', id: idOf(host), url: a.href });
+    });
+
+    if (page) {
+      addEventListener(
+        'scroll',
+        () => {
+          const r = page.getBoundingClientRect();
+          pageDepth = Math.max(pageDepth, Math.min(1, (innerHeight - r.top) / r.height));
+        },
+        { passive: true },
+      );
+    }
+
+    const seenToday = (): Record<string, string> => {
+      try {
+        const all = JSON.parse(localStorage.getItem(SEEN_KEY) ?? '{}') as Record<string, string>;
+        return Object.fromEntries(Object.entries(all).filter(([, d]) => d === today));
+      } catch {
+        return {};
+      }
+    };
+
+    // 화면이 가려지면 모아 둔 기록을 큐에 넣고 보낸다. 다시 돌아오면 이어서 센다
+    const settle = () => {
+      dwell.forEach((sec, id) => {
+        if (sec < MIN_DWELL) return;
+        record(page && id === idOf(page) ? { t: 'dwell', id, sec, depth: Math.round(pageDepth * 100) / 100 } : { t: 'dwell', id, sec });
+        dwell.delete(id);
+      });
+      const now = Date.now();
+      titleSince.forEach((since, id) => now - since >= 1000 && passed.add(id));
+      rows.forEach((el) => el.querySelector('details')?.open && opened.add(idOf(el))); // 주소(#id)로 열린 글 등
+      const seen = seenToday();
+      passed.forEach((id) => {
+        if (!opened.has(id) && !seen[id]) {
+          record({ t: 'seen', id });
+          seen[id] = today;
+        }
+      });
+      passed.clear();
+      try {
+        localStorage.setItem(SEEN_KEY, JSON.stringify(seen));
+      } catch {
+        /* 무시 */
+      }
+      flush();
+    };
+
+    addEventListener('visibilitychange', () => document.visibilityState === 'hidden' && settle());
+    addEventListener('pagehide', settle);
+    flush(); // 지난번에 못 보낸 묶음
+  }
+</script>

@@ -19,7 +19,7 @@ const videoId = firstVideoId(sources);
 ---
 
 <Base title={title} description={summary[0]} current="posts">
-  <article>
+  <article data-signal={`posts/${post.id}`} data-signal-page>
     <header class="head">
       <p class="meta">
         <time datetime={date.toISOString()}>{dayLabel(date)} {timeLabel(date)}</time>
@@ -54,7 +54,7 @@ const videoId = firstVideoId(sources);
         }
       </ul>
     </footer>
-    <Feedback id={`posts/${post.id}`} title={title} />
+    <Feedback id={`posts/${post.id}`} />
   </article>
 </Base>
 

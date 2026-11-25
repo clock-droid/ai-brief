@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Rail from '../components/Rail.astro';
+import Signals from '../components/Signals.astro';
 import { CATEGORIES, CATEGORY_KEYS, type CategoryKey } from '../categories';
 import { href } from '../lib/format';
 
@@ -52,6 +53,7 @@ const here = (on: boolean) => (on ? 'page' : undefined);
         <Rail posts={railPosts} />
       </div>
     </div>
+    <Signals />
     <script is:inline>
       // X 공식 임베드: 사진·영상이 붙은 트윗(.twitter-tweet, Card.astro)을 실제로 보게 될 때 X 위젯으로 바꿔 그린다.
       // 속보 목록의 카드는 닫혀 있으므로 카드를 열 때 그 카드만 그린다. 긴 글 등 늘 보이는 곳은 바로 그린다.

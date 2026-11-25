@@ -30,11 +30,6 @@ DATA = ROOT / "data"
 INBOX = DATA / "inbox"
 SEEN = DATA / "seen.json"
 DC_SIGNALS = DATA / "dc_signals.json"  # 특갤 X 링크 글의 최신 추천·조회 수 (rank.py가 화제성 점수에 씀)
-FEEDBACK = DATA / "feedback.json"      # 사이트 "관심 있음·관심 없음" 반응 (preferences.py가 순위표 점수에 씀)
-# 반응 이슈를 받는 저장소와 그 주인. 공개 저장소라 누구나 이슈를 열 수 있으므로 주인이 쓴 이슈만 반응으로 센다.
-# 사이트 쪽 링크는 web/src/lib/format.ts의 FEEDBACK_REPO.
-FEEDBACK_REPO, FEEDBACK_OWNER = "clock-droid/ai-brief", "clock-droid"
-FEEDBACK_VOTES = {"관심 있음": 1, "관심 없음": -1}
 
 KST = dt.timezone(dt.timedelta(hours=9))
 USER_AGENT = "ai-brief-collector/0.1"  # URL을 덧붙이면 Techmeme이 휴대폰용 간이 페이지(기사별 X 토론 없음)를 준다
@@ -429,28 +424,6 @@ def collect_techmeme_x(src: dict, seen: dict) -> list[dict]:
 
 # ---------- 조립 ----------
 
-# ---------- 사이트 반응 ----------
-
-def collect_feedback() -> list[dict]:
-    """feedback 라벨 이슈를 반응 목록으로. 제목 "관심 있음: 글 제목", 본문 첫 줄 "id: cards/<글 id>"."""
-    rows, page = [], 1
-    while True:
-        q = urllib.parse.urlencode({"labels": "feedback", "state": "all", "creator": FEEDBACK_OWNER,
-                                    "per_page": 100, "page": page})
-        issues = json.loads(fetch(f"https://api.github.com/repos/{FEEDBACK_REPO}/issues?{q}"))
-        for it in issues:
-            vote = next((v for k, v in FEEDBACK_VOTES.items() if it["title"].startswith(k)), None)
-            m = re.search(r"^id: ((?:cards|posts)/[\w.-]+)", it.get("body") or "", re.M)
-            if vote is None or not m:
-                continue
-            note = re.sub(r"^id: .*$", "", it.get("body") or "", flags=re.M).strip()
-            rows.append({"id": m.group(1), "vote": vote, "at": it["created_at"], "issue": it["number"],
-                         "note": note[:300]})
-        if len(issues) < 100:
-            return rows
-        page += 1
-
-
 def make_item(src: dict, title: str, url: str, published: dt.datetime | None, summary: str) -> dict:
     return {
         "id": item_id(url),
@@ -527,13 +500,6 @@ def main() -> int:
         for it in new_items:
             f.write(json.dumps(it, ensure_ascii=False) + "\n")
     SEEN.write_text(json.dumps(seen, ensure_ascii=False, indent=0, sort_keys=True))
-    if not args.only:
-        try:
-            fb = collect_feedback()
-            FEEDBACK.write_text(json.dumps(fb, ensure_ascii=False, indent=1))
-            print(f"사이트 반응 {len(fb)}개")
-        except Exception as exc:  # 반응을 못 받아도 수집은 끝낸다. 이전 feedback.json을 그대로 쓴다
-            print(f"! 사이트 반응 실패: {exc}", file=sys.stderr)
     return 0
 
 

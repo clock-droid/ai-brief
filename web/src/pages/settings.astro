@@ -1,0 +1,140 @@
+---
+import Base from '../layouts/Base.astro';
+
+// 주인 전용 기록 설정. 메뉴에 링크하지 않는다 (주소로만 연다: /settings/).
+// 토큰을 넣으면 이 브라우저에서 반응(좋아요·싫어요)이 보이고 읽은 기록이 비공개 저장소로 간다 (lib/signals.ts).
+---
+
+<Base title="기록 설정">
+  <section class="settings">
+    <h1>기록 설정</h1>
+    <p class="status" data-status></p>
+
+    <form data-token-form>
+      <label for="token">GitHub 토큰</label>
+      <input id="token" name="token" type="password" autocomplete="off" spellcheck="false" />
+      <p class="actions">
+        <button type="submit">저장</button>
+        <span aria-hidden="true"> · </span>
+        <button type="button" data-clear>이 브라우저에서 지우기</button>
+      </p>
+    </form>
+
+    <ol class="howto">
+      <li>
+        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub 토큰 만들기</a>
+        (Fine-grained token)
+      </li>
+      <li>Repository access: Only select repositories → ai-brief-transcripts</li>
+      <li>Permissions: Contents → Read and write</li>
+      <li>만든 토큰을 위 칸에 붙여넣고 저장. 기기마다 한 번씩</li>
+    </ol>
+  </section>
+</Base>
+
+<script>
+  import { enabled, flush, setToken, tokenError } from '../lib/signals';
+
+  const status = document.querySelector<HTMLElement>('[data-status]')!;
+  const form = document.querySelector<HTMLFormElement>('[data-token-form]')!;
+
+  function paint() {
+    const err = tokenError();
+    status.textContent = !enabled()
+      ? '꺼짐 — 이 브라우저는 기록하지 않음'
+      : err
+        ? `토큰 오류 (${err}) — 만료됐거나 권한이 맞지 않음`
+        : '켜짐 — 반응과 읽은 기록을 보냄';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = form.elements.namedItem('token') as HTMLInputElement;
+    const token = input.value.trim();
+    if (!token) return;
+    setToken(token);
+    input.value = '';
+    await flush();
+    paint();
+  });
+
+  form.querySelector('[data-clear]')!.addEventListener('click', () => {
+    setToken(null);
+    paint();
+  });
+
+  paint();
+</script>
+
+<style>
+  .settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  h1 {
+    font-size: var(--fs-title);
+    font-weight: 700;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  label {
+    font-weight: 500;
+  }
+
+  input {
+    font: inherit;
+    color: var(--text);
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: var(--s-2) 0;
+  }
+
+  input:focus-visible {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  .actions {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  button[type='submit'] {
+    color: var(--accent);
+  }
+
+  button:hover {
+    color: var(--text);
+  }
+
+  .status,
+  .howto {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .howto {
+    margin: 0;
+    padding-left: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+</style>

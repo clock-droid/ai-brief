@@ -19,7 +19,7 @@ const videoId = firstVideoId(sources);
 const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
 ---
 
-<Disclosure id={card.id} time={date} title={title}>
+<Disclosure id={card.id} signal={`cards/${card.id}`} time={date} title={title}>
   <p class="meta">
     {
       sourceTime && (
@@ -59,7 +59,7 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
     ))}
   </p>
   {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
-  <Feedback id={`cards/${card.id}`} title={title} />
+  <Feedback id={`cards/${card.id}`} />
 </Disclosure>
 
 <style>

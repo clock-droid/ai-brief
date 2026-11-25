@@ -15,7 +15,9 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 핵심 인물(연구소 경영진·수석 과학자·튜링/필즈상 수상자 등)의 발언 +2
 - 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
 - 급상승 지표: GitHub 오늘 별 500/1000 이상 +1/+2, 허깅페이스 급상승 점수 100/300 이상 +1/+2
-- 사용자 관심: 직접 지정(collector/interests.json)과 사이트 반응(data/feedback.json)으로 -4~+4 (collector/preferences.py)
+- 사용자 관심: 직접 지정(collector/interests.json)과 내용 유사도(주인의 반응·읽은 기록이 붙은 글과 닮은 정도)로 -4~+4
+  (collector/preferences.py, 계산은 collector/taste.py)
+- 탐색 후보: 관심 점수를 뺀 점수 상위 40 안에서 아직 반응이 없는 영역이거나 취향 점수가 음수인 것 3개를 맨 위에 따로 보인다
 
 사용: python3 collector/rank.py [--top 60]
 이미 검토하고 건너뛴 후보(data/skipped.jsonl)는 빠진다.
@@ -230,8 +232,7 @@ def main() -> int:
     written_sets = written_token_sets()
     transcripts = ROOT.parent / "ai-brief-transcripts"  # Mac이 받아 둔 자막 (글쓰기 작업이 함께 clone)
     t_index = tq.load_index(transcripts)
-    interests = preferences.load_interests()
-    pref_weights = preferences.learned_weights(KEY_PEOPLE)
+    prefs_model = preferences.Preferences(now())
 
     fresh = [r for r in load_candidates() if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
     # 같은 URL 중복 제거
@@ -247,23 +248,36 @@ def main() -> int:
         sources = {r["source"] for r in g}
         bonus = min(3, len(sources) - 1)
         done = any(r["url"].rstrip("/") in written for r in g) or covered(set().union(*(tokens(r) for r in g)), written_sets)
-        pref, pref_why = preferences.score(g, interests, pref_weights, KEY_PEOPLE)
-        total = best_score + bonus + pref  # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
-        ranked.append({"score": total, "lead": lead, "members": [r for _, r in scored], "why": why + pref_why,
+        # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
+        ranked.append({"base": best_score + bonus, "lead": lead, "members": [r for _, r in scored], "why": why,
                        "n_sources": len(sources), "done": done})
+    prefs = prefs_model.score_groups([x["members"] for x in ranked])
+    for x, p in zip(ranked, prefs):
+        x["score"] = x["base"] + p.points
+        x["why"] = x["why"] + p.why
+    for i in prefs_model.explore([x["base"] for x in ranked], prefs, [x["done"] for x in ranked]):
+        ranked[i]["explore"] = True
     # 이미 다룬 사건은 점수와 관계없이 뒤로 보낸다 (위쪽 자리를 새 소식에 쓰기 위해)
     ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
 
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
              "", f"발표 {WINDOW_H}시간 이내 후보 {len(fresh)}개 → 사건 {len(ranked)}개로 묶음. 상위 {args.top}개.",
-             "점수 구성은 collector/rank.py 맨 위 설명 참고. 위에서부터 검토한다.", ""]
-    for i, x in enumerate(ranked[: args.top], 1):
+             "점수 구성은 collector/rank.py 맨 위 설명 참고. 위에서부터 검토한다.", prefs_model.status() + ".", ""]
+    # 탐색 후보는 관심 감점으로 상위 밖에 밀려났어도 보인다
+    shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= args.top or x.get("explore")]
+    explore = [(i, x) for i, x in shown if x.get("explore")]
+    if explore:
+        lines += ["탐색 후보 (취향과 무관하게 화제성이 높은 것. WRITING.md 1절 3): "
+                  + ", ".join(f"{i}위" for i, _ in explore), ""]
+    for i, x in shown:
         lead = x["lead"]
         flags = []
         if x["n_sources"] > 1:
             flags.append(f"출처 {x['n_sources']}곳")
         if x["done"]:
             flags.append("이미 다룬 사건 — 새 사실이 있으면 정리 글 갱신(6-4)")
+        if x.get("explore"):
+            flags.append("탐색 후보")
         flags += x["why"]
         lead_text = " ".join([lead["title"], lead.get("summary", "")[:300], (lead.get("tweet") or {}).get("author") or "",
                               (lead.get("signal") or {}).get("title", "")])
