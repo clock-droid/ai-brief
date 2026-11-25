@@ -26,7 +26,14 @@ const { id } = Astro.props;
 </div>
 
 <script>
-  import { enabled, getVote, setVote, type Vote } from '../lib/signals';
+  import { enabled, flush, getVote, setVote, type Vote } from '../lib/signals';
+
+  // 반응은 읽은 기록과 달리 바로 보낸다. 이유를 이어서 고를 틈으로 2초 기다렸다 한 번에
+  let pending: ReturnType<typeof setTimeout> | undefined;
+  const sendSoon = () => {
+    clearTimeout(pending);
+    pending = setTimeout(flush, 2000);
+  };
 
   function paint(root: HTMLElement, vote: Vote | null) {
     root.querySelectorAll<HTMLButtonElement>('[data-v]').forEach((b) => {
@@ -58,6 +65,7 @@ const { id } = Astro.props;
           next = { v: cur.v, why: cur.why.includes(why) ? cur.why.filter((w) => w !== why) : [...cur.why, why] };
         }
         setVote(id, next);
+        sendSoon();
         paint(root, next);
       });
     });
