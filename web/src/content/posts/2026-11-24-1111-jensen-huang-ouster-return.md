@@ -3,11 +3,11 @@ title: "젠슨 황 사임에서 복귀까지 11일, 무슨 일이 있었나"
 date: 2026-11-24T11:11:00+09:00
 category: economy
 format: 정리
-updated: 2026-11-25T05:11:00+09:00
+updated: 2026-11-25T09:11:00+09:00
 summary:
   - "젠슨 황은 중국 정보기관 연루 의혹 속에 11월 12일 엔비디아 CEO에서 물러났다가, 11일 뒤인 23일 이사회 만장일치로 복귀함. 같은 날 상무부는 메가스피드 등 동남아 7개사(알리바바 싱가포르 자회사 포함)를 수출 제한 명단에 올림."
-  - "NYT는 트럼프가 정보당국 판단을 일축하고 복귀를 밀었다고, FT는 실리콘밸리 인사들이 로비했다고 보도함. 24일 지배구조 전문가들은 트럼프가 이사회 결정을 사실상 뒤집었다며 주주 소송 가능성을 지적함."
-  - "엔비디아 주가는 복귀 다음 날 6% 넘게 내림. 황은 첫 전체회의에서 행동강령 위반을 인정했고, 24일 블랜치 법무장관·파텔 FBI 국장은 황 수사 여부에 답하지 않음. 황은 12월 1일 하원 비공개 면담, 3일 상원 은행위 공개 청문회에 단독 증인으로 나섬."
+  - "NYT는 트럼프가 정보당국 판단을 일축하고 복귀를 밀었다고 보도함. 24일 트럼프는 뉴욕포스트에 황 사면은 '언제나 선택지'지만 필요 없을 것 같다고, 정부의 엔비디아 지분 확보도 '늦지 않았다'고 말함."
+  - "황은 첫 전체회의에서 행동강령 위반을 인정했지만 후계 계획은 필요 없다고 했다고 CNBC가 보도함. 중국 관영매체는 '왕의 귀환'이라며 반겼고, 황은 12월 1일 하원 비공개 면담, 3일 상원 은행위 공개 청문회에 나섬."
 sources:
   - name: The Next Web — Jensen Huang resigns as Nvidia CEO
     url: https://thenextweb.com/news/jensen-huang-resigns-as-nvidia-ceo-after-33-years-effective-immediately
@@ -94,6 +94,18 @@ sources:
   - name: Techmeme (CNBC) — Trump finds himself isolated in DC
     url: https://www.techmeme.com/261124/p32#a261124p32
     published: 2026-11-24T19:35:01+00:00
+  - name: Techmeme (CNBC) — Huang says Nvidia doesn't need a succession plan
+    url: https://www.techmeme.com/261124/p34#a261124p34
+    published: 2026-11-24T20:10:00+00:00
+  - name: Zvi Mowshowitz — Jensen Huang Reinstated As Nvidia CEO at Behest of President Trump
+    url: https://thezvi.substack.com/p/jensen-huang-reinstated-as-nvidia
+    published: 2026-11-24T22:42:01+00:00
+  - name: Techmeme (Washington Post) — Huang's return greeted with relief in China
+    url: https://www.techmeme.com/261124/p41#a261124p41
+    published: 2026-11-24T22:45:55+00:00
+  - name: Techmeme (New York Post) — Trump says a pardon is "always an option"
+    url: https://www.techmeme.com/261124/p42#a261124p42
+    published: 2026-11-24T23:10:00+00:00
 ---
 
 엔비디아 창업자 젠슨 황(Jensen Huang)이 CEO 자리에서 물러났다가 11일 만에 돌아온 사건을 날짜순으로 모았어. 날짜는 현지(미국) 기준이야. 판단은 출처의 보도·발언으로만 전하고, 사이트가 따로 전망하지는 않아.
@@ -225,3 +237,19 @@ sources:
    황은 12월 1일 하원 외교위·중국공산당 특위·정보위 비공개 면담(속기록 작성)에, 3일 상원 은행위 '미국의 AI 우위 보호: 수출 통제 감독' 청문회에 단독 증인으로 나섬. 같은 주 워싱턴 GTC의 1일 기조연설은 원래 황이 맡기로 했지만 지금은 이언 벅(Ian Buck) 부사장이 맡고 있고, 엔비디아는 황의 등장 여부를 밝히지 않음. 예일대 제프 소넨펠드(Jeff Sonnenfeld)는 조사가 겹친 상황에서 "어떻게 일을 할 수 있겠냐"고 지적함.
 
 다만 21번은 원문(CNBC)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
+
+## 11월 25일 09시
+
+23. **트럼프 "황 사면은 언제나 선택지" (11월 24일, 뉴욕포스트 인용 Techmeme)**
+   트럼프 대통령은 뉴욕포스트(New York Post) 단독 인터뷰에서 황에 대한 사면은 "언제나 선택지(always an option)"지만 아마 필요 없을 거라고 말함. 미국 정부가 엔비디아 지분을 갖는 것도 "아마 너무 늦지 않았다"고 함. 블랜치 법무장관이 수사 여부에 답하지 않은 같은 날 나온 발언임.
+
+24. **황 "후계 계획은 필요 없다" (11월 24일, CNBC 인용 Techmeme)**
+   CNBC는 소식통을 인용해 황이 복귀 뒤 첫 직원 회의에서 엔비디아는 독특한 사업 방식으로 움직이고, 후계 계획은 불필요한 위계만 만든다며 필요 없다고 말했다고 보도함. 이 회의에서 황은 행동강령 위반을 사과했고(18번), 전체적으로 화해하고 뉘우치는 분위기였다고 함.
+
+25. **중국 "왕의 귀환" (11월 24일, 워싱턴포스트 인용 Techmeme)**
+   워싱턴포스트는 중국이 황 복귀를 안도하며 반겼고, 관영매체가 "왕이 돌아왔다(The king is back!)"고 썼다고 보도함. 아시아 증시는 올랐고, 대만에서는 황을 고향의 영웅으로 치켜세웠다고 함.
+
+26. **즈비 "황은 자신 없이는 굴러가지 않게 회사를 짰다" (11월 24일, Don't Worry About the Vase)**
+   AI 정책 블로거 즈비 모쇼위츠(Zvi Mowshowitz)는 황이 복귀하지 못할 거라 예상했다가 틀렸다고 인정하고 이유를 분석함. 그는 황이 직속 부하 50명 이상, 악수로 맺는 거래, 트럼프와의 개인 관계로 회사를 자신 없이는 다스릴 수 없게 만들었고, 그래서 해임 비용이 너무 커졌다고 봄. 후계 계획 거부도 같은 맥락이라며, 후계 계획은 위계가 아니라 CEO가 갑자기 자리를 비울 때 위기를 막는 장치라고 반박함. 엔비디아가 다시 대중국 판매를 최대한 늘리려 할 가능성이 크다며, 의회가 수출통제를 더 조여야 한다고 주장함.
+
+다만 23~25번은 원문(뉴욕포스트·CNBC·워싱턴포스트)을 직접 확인하지 못했고 Techmeme 헤드라인 요약 기준임.
