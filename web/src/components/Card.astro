@@ -43,7 +43,7 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
         {/* 사진·영상이 붙은 트윗은 X 공식 임베드로 바꿔 그린다 (Base.astro). 그 전·실패 시에는 이 인용이 그대로 보인다 */}
         <blockquote class:list={{ 'twitter-tweet': embedTweet }} cite={tweet.url} data-dnt="true">
           <p>{tweet.text}</p>
-          <a class="meta breakable" href={tweet.url} rel="noopener">
+          <a class="meta breakable" href={tweet.url} target="_blank" rel="noopener">
             {tweet.author} @{tweet.handle}
           </a>
         </blockquote>
@@ -55,7 +55,7 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
     {sources.map((s, i) => (
       <>
         {i > 0 && <span aria-hidden="true"> · </span>}
-        <a href={s.url} rel="noopener">{s.name}</a>
+        <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
       </>
     ))}
   </p>
