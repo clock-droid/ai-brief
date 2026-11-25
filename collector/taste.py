@@ -6,9 +6,10 @@
 방법 (넷플릭스·메타 추천의 '내용 기반' 부분을 한 사람용으로):
 1. 다국어 문장 임베딩으로 글을 벡터로 바꾼다 (한국어 카드 ↔ 영어 원문 후보도 같은 공간에서 비교된다).
 2. 후보와 라벨 글의 코사인 유사도 s(라벨 글이 여러 판이면 가장 높은 값)가 S_MIN을 넘는 만큼만 '닮음' k = (s - S_MIN) / (1 - S_MIN)으로 센다.
-3. 점수 = Σ k·y·w / (Σ k·w + PRIOR). y는 라벨의 좋고 싫음(-1~+1), w는 최근일수록 큰 가중치.
+3. 점수 = Σ k·w·y / (Σ k·w·|y| + PRIOR). y는 라벨의 좋고 싫음(-1~+1), w는 최근일수록 큰 가중치.
+   분모에 |y|를 곱해, 약한 라벨(제목만 보고 지나침 -0.1 등)이 많아도 분명한 반응(±1)을 묻어 버리지 않게 한다.
    PRIOR가 있어 닮은 라벨이 적으면 점수가 0 쪽으로 줄어든다 (반응 하나로 순위가 크게 흔들리지 않게).
-4. 닮은 라벨의 무게 합(support)이 작으면 '아직 잘 모르는 영역'이다. 탐색 몫은 여기서 고른다.
+4. 닮은 라벨의 무게 합(support = Σ k·w·|y|)이 작으면 '아직 잘 모르는 영역'이다. 탐색 몫은 여기서 고른다.
 
 한국어로 쓴 글과 영어 후보는 같은 사건이어도 유사도가 낮게 나온다(음역된 인물 이름 등: 0.5 안팎, 같은 언어면 0.8 이상).
 그래서 라벨 글은 번역문과 원문을 함께 넣는다.
@@ -97,12 +98,13 @@ class Taste:
             best[:, owner] = np.maximum(best[:, owner], sims[:, col])
         k = np.clip((best - S_MIN) / (1 - S_MIN), 0, None)  # 후보 × 라벨
         y = np.array([l.y for l in self.labels])
-        w = np.array([l.weight for l in self.labels])
+        w = np.array([l.weight for l in self.labels]) * np.abs(y)
+        sign = np.sign(y)
         out = []
         for row in k:
             kw = row * w
             support = float(kw.sum())
-            value = float((kw * y).sum() / (support + PRIOR))
-            idx = [i for i in np.argsort(-(kw * np.abs(y))) if kw[i] > 0][:3]
+            value = float((kw * sign).sum() / (support + PRIOR))
+            idx = [i for i in np.argsort(-kw) if kw[i] > 0][:3]
             out.append(Match(value, support, [(self.labels[i], float(row[i])) for i in idx]))
         return out

@@ -12,6 +12,7 @@
 
 신호 → 라벨 (글마다 하나, y는 -1 ~ +1):
 - 좋아요/싫어요를 눌렀으면 그것이 전부다: +1 / -1 (같은 글에 여러 번 눌렀으면 마지막 것, 취소했으면 없음).
+  싫어요 이유가 글 품질 쪽(너무 뻔함·과장)뿐이면 주제 자체가 싫은 건 아니므로 -0.5.
 - 누르지 않았으면 읽은 기록으로 약하게: 펼침 +0.15, 읽은 시간 20초 +0.15·60초 +0.15 더, 원문 클릭 +0.25,
   긴 글을 70% 넘게 내려 읽음 +0.15 (최대 +0.6). 펼치지도 클릭하지도 않고 제목만 보고 지나친 날마다 -0.1 (최대 -0.3).
 - 오래된 신호일수록 덜 믿는다: 무게 = 0.5 ^ (지난 날수 / 60).
@@ -36,10 +37,11 @@ MORE_PTS, LESS_PTS = 2, -3
 CONTENT_PTS = 4          # 내용 유사도 -1~+1을 점수로 옮기는 배율
 CLAMP = 4
 HALF_LIFE_DAYS = 60
-EXPLORE_MIN_LABELS = 8   # 라벨이 이만큼 쌓이기 전에는 모든 후보가 '모르는 영역'이라 탐색 몫이 뜻이 없다
+EXPLORE_MIN_LABELS = 8   # 반응·읽은 글이 이만큼 쌓이기 전에는 모든 후보가 '모르는 영역'이라 탐색 몫이 뜻이 없다
 EXPLORE_POOL = 40        # 화제성(관심 점수 뺀 점수) 상위 몇 개 안에서 고르나
 EXPLORE_N = 3
 EXPLORE_SUPPORT = 0.1    # 닮은 라벨의 무게 합이 이보다 작으면 '아직 잘 모르는 영역'
+QUALITY_REASONS = {"너무 뻔함", "과장"}  # 주제가 아니라 그 글이 별로라는 이유 (web/src/lib/signals.ts의 DISLIKE_REASONS 중)
 
 
 @dataclass
@@ -115,8 +117,11 @@ def label_values(events: list[dict], now: dt.datetime) -> dict[str, tuple[float,
         weight = 0.5 ** (max(0.0, (now - last).total_seconds() / 86400) / HALF_LIFE_DAYS)
         votes = [e for e in evs if e["t"] == "vote"]
         if votes and votes[-1].get("v"):
-            v = votes[-1]
-            out[pid] = (float(v["v"]), weight, "·".join(["좋아요" if v["v"] > 0 else "싫어요", *v.get("why", [])]))
+            v, why = votes[-1], votes[-1].get("why", [])
+            y = float(v["v"])
+            if y < 0 and why and set(why) <= QUALITY_REASONS:
+                y = -0.5
+            out[pid] = (y, weight, "·".join(["좋아요" if y > 0 else "싫어요", *why]))
             continue
         opened = any(e["t"] == "open" for e in evs)
         clicked = any(e["t"] == "click" for e in evs)
@@ -188,6 +193,7 @@ class Preferences:
                 title = texts[0].split("\n", 1)[0]
                 labels.append(taste.Label(pid, texts, y, w, f"'{short(title)}' {note}"))
         self.n_labels = len(labels)
+        self.n_strong = sum(abs(l.y) >= 0.15 for l in labels)  # 보고 지나침만 있는 글은 빼고 센다
         self.taste = taste.Taste(labels, embedder)
 
     def status(self) -> str:
@@ -213,7 +219,7 @@ class Preferences:
 
     def explore(self, base_scores: list[float], prefs: list[Pref], skip: list[bool]) -> list[int]:
         """탐색 후보: 관심 점수를 뺀 점수 상위 EXPLORE_POOL 안에서, 아직 잘 모르는 영역인 것."""
-        if not self.taste.ready or self.n_labels < EXPLORE_MIN_LABELS:
+        if not self.taste.ready or self.n_strong < EXPLORE_MIN_LABELS:
             return []
         order = sorted(range(len(base_scores)), key=lambda i: -base_scores[i])[:EXPLORE_POOL]
         picks = [i for i in order if not skip[i] and prefs[i].unexplored]
