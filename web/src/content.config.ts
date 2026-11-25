@@ -18,7 +18,7 @@ const figure = z.object({
   height: z.number().int().positive().optional(),
 });
 
-// 속보 카드: 짧은 글. 본문은 ▶ 줄 · 한 줄 요약 · ※ 단서 (WRITING.md 참고).
+// 속보 카드: 한 소식을 설명하는 짧은 글. 큰 소식은 굵은 소제목 2~3개, 작은 소식은 문단 2~3개 (WRITING.md 3절).
 const cards = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/cards' }),
   schema: z.object({
