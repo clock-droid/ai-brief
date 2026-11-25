@@ -19,117 +19,116 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
 ---
 
 <article class="card" id={card.id}>
-  <p class="meta">
-    <time datetime={date.toISOString()}>{timeLabel(date)}</time>
-    {
-      sourceTime && (
-        <>
-          <span aria-hidden="true"> · </span>
-          원문 <time datetime={sourceTime.toISOString()}>{dateTimeLabel(sourceTime)}</time>
-        </>
-      )
-    }
-    <span aria-hidden="true"> · </span>
-    <a class="category" href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
-  </p>
-  <h2>{title}</h2>
-  <div class="body">
-    <Content />
-  </div>
-  {figure && <Figure figure={figure} />}
-  {videoId && <YouTube id={videoId} title={title} />}
-  {
-    tweet && (
-      <figure class:list={['tweet', { embed: embedTweet }]}>
-        {/* 사진·영상이 붙은 트윗은 X 공식 임베드로 바꿔 그린다 (Base.astro). 그 전·실패 시에는 이 인용이 그대로 보인다 */}
-        <blockquote class:list={{ 'twitter-tweet': embedTweet }} cite={tweet.url} data-dnt="true">
-          <p>{tweet.text}</p>
-          <a class="meta breakable" href={tweet.url} target="_blank" rel="noopener">
-            {tweet.author} @{tweet.handle}
-          </a>
-        </blockquote>
-      </figure>
-    )
-  }
-  <p class="sources">
-    출처{' '}
-    {sources.map((s, i) => (
-      <>
-        {i > 0 && <span aria-hidden="true"> · </span>}
-        <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
-      </>
-    ))}
-  </p>
-  {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
-  <Feedback id={`cards/${card.id}`} title={title} />
+  {/* 목록에는 시각과 제목만. 제목을 누르면 그 자리 아래로 카드 전체가 열린다. 여러 개를 함께 열어 둘 수 있다. */}
+  <details>
+    <summary>
+      <time datetime={date.toISOString()}>{timeLabel(date)}</time>
+      <h2>{title}</h2>
+    </summary>
+    <div class="content">
+      <p class="meta">
+        {
+          sourceTime && (
+            <>
+              원문 <time datetime={sourceTime.toISOString()}>{dateTimeLabel(sourceTime)}</time>
+              <span aria-hidden="true"> · </span>
+            </>
+          )
+        }
+        <a class="category" href={href(`/c/${category}/`)}>{CATEGORIES[category]}</a>
+      </p>
+      <div class="body">
+        <Content />
+      </div>
+      {figure && <Figure figure={figure} />}
+      {videoId && <YouTube id={videoId} title={title} />}
+      {
+        tweet && (
+          <figure class:list={['tweet', { embed: embedTweet }]}>
+            {/* 사진·영상이 붙은 트윗은 카드를 열 때 X 공식 임베드로 바꿔 그린다 (Base.astro). 그 전·실패 시에는 이 인용이 그대로 보인다 */}
+            <blockquote class:list={{ 'twitter-tweet': embedTweet }} cite={tweet.url} data-dnt="true">
+              <p>{tweet.text}</p>
+              <a class="meta breakable" href={tweet.url} target="_blank" rel="noopener">
+                {tweet.author} @{tweet.handle}
+              </a>
+            </blockquote>
+          </figure>
+        )
+      }
+      <p class="sources">
+        출처{' '}
+        {sources.map((s, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true"> · </span>}
+            <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
+          </>
+        ))}
+      </p>
+      {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
+      <Feedback id={`cards/${card.id}`} title={title} />
+    </div>
+  </details>
 </article>
 
 <script>
-  // ▶ 목록만 3줄 안팎까지 보이고 "더 보기"로 그 자리에서 펼친다. 한 줄 요약·※ 단서는 접지 않는다.
-  // JS가 없으면 접지 않은 채로 보인다. 웹폰트가 늦게 와서 줄 수가 바뀌므로 폰트가 다 온 뒤에 잰다.
-
-  /** 줄 중간에서 자르면 문장이 끝난 것처럼 읽히므로 ▶ 항목 경계에서 자른다:
-   *  3줄 안에 들어가는 항목까지, 첫 항목부터 3줄을 넘으면 첫 항목까지. 접을 게 없으면 undefined. */
-  function cutHeight(list: HTMLElement): number | undefined {
-    const top = list.getBoundingClientRect().top;
-    const limit = parseFloat(getComputedStyle(list).lineHeight) * 3 + 1;
-    const bottoms = [...list.children].map((li) => li.getBoundingClientRect().bottom - top);
-    const fit = bottoms.filter((b) => b <= limit).at(-1) ?? bottoms[0];
-    return fit !== undefined && fit < bottoms.at(-1)! - 1 ? fit : undefined;
+  // 주소가 카드를 가리키면(#카드-id) 그 카드를 열어 둔다
+  function openTarget() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const details = id ? document.getElementById(id)?.querySelector('details') : null;
+    if (details) details.open = true;
   }
-
-  function fold(list: HTMLElement) {
-    list.style.maxHeight = '';
-    const cut = cutHeight(list);
-    list.classList.toggle('clamped', cut !== undefined);
-    if (cut !== undefined) list.style.maxHeight = `${cut}px`;
-    return cut !== undefined;
-  }
-
-  function clampLists() {
-    for (const list of document.querySelectorAll<HTMLElement>('.card .body > ul:not([data-clamp])')) {
-      list.dataset.clamp = 'folded';
-      if (!fold(list)) continue;
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'expand';
-      button.textContent = '더 보기';
-      button.addEventListener('click', () => {
-        list.dataset.clamp = 'open';
-        list.classList.remove('clamped');
-        list.style.maxHeight = '';
-        button.remove();
-      });
-      list.after(button);
-    }
-  }
-
-  // 창 폭이 바뀌면 줄 수가 달라지므로 접힌 목록만 다시 잰다
-  let resizeFrame = 0;
-  addEventListener('resize', () => {
-    cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(() => {
-      document.querySelectorAll<HTMLElement>('.card .body > ul.clamped').forEach(fold);
-    });
-  });
-
-  document.fonts.ready.then(clampLists);
+  openTarget();
+  addEventListener('hashchange', openTarget);
 </script>
 
 <style>
-  .card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
+  summary {
+    display: grid;
+    grid-template-columns: var(--time-col) 1fr;
+    column-gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-3) 0;
+    cursor: pointer;
+    list-style: none;
   }
 
-  .category {
+  /* 기본 삼각형 표시를 쓰지 않는다 (아이콘 없음 원칙). 열림은 아래로 펼쳐지는 내용이 말한다 */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary time {
+    font-size: var(--fs-meta);
     color: var(--muted);
   }
 
   h2 {
-    font-size: var(--fs-title);
-    font-weight: 700;
+    font-size: var(--fs-body);
+    font-weight: 500;
+    line-height: var(--lh-title);
+  }
+
+  summary:hover h2 {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* 펼친 내용은 제목 첫 글자에 맞춘다 */
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    margin-left: calc(var(--time-col) + var(--s-3));
+    padding-bottom: var(--s-5);
+  }
+
+  .category {
+    color: var(--muted);
   }
 
   .body {
@@ -147,29 +146,6 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
 
   .body :global(li::marker) {
     font-size: 0.8em;
-  }
-
-  /* 높이는 스크립트가 항목 경계에 맞춰 정한다 */
-  .body :global(ul.clamped) {
-    overflow: hidden;
-  }
-
-  /* 그 자리에서 펼치는 글자 단추. 다른 쪽으로 넘어가는 "긴 글로 읽기" 링크와 말로 구분한다 */
-  .body :global(.expand) {
-    align-self: flex-start;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    font: inherit;
-    font-size: var(--fs-small);
-    color: var(--accent);
-    cursor: pointer;
-  }
-
-  .body :global(.expand:hover) {
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 
   .tweet {

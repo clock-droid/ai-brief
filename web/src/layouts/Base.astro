@@ -53,15 +53,33 @@ const here = (on: boolean) => (on ? 'page' : undefined);
       </div>
     </div>
     <script is:inline>
-      // X 공식 임베드: 사진·영상이 붙은 트윗(.twitter-tweet, Card.astro)이 있는 쪽에서만 X 위젯을 부른다.
-      if (document.querySelector('.twitter-tweet')) {
+      // X 공식 임베드: 사진·영상이 붙은 트윗(.twitter-tweet, Card.astro)을 실제로 보게 될 때 X 위젯으로 바꿔 그린다.
+      // 속보 목록의 카드는 닫혀 있으므로 카드를 열 때 그 카드만 그린다. 긴 글 등 늘 보이는 곳은 바로 그린다.
+      (() => {
         const theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        document.querySelectorAll('.twitter-tweet').forEach((el) => (el.dataset.theme = theme));
-        const widget = document.createElement('script');
-        widget.src = 'https://platform.twitter.com/widgets.js';
-        widget.async = true;
-        document.body.append(widget);
-      }
+        let loading;
+        const widgets = () =>
+          (loading ??= new Promise((resolve) => {
+            const s = document.createElement('script');
+            s.src = 'https://platform.twitter.com/widgets.js';
+            s.async = true;
+            s.onload = () => window.twttr.ready(resolve);
+            document.body.append(s);
+          }));
+        const render = (root) => {
+          const tweets = [...root.querySelectorAll('.twitter-tweet:not([data-theme])')];
+          if (!tweets.length) return;
+          tweets.forEach((el) => (el.dataset.theme = theme));
+          widgets().then((twttr) => twttr.widgets.load(root));
+        };
+        document.querySelectorAll('details').forEach((d) =>
+          d.addEventListener('toggle', () => d.open && render(d)),
+        );
+        document.querySelectorAll('.twitter-tweet').forEach((el) => {
+          const d = el.closest('details');
+          if (!d || d.open) render(d ?? el.parentElement);
+        });
+      })();
     </script>
   </body>
 </html>

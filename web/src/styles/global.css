@@ -32,6 +32,7 @@
   --col-rail: 300px;
   --col-gap: 48px;
   --gutter: 20px;
+  --time-col: 40px; /* 속보 목록의 시각 칸. "23:59"(13px)이 들어가는 폭 */
 }
 
 @media (prefers-color-scheme: dark) {

@@ -41,7 +41,7 @@ const days = groupByDay(sorted);
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--muted);
-    margin-bottom: var(--s-5);
+    margin-bottom: var(--s-3);
   }
 
   .cards {
@@ -49,15 +49,7 @@ const days = groupByDay(sorted);
     flex-direction: column;
   }
 
-  /* 글 사이 옅은 선 한 줄 (X식 타임라인) */
-  .cards > :global(.card) {
-    padding: var(--s-5) 0;
-  }
-
-  .cards > :global(.card:first-child) {
-    padding-top: 0;
-  }
-
+  /* 제목 줄 사이 옅은 선 한 줄. 줄 위아래 여백은 Card.astro의 제목 줄이 갖는다 */
   .cards > :global(.card + .card) {
     border-top: 1px solid var(--line);
   }
