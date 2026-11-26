@@ -3,10 +3,11 @@ title: "美 '원격 접속' 칩 규정 열흘, 무엇이 멈췄나"
 date: 2026-11-26T07:12:00+09:00
 category: policy
 format: 정리
+updated: 2026-11-26T15:13:00+09:00
 summary:
   - "미 상무부가 11월 16일 내놓고 19일 시행한 '원격 접속' 규정은 중국 기업이 동남아 등 해외 데이터센터의 엔비디아 칩을 빌려 쓰는 길을 막으려는 조치다."
   - "열흘 새 바이트댄스 연계 4억 8,000만 달러 칩 대출이 보류됐고, 25일엔 바이트댄스·알리바바·텐센트 관련 데이터센터 대출 수십억 달러가 멈췄다는 보도가 나왔다(블룸버그). 23일엔 메가스피드 등 7개사가 수출 제한 명단에 올랐다."
-  - "디인포메이션 보도로는 딥시크가 '증류까지 막히면 격차가 9개월로 벌어질 수 있다'고 내부 추산했고 문샷 AI는 인도네시아 칩 거래를 취소했다. 반면 선전 암시장에선 B300 서버 호가가 300만 달러를 넘었다."
+  - "디인포메이션 보도로는 딥시크가 '증류까지 막히면 격차가 9개월로 벌어질 수 있다'고 내부 추산했고 문샷 AI는 인도네시아 칩 거래를 취소했다. 26일엔 엔비디아가 델·슈퍼마이크로 등에 말레이시아·싱가포르·태국·인도네시아행 AI 서버 출하를 멈추라고 했다는 FT 보도가 나왔다. 허가 신청 지침이 없어 현지에선 '90일 시한 속 혼란'이라는 말이 나온다."
 sources:
   - name: ChinaTalk — Remote Access Buys Six Months of AI Lead
     url: https://www.chinatalk.media/p/the-remote-access-rule-will-slow
@@ -37,6 +38,15 @@ sources:
   - name: Techmeme (Bloomberg) — 中 빅테크 연계 데이터센터 대출 중단
     url: https://www.techmeme.com/261125/p38#a261125p38
     published: 2026-11-25T22:05:01+00:00
+  - name: Techmeme (Financial Times) — 엔비디아, 동남아 4개국 서버 출하 중단 지시
+    url: https://www.techmeme.com/261126/p2#a261126p2
+    published: 2026-11-26T05:45:02+00:00
+  - name: The National — Nvidia halts chip shipments to South-East Asia amid US crackdown
+    url: https://www.thenationalnews.com/future/technology/2026/11/26/nvidia-halts-chip-shipments-to-south-east-asia-amid-us-crackdown/
+    published: 2026-11-26T06:04:00+00:00
+  - name: DIGITIMES — Nvidia server partners reportedly suspend shipments to Southeast Asia
+    url: https://www.digitimes.com/news/a20261123VL212/nvidia-southeast-asia-ai-server-shipments.html
+    published: 2026-11-23T08:08:00+00:00
 figure:
   src: https://substack-post-media.s3.amazonaws.com/public/images/3e8b1c08-8445-43b6-b400-7a00feba9a9f_2046x1115.png
   alt: "2027~2035년 분기별로 규정이 중국 최첨단 컴퓨트를 몇 개월 늦추는지 보여 주는 선 그래프. 중앙값이 2028년 말 6.0개월이고 이후 5개월 안팎에서 평탄해짐"
@@ -79,3 +89,11 @@ figure:
 규정 효과는 돈줄(대출 보류)과 연구 현장(프로젝트 지연·칩 거래 취소)에서 먼저 보이고 있어요. 반면 암시장 가격 상승과 제3자를 통한 임대 시도는 우회로가 남아 있다는 신호예요. ChinaTalk은 결과가 결국 러트닉(Lutnick) 상무장관과 트럼프 대통령의 집행 의지에 달렸다고 봤는데요, 12월 초 젠슨 황의 의회 출석에서 수출통제 집행이 다시 질문대에 오를 예정이에요.
 
 다만 3·4·6번은 원문(블룸버그·워싱턴포스트, 유료)이 아니라 Techmeme 헤드라인 기준이고, 5번은 디인포메이션 원문(유료)이 아니라 디코더 보도 기준이에요. 격차 수치는 딥시크 내부 추정, 6개월 지연은 ChinaTalk의 모델 추정이에요.
+
+## 11월 26일 15시
+
+7. **엔비디아, 동남아 4개국 AI 서버 출하 중단 지시 (11월 26일, FT 인용 Techmeme·더내셔널)**
+   FT는 엔비디아가 제조 파트너들에게 말레이시아·싱가포르·태국·인도네시아로 가는 AI 서버 출하를 멈추라고 했고, 델·슈퍼마이크로가 이 나라 고객들에게 "엔비디아가 출하를 허락하지 않는다"고 통보했다고 보도했어요. 1번 규정이 이 네 나라로 가는 첨단 칩에 미국 허가를 요구했는데, 허가를 어떻게 받는지 지침이 아직 없다는 게 문제예요. FT가 인용한 한 클라우드 업체 임원은 "규정은 있는데 집행 지침이 없다", "90일 시한이 흐르는데 아무도 신청법을 모른다"고 말했어요. 엔비디아는 2025년 싱가포르 법인으로 1,040억 달러(전년 대비 72% 증가) 매출을 잡았는데, 이 숫자엔 대만·중국 매출 일부도 섞여 있어요. 일시 중단인지는 아직 알 수 없어요.
+   - ▶ 1번 이후 10일 — 돈줄(대출 보류)과 연구소(칩 거래 취소)에 이어, 칩을 파는 엔비디아 쪽에서도 출하가 멈췄어요. 대만 디지타임스는 사흘 전인 23일 일부 서버 업체가 동남아 출하를 먼저 멈췄다고 보도했어요.
+
+다만 7번은 원문(FT, 유료)이 아니라 Techmeme 헤드라인과 더내셔널 보도 기준이에요.
