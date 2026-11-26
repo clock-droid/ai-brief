@@ -1,0 +1,81 @@
+---
+interface Props {
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<div class="bookmark" data-bookmark={id} data-title={title} hidden>
+  <button type="button">북마크</button>
+  <span role="status"></span>
+</div>
+
+<script>
+  import { readBookmarks, writeBookmarks, type Bookmark } from '../lib/bookmarks';
+
+  const controls = [...document.querySelectorAll<HTMLElement>('[data-bookmark]')];
+
+  function paint(items: Bookmark[]) {
+    const ids = new Set(items.map(({ id }) => id));
+    for (const control of controls) {
+      const saved = ids.has(control.dataset.bookmark!);
+      const button = control.querySelector('button')!;
+      button.textContent = saved ? '저장됨' : '북마크';
+      button.setAttribute('aria-label', saved ? '저장됨, 북마크 해제' : '북마크');
+      button.toggleAttribute('data-saved', saved);
+    }
+  }
+
+  paint(readBookmarks());
+  for (const control of controls) {
+    const id = control.dataset.bookmark!;
+    const title = control.dataset.title!;
+    const status = control.querySelector('[role="status"]')!;
+    control.hidden = false;
+    control.querySelector('button')!.addEventListener('click', () => {
+      const items = readBookmarks();
+      const saved = items.some((item) => item.id === id);
+      const next = writeBookmarks(saved ? items.filter((item) => item.id !== id) : [{ id, title }, ...items]);
+      status.textContent = next ? '' : '북마크 변경 실패';
+      if (next) paint(next);
+    });
+  }
+
+  addEventListener('storage', () => paint(readBookmarks()));
+  addEventListener('pageshow', () => paint(readBookmarks()));
+</script>
+
+<style>
+  .bookmark {
+    align-self: flex-start;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  button {
+    min-height: 44px;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  button[data-saved] {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>

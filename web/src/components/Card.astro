@@ -2,6 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../categories';
 import { dateTimeLabel, earliestSourceTime, firstVideoId, href, tweetHasMedia } from '../lib/format';
+import BookmarkButton from './BookmarkButton.astro';
 import Disclosure from './Disclosure.astro';
 import Feedback from './Feedback.astro';
 import Figure from './Figure.astro';
@@ -59,6 +60,7 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
     ))}
   </p>
   {post && <p class="more"><a href={href(`/posts/${post}/`)}>긴 글로 읽기</a></p>}
+  <BookmarkButton id={`cards/${card.id}`} title={title} />
   <Feedback id={`cards/${card.id}`} />
 </Disclosure>
 

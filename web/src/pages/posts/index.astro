@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import BookmarkButton from '../../components/BookmarkButton.astro';
 import Disclosure from '../../components/Disclosure.astro';
 import Feedback from '../../components/Feedback.astro';
 import { CATEGORIES } from '../../categories';
@@ -33,6 +34,7 @@ const days = groupByDay(posts);
                     {p.data.summary.map((line) => <li>{line}</li>)}
                   </ol>
                   <p class="more"><a href={href(`/posts/${p.id}/`)}>전문 읽기</a></p>
+                  <BookmarkButton id={`posts/${p.id}`} title={p.data.title} />
                   <Feedback id={`posts/${p.id}`} />
                 </Disclosure>
               ))}

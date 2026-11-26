@@ -8,7 +8,7 @@ import { href } from '../lib/format';
 interface Props {
   title?: string;
   description?: string;
-  current?: 'cards' | 'posts';
+  current?: 'cards' | 'posts' | 'bookmarks';
   category?: CategoryKey; // 분류 페이지일 때 왼쪽 메뉴에서 현재 위치로 표시
   railPosts?: boolean; // 곁줄의 긴 글 목록. 긴 글 목록 페이지에서는 본문과 겹치므로 끈다
 }
@@ -35,6 +35,7 @@ const here = (on: boolean) => (on ? 'page' : undefined);
         <nav aria-label="주요 메뉴">
           <a href={href('/')} aria-current={here(current === 'cards' && !category)}>속보</a>
           <a href={href('/posts/')} aria-current={here(current === 'posts')}>긴 글</a>
+          <a href={href('/bookmarks/')} aria-current={here(current === 'bookmarks')}>북마크</a>
         </nav>
         <nav class="categories" aria-label="분류">
           {
@@ -87,7 +88,7 @@ const here = (on: boolean) => (on ? 'page' : undefined);
 </html>
 
 <style>
-  /* 900 미만: 1단. 사이트 이름 + 속보·긴 글 머리줄, 분류 메뉴·곁줄은 숨김 */
+  /* 900 미만: 1단. 분류 메뉴와 곁줄을 숨긴다 */
   .shell {
     max-width: calc(var(--col-feed) + var(--gutter) * 2);
     margin: 0 auto;
@@ -98,6 +99,7 @@ const here = (on: boolean) => (on ? 'page' : undefined);
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+    flex-wrap: wrap;
     padding-top: var(--s-5);
     padding-bottom: var(--s-6);
   }
@@ -151,6 +153,7 @@ const here = (on: boolean) => (on ? 'page' : undefined);
       max-height: 100vh;
       overflow-y: auto;
       flex-direction: column;
+      flex-wrap: nowrap;
       align-items: stretch;
       justify-content: flex-start;
       gap: var(--s-5);
