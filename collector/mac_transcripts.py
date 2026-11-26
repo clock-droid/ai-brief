@@ -15,6 +15,7 @@ from __future__ import annotations
 import datetime as dt
 import glob
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -30,6 +31,13 @@ def main() -> int:
     import rank
     import transcript_queue as q
     rank.DATA, rank.CONTENT = repo / "data", repo / "web" / "src" / "content"
+
+    # GPT 원문 수집도 기존 비공개 전달 폴더로 보낸다. 실패해도 자막 수집은 계속한다.
+    try:
+        subprocess.run([sys.executable, str(repo / "collector/gpt_primary_sources/capture.py"), str(out)],
+                       check=True, timeout=500)
+    except (OSError, subprocess.SubprocessError) as exc:
+        print(f"GPT 원문 수집 실패: {exc}", file=sys.stderr)
 
     from youtube_transcript_api import YouTubeTranscriptApi
 

@@ -221,6 +221,7 @@ def transcript_note(r: dict, transcripts: Path, index: dict, tiers: dict) -> str
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--top", type=int, default=60)
+    ap.add_argument("--primary-dir", type=Path, help="GPT 원문 수집 파일이 있는 폴더")
     args = ap.parse_args()
 
     srcs = json.loads((ROOT / "collector" / "sources.json").read_text())["sources"]
@@ -234,7 +235,8 @@ def main() -> int:
     t_index = tq.load_index(transcripts)
     prefs_model = preferences.Preferences(now())
 
-    fresh = [r for r in load_candidates() if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
+    candidates = load_candidates()
+    fresh = [r for r in candidates if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
     # 같은 URL 중복 제거
     fresh = list({r["url"].rstrip("/"): r for r in fresh}.values())
     skipped = skipped_urls()
@@ -263,6 +265,9 @@ def main() -> int:
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
              "", f"발표 {WINDOW_H}시간 이내 후보 {len(fresh)}개 → 사건 {len(ranked)}개로 묶음. 상위 {args.top}개.",
              "점수 구성은 collector/rank.py 맨 위 설명 참고. 위에서부터 검토한다.", prefs_model.status() + ".", ""]
+    from gpt_primary_sources.review import section
+    lines += section(args.primary_dir or transcripts, candidates, written | skipped, now())
+    lines += ["## 기존 사건 순위", ""]
     # 탐색 후보는 관심 감점으로 상위 밖에 밀려났어도 보인다
     shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= args.top or x.get("explore")]
     explore = [(i, x) for i, x in shown if x.get("explore")]

@@ -1,0 +1,38 @@
+{
+  "accounts": [
+    "ShaneLegg",
+    "sebkrier",
+    "_philschmid",
+    "OfficialLoganK",
+    "demishassabis",
+    "GoogleDeepMind",
+    "kellerjordan0",
+    "_jasonwei",
+    "polynoamial",
+    "SebastienBubeck",
+    "OpenAI",
+    "JacksonKernion",
+    "janleike",
+    "ch402",
+    "AnthropicAI",
+    "trq212",
+    "ylecun",
+    "ibab",
+    "hardmaru",
+    "SemiAnalysis_",
+    "AIatMeta",
+    "MSFTResearch"
+  ],
+  "discovery": [
+    "(DeepMind OR OpenAI OR Anthropic OR Gemini OR xAI OR MetaAI) (\"we found\" OR \"we measured\" OR \"our benchmark\" OR \"my experiments\")",
+    "(AGI OR superintelligence OR \"AI agents\") (\"changed my mind\" OR \"my estimate\" OR \"I disagree\" OR \"my prediction\")"
+  ],
+  "existing_blog_sources": [
+    "aaronson",
+    "simonw",
+    "interconnects",
+    "import-ai",
+    "zvi",
+    "semianalysis"
+  ]
+}
