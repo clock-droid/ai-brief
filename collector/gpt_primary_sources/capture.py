@@ -45,14 +45,15 @@ def read_x(request):
 
 def schmid_index(start, end):
     # The index exposes calendar dates only. Preserve this precision for the editor.
+    # Read the machine-readable <time dateTime> rather than the display text around it.
     base = "https://www.philschmid.de/"
     html = collect.fetch(base)
-    pattern = r'<a href="(/[^"#?]+)"><article\b.*?<h3[^>]*>(.*?)</h3>.*?<p[^>]*>([A-Z][a-z]+ \d{1,2}, \d{4})'
+    pattern = r'<a href="(/[^"#?]+)"><article\b.*?<h3[^>]*>(.*?)</h3>.*?<time [^>]*dateTime="(\d{4}-\d{2}-\d{2})"'
     entries = re.findall(pattern, html, re.S)
     if not entries:
         raise ValueError("블로그 목록 형식 변경")
     for path, title, date in entries:
-        day = dt.datetime.strptime(date, "%B %d, %Y").date()
+        day = dt.date.fromisoformat(date)
         if start.date() <= day <= end.date():
             yield dict(url=urljoin(base, path), author="Philipp Schmid", text=collect.clean_text(title),
                        day=day.isoformat(), kind="blog")
