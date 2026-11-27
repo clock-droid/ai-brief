@@ -18,6 +18,8 @@ import collect
 
 CONFIG = json.loads((HERE / "sources.json").read_text())
 SNAPSHOT = "gpt-primary-sources.json"
+SEARCH_INTERVAL = dt.timedelta(hours=3)
+SEARCH_PAUSE = dt.timedelta(days=1)
 
 
 def timestamp(value):
@@ -105,36 +107,58 @@ def capture(directory):
     rows = {r["url"]: r for r in previous.get("rows", []) if recent(r)}
     cursors = previous.get("last_complete", {})
     warnings = []
-    # X Latest can omit a status from a combined OR even when the author-only query finds it.
-    groups = [("people", "from:" + handle) for handle in CONFIG["accounts"]]
-    groups.extend(("discovery", q) for q in CONFIG["discovery"])
+    # People come from each account's Posts tab, which does not depend on X search.
+    # Search is only for the discovery queries: it is throttled, and one failure pauses it
+    # for a day so a restricted account is not hammered every hour.
+    search_state = previous.get("search", {})
+    paused_until = search_state.get("paused_until")
+    search_open = not paused_until or now >= timestamp(paused_until)
+    if not search_open:
+        warnings.append(f"X 검색 일시 중지 중 · {paused_until}까지")
+    last_search = search_state.get("last_attempt")
+    search_due = search_open and (not last_search or now - timestamp(last_search) >= SEARCH_INTERVAL)
+    groups = [("people", handle) for handle in CONFIG["accounts"]]
+    if search_due:
+        groups.extend(("discovery", q) for q in CONFIG["discovery"])
+        search_state["last_attempt"] = now.isoformat()
     groups.sort(key=lambda pair: cursors.get(pair[1], ""))
     rate_limited = False
-    for index, (kind, query) in enumerate(groups):
+    for index, (kind, key) in enumerate(groups):
+        if kind == "discovery" and not search_open:
+            continue
         since = start
-        if query in cursors:
-            last = timestamp(cursors[query])
+        if key in cursors:
+            last = timestamp(cursors[key])
             if now - last < dt.timedelta(minutes=10):
                 continue
             since = max(start, last - dt.timedelta(minutes=10))
-        window = since.strftime(" since:%Y-%m-%d_%H:%M:%S_UTC") + now.strftime(" until:%Y-%m-%d_%H:%M:%S_UTC")
+        if kind == "people":
+            request = {"user": key, "since": since.isoformat()}
+        else:
+            window = since.strftime(" since:%Y-%m-%d_%H:%M:%S_UTC") + now.strftime(" until:%Y-%m-%d_%H:%M:%S_UTC")
+            request = {"query": key + " -filter:retweets" + window}
         try:
-            batch, complete = read_x({"query": query + " -filter:retweets" + window})
+            batch, complete = read_x(request)
             for row in batch:
                 if recent(row):
                     old = rows.get(row["url"], {})
                     row["kind"] = "people" if "people" in (kind, old.get("kind")) else kind
                     rows[row["url"]] = {**old, **row}
             if complete:
-                cursors[query] = now.isoformat()
+                cursors[key] = now.isoformat()
             else:
-                warnings.append(f"X 검색 일부만 확인: {query}")
+                warnings.append(f"X 조회 일부만 확인: {key}")
         except XRateLimit:
             rate_limited = True
-            warnings.append(f"X 요청 한도(429) · 미완료 검색 {len(groups)-index}개, 다음 회차 재개")
+            warnings.append(f"X 요청 한도(429) · 미완료 조회 {len(groups)-index}개, 다음 회차 재개")
             break
         except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
-            warnings.append(f"X 검색 실패: {query} ({exc})")
+            if kind == "discovery":
+                search_open = False
+                search_state["paused_until"] = (now + SEARCH_PAUSE).isoformat()
+                warnings.append(f"X 검색 실패, {SEARCH_PAUSE.days}일 중지: {key} ({exc})")
+            else:
+                warnings.append(f"X 계정 글 조회 실패: {key} ({exc})")
 
     try:
         for row in schmid_index(start, now):
@@ -173,7 +197,7 @@ def capture(directory):
             row["parents"] = chain
 
     verified, public_ids = public_rows(list(rows.values()), previous.get("public_ids", []), warnings)
-    snapshot = dict(public_ids=public_ids, checked=now.isoformat(), last_complete=cursors, warnings=warnings, rows=verified)
+    snapshot = dict(public_ids=public_ids, checked=now.isoformat(), last_complete=cursors, search=search_state, warnings=warnings, rows=verified)
     directory.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(mode="w", dir=directory, delete=False) as out:
         json.dump(snapshot, out, ensure_ascii=False)
