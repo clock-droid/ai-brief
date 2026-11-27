@@ -20,6 +20,23 @@ const { id, signal, time, title } = Astro.props;
     <summary>
       <time datetime={time.toISOString()}>{timeLabel(time)}</time>
       <h2>{title}</h2>
+      {
+        signal && (
+          <span class="marks" role="img" data-marks={signal} hidden>
+            {/* 선 아이콘(1.5px 획). 이 브라우저에서 누른 것만 보인다 */}
+            <svg data-mark="like" viewBox="0 0 24 24" hidden>
+              <path d="M12 20 4.6 12.6a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9a4.6 4.6 0 0 1 6.5 6.5Z" />
+            </svg>
+            <svg data-mark="dislike" viewBox="0 0 24 24" hidden>
+              <path d="M12 20 4.6 12.6a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9a4.6 4.6 0 0 1 6.5 6.5Z" />
+              <path d="m12 7-1.6 4 3 2-1.4 4" />
+            </svg>
+            <svg data-mark="bookmark" viewBox="0 0 24 24" hidden>
+              <path d="M6.5 3.5h11v17L12 15.8l-5.5 4.7Z" />
+            </svg>
+          </span>
+        )
+      }
     </summary>
     <div class="content">
       <slot />
@@ -28,6 +45,31 @@ const { id, signal, time, title } = Astro.props;
 </article>
 
 <script>
+  import { readBookmarks } from '../lib/bookmarks';
+  import { getVote } from '../lib/signals';
+
+  // 제목 뒤 표시: 이 브라우저에서 누른 반응과 북마크. 접힌 줄만 봐도 알 수 있게 한다
+  const MARKS = [
+    { key: 'like', label: '좋아요 누름', on: (id: string) => getVote(id)?.v === 1 },
+    { key: 'dislike', label: '싫어요 누름', on: (id: string) => getVote(id)?.v === -1 },
+    { key: 'bookmark', label: '북마크함', on: (id: string, saved: Set<string>) => saved.has(id) },
+  ];
+
+  function paintMarks() {
+    const saved = new Set(readBookmarks().map(({ id }) => id));
+    document.querySelectorAll<HTMLElement>('[data-marks]').forEach((el) => {
+      const id = el.dataset.marks!;
+      const on = MARKS.filter((m) => m.on(id, saved));
+      el.hidden = on.length === 0;
+      for (const m of MARKS) el.querySelector<SVGElement>(`[data-mark="${m.key}"]`)!.toggleAttribute('hidden', !on.includes(m));
+      el.setAttribute('aria-label', on.map((m) => m.label).join(', '));
+    });
+  }
+  paintMarks();
+  addEventListener('aib:marks', paintMarks);
+  addEventListener('storage', paintMarks);
+  addEventListener('pageshow', paintMarks);
+
   // 주소가 줄을 가리키면(#id) 그 줄을 열어 둔다
   function openTarget() {
     const id = decodeURIComponent(location.hash.slice(1));
@@ -41,7 +83,7 @@ const { id, signal, time, title } = Astro.props;
 <style>
   summary {
     display: grid;
-    grid-template-columns: var(--time-col) 1fr;
+    grid-template-columns: var(--time-col) 1fr auto;
     column-gap: var(--s-3);
     align-items: baseline;
     padding: var(--s-3) 0;
@@ -63,6 +105,30 @@ const { id, signal, time, title } = Astro.props;
     font-size: var(--fs-body);
     font-weight: 500;
     line-height: var(--lh-title);
+  }
+
+  /* 줄 맨 오른쪽 칸. 제목 첫 줄 높이에 맞춘다 */
+  .marks {
+    display: flex;
+    gap: var(--s-1);
+    align-self: start;
+    padding-top: 0.15em;
+    color: var(--muted);
+  }
+
+  .marks svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .marks[hidden],
+  .marks svg[hidden] {
+    display: none;
   }
 
   summary:hover h2 {

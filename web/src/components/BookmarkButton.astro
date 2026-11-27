@@ -40,6 +40,7 @@ const { id, title } = Astro.props;
       const next = writeBookmarks(saved ? items.filter((item) => item.id !== id) : [{ id, title }, ...items]);
       status.textContent = next ? '' : '북마크 변경 실패';
       if (next) paint(next);
+      dispatchEvent(new Event('aib:marks')); // 제목 뒤 표시(Disclosure.astro)를 다시 그린다
     });
   }
 

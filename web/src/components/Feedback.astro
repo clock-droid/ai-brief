@@ -67,6 +67,7 @@ const { id } = Astro.props;
         setVote(id, next);
         sendSoon();
         paint(root, next);
+        dispatchEvent(new Event('aib:marks')); // 제목 뒤 표시(Disclosure.astro)를 다시 그린다
       });
     });
   }
