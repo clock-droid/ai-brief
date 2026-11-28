@@ -1,0 +1,218 @@
+---
+import { finChartData, finPct, finValue, type FinMetric } from '../lib/financials';
+
+interface Props {
+  financials: { ticker: string; metrics: FinMetric[]; through: Date };
+  where: string; // 빌드 오류 메시지에 쓸 글 id
+}
+
+// 숫자 그림: 항목마다 분기 막대 하나씩 (축이 둘인 그림은 쓰지 않는다). 지난 분기는 회색, 글이 다루는 마지막 분기는 본문색.
+// 막대 위 숫자는 처음 값이 있는 분기와 마지막 분기에만 — 나머지는 마우스를 올리면(title) 보이고, 화면 읽기 프로그램에는 표로 읽힌다.
+const { financials, where } = Astro.props;
+const data = finChartData(financials, where);
+
+function geometry(values: number[]) {
+  const max = Math.max(0, ...values);
+  const min = Math.min(0, ...values);
+  const span = max - min || 1;
+  return { zero: (-min / span) * 100, pct: (v: number) => (Math.abs(v) / span) * 100 };
+}
+
+const quarterName = (fq: number) => `${fq}분기`;
+const yearName = (fy: number) => `FY${String(fy).slice(2)}`;
+---
+
+<figure class="fin" aria-label={`${data.ticker} 분기 실적`}>
+  {
+    data.series.map((s) => {
+      const g = geometry(s.slots.flatMap((x) => (x.q ? [x.q.value] : [])));
+      const last = s.slots.at(-1)!.q!;
+      const first = s.slots.findIndex((x) => x.q);
+      return (
+        <div class="metric">
+          <p class="head">
+            <span class="name">{s.label}</span>
+            <span>{yearName(s.slots.at(-1)!.fy)} {quarterName(s.slots.at(-1)!.fq)} {finValue(last.value, s.unit)}</span>
+            {s.yoy !== undefined && <span class="muted">전년 같은 분기보다 {finPct(s.yoy)}</span>}
+          </p>
+          <div class="plot" aria-hidden="true" style={`--cols: ${s.slots.length}`}>
+            <div class="base" style={`bottom: ${g.zero}%`} />
+            {s.slots.map(({ fy, fq, q }, i) => {
+              if (!q) return <div class="col" title={`${yearName(fy)} ${quarterName(fq)} 공시 없음`} />;
+              const isLast = i === s.slots.length - 1;
+              const pos = q.value >= 0;
+              const style = pos
+                ? `bottom: ${g.zero}%; height: ${g.pct(q.value)}%`
+                : `top: ${100 - g.zero}%; height: ${g.pct(q.value)}%`;
+              return (
+                <div class="col" title={`${yearName(fy)} ${quarterName(fq)} ${finValue(q.value, s.unit)}`}>
+                  <div class:list={['bar', { now: isLast, neg: !pos }]} style={style}>
+                    {(i === first || isLast) && <span class="tip">{finValue(q.value, s.unit)}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div class="axis" aria-hidden="true" style={`--cols: ${s.slots.length}`}>
+            {s.slots.map(({ fy, fq }, i) => (
+              <span>
+                {quarterName(fq)}
+                <br />
+                {(i === 0 || fq === 1) && yearName(fy)}
+              </span>
+            ))}
+          </div>
+          <table class="sr-only">
+            <caption>{`${data.ticker} 분기 ${s.label}`}</caption>
+            <tbody>
+              {s.slots.map(({ fy, fq, q }) => (
+                <tr>
+                  <th scope="row">{`${yearName(fy)} ${quarterName(fq)}`}</th>
+                  <td>{q ? finValue(q.value, s.unit) : '공시 없음'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    })
+  }
+  <figcaption>
+    회계연도 기준 분기 실적({data.fyeMonth}월 결산)
+    {data.anyDerived && ', 4분기와 일부 현금흐름은 누적치에서 앞 분기를 빼서 계산'}
+    {data.anyMissing && ', 빈 칸은 분기 숫자를 따로 공시하지 않은 분기'}
+    {data.newerQuarterPending && ', 가장 최근 분기는 실적 발표만 나오고 정식 공시 전이라 빠짐'}
+    <span aria-hidden="true"> · </span>
+    숫자 <a href={data.filingsUrl} target="_blank" rel="noopener">SEC 공시(10-Q·10-K)</a>
+  </figcaption>
+</figure>
+
+<style>
+  .fin {
+    margin: var(--s-2) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .head {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-2);
+    font-size: var(--fs-small);
+  }
+
+  .name {
+    font-weight: 500;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  /* 막대 위 숫자(13px 한 줄)가 들어갈 자리를 위에 비워 둔다 */
+  .plot {
+    position: relative;
+    height: 120px;
+    margin-top: var(--s-5);
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+  }
+
+  .col {
+    position: relative;
+  }
+
+  .bar {
+    position: absolute;
+    left: 50%;
+    width: min(24px, calc(100% - 4px));
+    transform: translateX(-50%);
+    background: var(--chart-past);
+    border-radius: 4px 4px 0 0;
+  }
+
+  .bar.neg {
+    border-radius: 0 0 4px 4px;
+  }
+
+  .bar.now {
+    background: var(--text);
+  }
+
+  .tip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-bottom: var(--s-1);
+    font-size: var(--fs-meta);
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  .now .tip {
+    color: var(--text);
+  }
+
+  /* 첫 막대·마지막 막대 숫자가 그림 밖으로 나가지 않게 바깥쪽 끝에 맞춘다 */
+  .col:first-child .tip {
+    left: 0;
+    transform: none;
+  }
+
+  .col:last-child .tip {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+
+  .neg .tip {
+    bottom: auto;
+    top: 100%;
+    padding: var(--s-1) 0 0;
+  }
+
+  .base {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .axis {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-title);
+    color: var(--muted);
+    text-align: center;
+  }
+
+  figcaption {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  figcaption a {
+    white-space: nowrap;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

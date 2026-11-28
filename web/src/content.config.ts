@@ -2,6 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { CATEGORY_KEYS } from './categories';
+import { FIN_METRICS } from './lib/financials';
 
 // published: 원문 발표 시각 (후보의 published). 카드 위 시각 줄에 "원문 …"으로 표시된다.
 const source = z.object({ name: z.string(), url: z.url(), published: z.coerce.date().optional() });
@@ -18,6 +19,14 @@ const figure = z.object({
   height: z.number().int().positive().optional(),
 });
 
+// 숫자 그림: 미국 상장사 분기 실적. 숫자는 collector/financials.py가 받은 SEC 공시 파일에서만 온다 (WRITING.md 3-2).
+// through는 글이 다루는 마지막 분기의 끝 날짜 — 나중에 숫자 파일이 갱신돼도 그 글의 그림은 그 분기까지만 그린다.
+const financials = z.object({
+  ticker: z.string().min(1),
+  metrics: z.array(z.enum(FIN_METRICS)).min(1).max(3),
+  through: z.coerce.date(),
+});
+
 // 속보 카드: 한 소식을 설명하는 짧은 글. 큰 소식은 굵은 소제목 2~3개, 작은 소식은 문단 2~3개 (WRITING.md 3절).
 const cards = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/cards' }),
@@ -31,6 +40,7 @@ const cards = defineCollection({
       .optional(),
     post: z.string().optional(), // 같은 사건을 다룬 긴 글의 id
     figure: figure.optional(),
+    financials: financials.optional(),
   }),
 });
 
@@ -46,6 +56,7 @@ const posts = defineCollection({
     summary: z.array(z.string()).length(3), // 3줄 요약
     sources: z.array(source).min(1),
     figure: figure.optional(),
+    financials: financials.optional(),
   }),
 });
 

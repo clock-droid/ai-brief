@@ -5,6 +5,7 @@ import { dateTimeLabel, earliestSourceTime, firstVideoId, href, tweetHasMedia } 
 import BookmarkButton from './BookmarkButton.astro';
 import Disclosure from './Disclosure.astro';
 import Feedback from './Feedback.astro';
+import FinancialChart from './FinancialChart.astro';
 import Figure from './Figure.astro';
 import YouTube from './YouTube.astro';
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 const { card } = Astro.props;
-const { title, date, category, sources, tweet, post, figure } = card.data;
+const { title, date, category, sources, tweet, post, figure, financials } = card.data;
 const { Content } = await render(card);
 const sourceTime = earliestSourceTime(sources, tweet?.url);
 const videoId = firstVideoId(sources);
@@ -35,6 +36,7 @@ const embedTweet = tweet ? tweetHasMedia(tweet.text) : false;
   <div class="body">
     <Content />
   </div>
+  {financials && <FinancialChart financials={financials} where={`cards/${card.id}`} />}
   {figure && <Figure figure={figure} />}
   {videoId && <YouTube id={videoId} title={title} />}
   {
