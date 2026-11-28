@@ -164,5 +164,78 @@
    "value_before_usd": 33955972
   }
  ],
+ "top_holdings": [
+  {
+   "name": "PERSHING SQUARE INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 184289699,
+   "weight_pct": 33.5
+  },
+  {
+   "name": "UBER TECHNOLOGIES INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 34268279,
+   "weight_pct": 7.6
+  },
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 8505779,
+   "weight_pct": 6.9
+  },
+  {
+   "name": "MICROSOFT CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4064779,
+   "weight_pct": 6.8
+  },
+  {
+   "name": "META PLATFORMS INC",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 2833299,
+   "weight_pct": 6.7
+  },
+  {
+   "name": "HOWARD HUGHES HOLDINGS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 27852064,
+   "weight_pct": 6.7
+  },
+  {
+   "name": "BROOKFIELD CORP",
+   "class": "CL A LTD VT SH",
+   "put_call": "",
+   "shares": 51331099,
+   "weight_pct": 6.1
+  },
+  {
+   "name": "RESTAURANT BRANDS INTL INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 22007079,
+   "weight_pct": 5.1
+  },
+  {
+   "name": "NETFLIX INC.",
+   "class": "COM",
+   "put_call": "",
+   "shares": 15412744,
+   "weight_pct": 3.5
+  },
+  {
+   "name": "MASTERCARD INCORPORATED",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 1888419,
+   "weight_pct": 3.4
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

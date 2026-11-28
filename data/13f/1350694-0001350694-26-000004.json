@@ -13939,5 +13939,78 @@
    "value_before_usd": 0
   }
  ],
+ "top_holdings": [
+  {
+   "name": "STATE STR SPDR S&P 500 ETF T",
+   "class": "TR UNIT",
+   "put_call": "",
+   "shares": 3403317,
+   "weight_pct": 11.3
+  },
+  {
+   "name": "ISHARES TR",
+   "class": "CORE S&P500 ETF",
+   "put_call": "",
+   "shares": 1508053,
+   "weight_pct": 5.0
+  },
+  {
+   "name": "NVIDIA CORPORATION",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2688221,
+   "weight_pct": 2.7
+  },
+  {
+   "name": "BROADCOM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1314746,
+   "weight_pct": 2.0
+  },
+  {
+   "name": "LAM RESEARCH CORP",
+   "class": "COM NEW",
+   "put_call": "",
+   "shares": 1059885,
+   "weight_pct": 1.5
+  },
+  {
+   "name": "ADVANCED MICRO DEVICES INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 491337,
+   "weight_pct": 1.3
+  },
+  {
+   "name": "APPLIED MATLS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 563379,
+   "weight_pct": 1.3
+  },
+  {
+   "name": "MICRON TECHNOLOGY INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 237119,
+   "weight_pct": 1.1
+  },
+  {
+   "name": "NEWMONT CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2103682,
+   "weight_pct": 1.1
+  },
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 970756,
+   "weight_pct": 1.1
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

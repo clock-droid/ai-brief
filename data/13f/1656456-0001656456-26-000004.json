@@ -391,5 +391,78 @@
    "value_before_usd": 9956701
   }
  ],
+ "top_holdings": [
+  {
+   "name": "MICRON TECHNOLOGY INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1250000,
+   "weight_pct": 17.6
+  },
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4475000,
+   "weight_pct": 14.7
+  },
+  {
+   "name": "TAIWAN SEMICONDUCTOR MANUFAC",
+   "class": "SPONSORED ADS",
+   "put_call": "",
+   "shares": 1575000,
+   "weight_pct": 9.5
+  },
+  {
+   "name": "SPACE EXPLORATION TECHN CORP",
+   "class": "CLASS A COM STK",
+   "put_call": "",
+   "shares": 3883329,
+   "weight_pct": 7.4
+  },
+  {
+   "name": "UBER TECHNOLOGIES INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 7315000,
+   "weight_pct": 6.6
+  },
+  {
+   "name": "NVIDIA CORPORATION",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2000000,
+   "weight_pct": 6.0
+  },
+  {
+   "name": "ISHARES INC",
+   "class": "MSCI STH KOR ETF",
+   "put_call": "",
+   "shares": 2106149,
+   "weight_pct": 5.1
+  },
+  {
+   "name": "META PLATFORMS INC",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 525000,
+   "weight_pct": 5.0
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL C",
+   "put_call": "",
+   "shares": 1000000,
+   "weight_pct": 4.5
+  },
+  {
+   "name": "VISTRA CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2115272,
+   "weight_pct": 3.9
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

@@ -2395,5 +2395,78 @@
    "value_before_usd": 12406622
   }
  ],
+ "top_holdings": [
+  {
+   "name": "Tesla Inc",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 3371681,
+   "weight_pct": 6.9
+  },
+  {
+   "name": "Space Exploration Technologies",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 6746417,
+   "weight_pct": 5.9
+  },
+  {
+   "name": "Tempus AI Inc",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 9357545,
+   "weight_pct": 4.4
+  },
+  {
+   "name": "Twist Bioscience Corp",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 3398057,
+   "weight_pct": 3.8
+  },
+  {
+   "name": "NVIDIA Corp",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 2561223,
+   "weight_pct": 3.4
+  },
+  {
+   "name": "10X Genomics Inc",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 6272998,
+   "weight_pct": 3.3
+  },
+  {
+   "name": "Circle Internet Group Inc",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 6857482,
+   "weight_pct": 3.2
+  },
+  {
+   "name": "CRISPR Therapeutics AG",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 10056844,
+   "weight_pct": 3.2
+  },
+  {
+   "name": "Coinbase Global Inc",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 2927800,
+   "weight_pct": 3.1
+  },
+  {
+   "name": "Robinhood Markets Inc",
+   "class": "Common Stock",
+   "put_call": "",
+   "shares": 4604197,
+   "weight_pct": 3.0
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

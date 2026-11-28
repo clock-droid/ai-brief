@@ -343,5 +343,78 @@
    "value_before_usd": 0
   }
  ],
+ "top_holdings": [
+  {
+   "name": "PHILLIPS 66",
+   "class": "COM",
+   "put_call": "",
+   "shares": 19251000,
+   "weight_pct": 17.2
+  },
+  {
+   "name": "TRIPLE FLAG PRECIOUS METAL",
+   "class": "COM",
+   "put_call": "",
+   "shares": 133241535,
+   "weight_pct": 14.3
+  },
+  {
+   "name": "INVESCO QQQ TR",
+   "class": "UNIT SER 1",
+   "put_call": "Put",
+   "shares": 5461200,
+   "weight_pct": 14.1
+  },
+  {
+   "name": "SUNCOR ENERGY INC NEW",
+   "class": "COM",
+   "put_call": "",
+   "shares": 29454000,
+   "weight_pct": 7.0
+  },
+  {
+   "name": "HEWLETT PACKARD ENTERPRISE C",
+   "class": "COM",
+   "put_call": "",
+   "shares": 27000000,
+   "weight_pct": 6.0
+  },
+  {
+   "name": "SELECT SECTOR SPDR TR",
+   "class": "ST STR INDL ETF",
+   "put_call": "Put",
+   "shares": 7600000,
+   "weight_pct": 4.4
+  },
+  {
+   "name": "SOUTHWEST AIRLS CO",
+   "class": "COM",
+   "put_call": "",
+   "shares": 24308000,
+   "weight_pct": 3.5
+  },
+  {
+   "name": "SELECT SECTOR SPDR TR",
+   "class": "ST STR STAPL ETF",
+   "put_call": "Put",
+   "shares": 11200000,
+   "weight_pct": 3.2
+  },
+  {
+   "name": "ISHARES TR",
+   "class": "EXPANDED TECH",
+   "put_call": "Put",
+   "shares": 8200000,
+   "weight_pct": 3.0
+  },
+  {
+   "name": "VANECK ETF TRUST",
+   "class": "GOLD MINERS ETF",
+   "put_call": "Put",
+   "shares": 9850000,
+   "weight_pct": 3.0
+  }
+ ],
+ "options_value_share": 43.9,
  "value_in_thousands_suspected": false
 }

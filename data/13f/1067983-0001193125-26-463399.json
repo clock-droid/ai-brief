@@ -151,5 +151,78 @@
    "value_before_usd": 26445959
   }
  ],
+ "top_holdings": [
+  {
+   "name": "APPLE INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 227917808,
+   "weight_pct": 25.0
+  },
+  {
+   "name": "AMERICAN EXPRESS CO",
+   "class": "COM",
+   "put_call": "",
+   "shares": 151610700,
+   "weight_pct": 15.2
+  },
+  {
+   "name": "COCA COLA CO",
+   "class": "COM",
+   "put_call": "",
+   "shares": 400000000,
+   "weight_pct": 11.3
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL A",
+   "put_call": "",
+   "shares": 78791167,
+   "weight_pct": 8.9
+  },
+  {
+   "name": "BANK OF AMER CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 455860908,
+   "weight_pct": 8.2
+  },
+  {
+   "name": "CHEVRON CORPORATION",
+   "class": "COM",
+   "put_call": "",
+   "shares": 84375856,
+   "weight_pct": 5.7
+  },
+  {
+   "name": "OCCIDENTAL PETE CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 264941431,
+   "weight_pct": 4.8
+  },
+  {
+   "name": "MOODYS CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 24669778,
+   "weight_pct": 3.7
+  },
+  {
+   "name": "CHUBB LIMITED",
+   "class": "COM",
+   "put_call": "",
+   "shares": 34249183,
+   "weight_pct": 3.7
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL C",
+   "put_call": "",
+   "shares": 27188433,
+   "weight_pct": 3.0
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

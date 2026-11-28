@@ -234,24 +234,26 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
     return score, why
 
 
-def economy_score(r: dict, tiers: dict, wires: set) -> tuple[int, list[str]]:
-    """경제 후보 점수. 목표는 '투자 판단에 필요한 깊은 정보'(2026-11-28 사용자)라 원문의 무게를 본다.
-    - 신선도: 6시간 3, 12시간 2, 24시간 1 (서한·연구처럼 며칠 머무는 글은 0이어도 출처 등급으로 겨룬다)
-    - 출처 등급: 1차 원천 3(중앙은행·통계·투자사·공시), 전문가 2, 국내 2차 0
-    - 시장 뉴스 제목(wire): -3. 단독으로는 위에 오지 않고, 같은 사건 묶음의 출처 수로 기여한다
-    - 이름난 투자자·중앙은행 수장 등의 발언 +2, 13F 공시 +2
+def economy_score(r: dict, kinds: dict, aged: set) -> tuple[int, list[str]]:
+    """경제 후보 점수. 목표는 '투자 판단에 필요한 깊은 정보'(2026-11-28 사용자)라 출처 종류의 무게를 먼저 본다 (WRITING.md 2-1 순서).
+    - 종류: 고수 원문(투자자 서한·매크로 필자·인터뷰) 4, 중앙은행·통계 기관 1, 시장 뉴스 제목(wire) 0
+    - 신선도 6시간 3, 12시간 2, 24시간 1: 속보성 출처에만. 며칠 머무는 서한·연구(sources.json max_age_days)에는 주지 않는다
+    - 이름난 투자자·중앙은행 수장 등의 발언 +2, 13F 공시 +4
+    시장 뉴스 제목은 단독으로는 위에 오지 않고, 같은 사건 묶음의 출처 수로 기여한다.
     """
     why = []
-    a = age_hours(r)
-    score = (3 if a <= 6 else 2 if a <= 12 else 1 if a <= 24 else 0) + {1: 3, 2: 2, 3: 0}.get(tiers.get(r["source"], 2), 2)
-    if r["source"] in wires:
-        score -= 3
+    kind = kinds.get(r["source"], "original")
+    score = {"original": 4, "institution": 1, "wire": 0}[kind]
+    if kind == "wire":
         why.append("시장 뉴스 제목")
+    if r["source"] not in aged:
+        a = age_hours(r)
+        score += 3 if a <= 6 else 2 if a <= 12 else 1 if a <= 24 else 0
     if ECON_PEOPLE.search(" ".join([r["title"], r.get("summary", "")[:300]])):
         score += 2
         why.append("핵심 인물")
     if r.get("filing"):
-        score += 2
+        score += 4
         why.append("13F 공시 — 비교 결과: " + (r["filing"].get("data") or "없음"))
     if r.get("video"):
         why.append("영상")
@@ -334,11 +336,13 @@ def main() -> int:
     skipped = skipped_urls()
     fresh = [r for r in fresh if r["url"].rstrip("/") not in skipped]
     econ_sources = {x["id"] for x in srcs if x.get("category") in ECON_CATEGORIES}
-    wires = {x["id"] for x in srcs if x.get("wire")}
+    kinds = {x["id"]: "wire" if x.get("wire") else "institution" if x.get("institution") else "original" for x in srcs}
+    aged = {x["id"] for x in srcs if x.get("max_age_days")}
     ai_rows = [r for r in fresh if r["source"] not in econ_sources]
     econ_rows = [r for r in fresh if r["source"] in econ_sources]
 
-    def rank(rows: list[dict], score) -> list[dict]:
+    def rank(rows: list[dict], score, explore: bool = True) -> list[dict]:
+        """explore: 탐색 후보(취향 밖 화제)를 뽑을지. 탐색 몫은 AI 섹션 규칙이다 (WRITING.md 1절 3)."""
         ranked = []
         for g in cluster(rows):
             scored = [(score(r), r) for r in g]
@@ -354,7 +358,7 @@ def main() -> int:
         for x, p in zip(ranked, prefs):
             x["score"] = x["base"] + p.points
             x["why"] = x["why"] + p.why
-        for i in prefs_model.explore([x["base"] for x in ranked], prefs, [x["done"] for x in ranked]):
+        for i in prefs_model.explore([x["base"] for x in ranked], prefs, [x["done"] for x in ranked]) if explore else []:
             ranked[i]["explore"] = True
         ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
         # 인터뷰·강연 몫: 영상·팟캐스트는 신선도에서 속보를 못 이겨 상위 밖으로 밀리기 쉽다. 그들끼리 겨룬 상위 몇 개는 늘 보인다
@@ -363,7 +367,8 @@ def main() -> int:
             x["talk"] = True
         return ranked
 
-    def render(ranked: list[dict], top: int) -> list[str]:
+    def render(ranked: list[dict], top: int, paywall: bool = True) -> list[str]:
+        """paywall: 유료 기사 본문 상태 줄을 붙일지. Mac은 AI 기사만 받으므로 경제 순위에는 붙이지 않는다 (mac_paywall.py)."""
         out = []
         # 탐색 후보는 관심 감점으로 상위 밖에 밀려났어도 보인다
         shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= top or x.get("explore") or x.get("talk")]
@@ -398,12 +403,12 @@ def main() -> int:
                 out.append(f"   - {m['source']}: {m['url']}")
                 if m.get("video"):
                     out.append("     " + transcript_note(m, transcripts, t_index, tiers))
-                elif pq.site(m["url"]):
+                elif paywall and pq.site(m["url"]):
                     out.append("     " + paywall_note(m, transcripts, p_index))
         return out
 
     ai_ranked = rank(ai_rows, lambda r: item_score(r, tiers, broad, dc_signals))
-    econ_ranked = rank(econ_rows, lambda r: economy_score(r, tiers, wires))
+    econ_ranked = rank(econ_rows, lambda r: economy_score(r, kinds, aged), explore=False)
 
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
              "", f"AI: 발표 {WINDOW_H}시간 이내 후보 {len(ai_rows)}개 → 사건 {len(ai_ranked)}개로 묶음. 상위 {args.top}개.",
@@ -414,7 +419,7 @@ def main() -> int:
     lines += ["## 기존 사건 순위", ""]
     lines += render(ai_ranked, args.top)
     lines += ["", "## 경제 순위", "", "경제 섹션 후보 (WRITING.md 2-1). AI 순위와 따로 겨룬다.", ""]
-    lines += render(econ_ranked, args.econ_top)
+    lines += render(econ_ranked, args.econ_top, paywall=False)
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0

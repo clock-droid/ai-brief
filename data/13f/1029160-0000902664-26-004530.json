@@ -3967,5 +3967,78 @@
    "value_before_usd": 60171083
   }
  ],
+ "top_holdings": [
+  {
+   "name": "SELECT SECTOR SPDR TR",
+   "class": "ST STR ENERG ETF",
+   "put_call": "Put",
+   "shares": 10898300,
+   "weight_pct": 7.9
+  },
+  {
+   "name": "INTEL CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2830000,
+   "weight_pct": 4.0
+  },
+  {
+   "name": "SPDR SERIES TRUST",
+   "class": "SP O&G EXPL PRO",
+   "put_call": "Put",
+   "shares": 1826500,
+   "weight_pct": 3.8
+  },
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1055346,
+   "weight_pct": 3.1
+  },
+  {
+   "name": "TAIWAN SEMICONDUCTOR MANUFAC",
+   "class": "SPONSORED ADS",
+   "put_call": "",
+   "shares": 548915,
+   "weight_pct": 2.9
+  },
+  {
+   "name": "ISHARES TR",
+   "class": "20 YR TR BD ETF",
+   "put_call": "Call",
+   "shares": 3050000,
+   "weight_pct": 2.8
+  },
+  {
+   "name": "PG&E CORP",
+   "class": "NOTE 4.250%12/0",
+   "put_call": "",
+   "shares": 222500000,
+   "weight_pct": 2.6
+  },
+  {
+   "name": "SELECT SECTOR SPDR TR",
+   "class": "ST STR UTIL ETF",
+   "put_call": "Call",
+   "shares": 5446000,
+   "weight_pct": 2.5
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL A",
+   "put_call": "",
+   "shares": 600960,
+   "weight_pct": 2.4
+  },
+  {
+   "name": "NVIDIA CORPORATION",
+   "class": "COM",
+   "put_call": "",
+   "shares": 858822,
+   "weight_pct": 2.3
+  }
+ ],
+ "options_value_share": 23.8,
  "value_in_thousands_suspected": false
 }

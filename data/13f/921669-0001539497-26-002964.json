@@ -103,5 +103,78 @@
    "value_before_usd": 57960000
   }
  ],
+ "top_holdings": [
+  {
+   "name": "Icahn Enterprises LP",
+   "class": "DEPOSITARY UNIT",
+   "put_call": "",
+   "shares": 658924537,
+   "weight_pct": 47.2
+  },
+  {
+   "name": "CVR Energy Inc",
+   "class": "COM",
+   "put_call": "",
+   "shares": 71201875,
+   "weight_pct": 38.5
+  },
+  {
+   "name": "CVR Partners, LP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4164274,
+   "weight_pct": 5.5
+  },
+  {
+   "name": "Centuri Holdings, Inc.",
+   "class": "COM SHS",
+   "put_call": "",
+   "shares": 14336044,
+   "weight_pct": 3.0
+  },
+  {
+   "name": "International Flavors and Fragrances Inc.",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2993728,
+   "weight_pct": 2.7
+  },
+  {
+   "name": "Caesars Entertainment, Inc.",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2440109,
+   "weight_pct": 0.8
+  },
+  {
+   "name": "Monro, Inc.",
+   "class": "COM",
+   "put_call": "",
+   "shares": 5078573,
+   "weight_pct": 0.8
+  },
+  {
+   "name": "SandRidge Energy, Inc.",
+   "class": "COM NEW",
+   "put_call": "",
+   "shares": 5082427,
+   "weight_pct": 0.7
+  },
+  {
+   "name": "EchoStar Corporation",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 500000,
+   "weight_pct": 0.5
+  },
+  {
+   "name": "Bausch Plus Lomb Corp.",
+   "class": "COMMON SHARES",
+   "put_call": "",
+   "shares": 2378100,
+   "weight_pct": 0.4
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

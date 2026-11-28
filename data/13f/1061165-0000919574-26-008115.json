@@ -523,5 +523,78 @@
    "value_before_usd": 33761817
   }
  ],
+ "top_holdings": [
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 5598502,
+   "weight_pct": 9.1
+  },
+  {
+   "name": "DANAHER CORP DEL",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4943211,
+   "weight_pct": 7.1
+  },
+  {
+   "name": "META PLATFORMS INC",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 1252717,
+   "weight_pct": 5.9
+  },
+  {
+   "name": "VISA INC",
+   "class": "COM CL A",
+   "put_call": "",
+   "shares": 2229711,
+   "weight_pct": 5.2
+  },
+  {
+   "name": "TAIWAN SEMICONDUCTOR MANUFAC",
+   "class": "SPONSORED ADS",
+   "put_call": "",
+   "shares": 1716117,
+   "weight_pct": 5.1
+  },
+  {
+   "name": "ASML HLDG NV",
+   "class": "N Y REGISTRY SHS",
+   "put_call": "",
+   "shares": 426911,
+   "weight_pct": 5.0
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL A",
+   "put_call": "",
+   "shares": 2158580,
+   "weight_pct": 4.8
+  },
+  {
+   "name": "INTEL CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 5994254,
+   "weight_pct": 4.7
+  },
+  {
+   "name": "THERMO FISHER SCIENTIFIC INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 996686,
+   "weight_pct": 4.4
+  },
+  {
+   "name": "MCKESSON CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 759621,
+   "weight_pct": 4.2
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

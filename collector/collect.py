@@ -272,35 +272,43 @@ DATE_PATTERNS = [
 ]
 
 
-def _find_date(text: str) -> dt.datetime | None:
+def _find_date(text: str, last: bool = False) -> dt.datetime | None:
+    """글자 속 첫 날짜 (last면 마지막 날짜)."""
+    found = []
     for pattern, fmts in DATE_PATTERNS:
         for m in pattern.finditer(text):
             for fmt in fmts:
                 try:
-                    return dt.datetime.strptime(m.group(1), fmt).replace(tzinfo=dt.timezone.utc)
+                    found.append((m.start(), dt.datetime.strptime(m.group(1), fmt).replace(tzinfo=dt.timezone.utc)))
+                    break
                 except ValueError:
                     continue
-    return None
+    if not found:
+        return None
+    return sorted(found)[-1 if last else 0][1]
 
 
 def collect_page_list(src: dict) -> list[dict]:
     """RSS가 없는 글 목록 페이지(투자사 메모·연구소 블로그). link_pattern에 맞는 href를 글로 본다.
 
-    날짜는 링크 주소나 링크 뒤 가까운 글자에서 찾는다. 날짜를 못 찾은 글도 넣고, 새 글인지는 main()이
-    "지난 실행 때 목록에 있었나"(data/page_lists.json)로 가린다. seen은 21일 뒤 잊으므로 오래된 글이 되살아나지 않게
-    목록 기억을 따로 둔다. 처음 실행하면 목록을 기억만 하고 후보로 내지 않는다.
+    날짜는 링크 주소 → 링크 글자 → 링크 앞(date_before, Oaktree처럼 날짜가 제목 위에 있는 곳) 또는 뒤의 가까운 글자에서 찾는다.
+    날짜를 못 찾은 글도 넣고, 새 글인지는 main()이 "지난 실행 때 목록에 있었나"(data/page_lists.json)로 가린다.
+    seen은 21일 뒤 잊으므로 오래된 글이 되살아나지 않게 목록 기억을 따로 둔다. 처음 실행하면 목록을 기억만 하고 후보로 내지 않는다.
     """
     page = fetch(src["url"])
     base = re.match(r"https?://[^/]+", src["url"]).group(0)
     items = {}
-    for m in re.finditer(r'<a\b[^>]*href="(' + src["link_pattern"] + r')"[^>]*>([\s\S]*?)</a>', page):
-        url = m.group(1) if m.group(1).startswith("http") else base + m.group(1)
+    for m in re.finditer(r'<a\b([^>]*)href="(' + src["link_pattern"] + r')"([^>]*)>([\s\S]*?)</a>', page):
+        url = m.group(2) if m.group(2).startswith("http") else base + m.group(2)
         if url in items:
             continue
-        title = clean_text(m.group(2), 300)
+        attr = re.search(r'\btitle="([^"]+)"', m.group(1) + m.group(3))
+        text = clean_text(m.group(4), 300)
+        title = clean_text(attr.group(1), 300) if attr else text
         if len(title) < 8:  # 그림 링크·"Read more" 등은 같은 글의 다른 링크에서 제목을 얻는다
             continue
-        published = _find_date(m.group(1)) or _find_date(page[m.end(): m.end() + 600])
+        near = page[max(0, m.start() - 400): m.start()] if src.get("date_before") else page[m.end(): m.end() + 600]
+        published = _find_date(m.group(2)) or _find_date(text) or _find_date(near, last=bool(src.get("date_before")))
         if published and now_utc() - published > max_age(src):
             continue
         items[url] = make_item(src, title, url, published, "")
@@ -335,8 +343,10 @@ def collect_sec_13f(src: dict) -> list[dict]:
         try:
             rep = sec13f.report(filer, current, rows, ua)
         except Exception as exc:
+            # 본 것으로 남기지 않아야 다음 실행에서 다시 비교한다 (클라우드에서 SEC가 막는 경우 등)
             print(f"! sec-13f {filer['name']} 비교 실패: {exc}", file=sys.stderr)
-            rep = {"changes": None, "note": f"비교 실패: {exc}", "period": current["period"]}
+            continue
+
         path = None if DRY_RUN else sec13f.save({**rep, "cik": filer["cik"], "accession": current["accession"]})
         title = f"{filer['name']} 13F ({current['period']} 분기)"
         item = make_item(src, title, url, filed, sec13f.summary_line(rep))

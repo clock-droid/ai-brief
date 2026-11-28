@@ -43,5 +43,64 @@
    "value_before_usd": 55033481
   }
  ],
+ "top_holdings": [
+  {
+   "name": "PDD HOLDINGS INC",
+   "class": "SPON ADS",
+   "put_call": "",
+   "shares": 11761119,
+   "weight_pct": 24.2
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL A",
+   "put_call": "",
+   "shares": 2543300,
+   "weight_pct": 23.1
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL C",
+   "put_call": "",
+   "shares": 2451300,
+   "weight_pct": 22.1
+  },
+  {
+   "name": "BERKSHIRE HATHAWAY INC DEL",
+   "class": "CL B NEW",
+   "put_call": "",
+   "shares": 1108318,
+   "weight_pct": 14.6
+  },
+  {
+   "name": "EAST WEST BANCORP INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2776351,
+   "weight_pct": 9.1
+  },
+  {
+   "name": "TENCENT MUSIC ENTERTAINM",
+   "class": "SPON ADS",
+   "put_call": "",
+   "shares": 14824464,
+   "weight_pct": 3.1
+  },
+  {
+   "name": "CROCS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 887093,
+   "weight_pct": 2.8
+  },
+  {
+   "name": "APPLE INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 110600,
+   "weight_pct": 1.0
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

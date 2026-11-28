@@ -145,6 +145,14 @@ def of_period(rows: list[dict], period: str) -> list[dict]:
     return [r for r in rows if r["period"] == period]
 
 
+def top_holdings(rows: dict, n: int = 10) -> list[dict]:
+    """평가액 상위 종목과 비중(%). '가장 큰 종목' 같은 말은 바뀐 종목만이 아니라 이 목록으로 확인한다."""
+    total = max(1, sum(v["value"] for v in rows.values()))
+    top = sorted(rows.items(), key=lambda kv: -kv[1]["value"])[:n]
+    return [{"name": v["name"], "class": v["class"], "put_call": k[1], "shares": v["shares"],
+             "weight_pct": round(v["value"] / total * 100, 1)} for k, v in top]
+
+
 def previous_period(rows: list[dict], period: str) -> str | None:
     older = [r["period"] for r in rows if r["period"] < period]
     return max(older) if older else None
@@ -176,6 +184,8 @@ def report(filer: dict, current: dict, rows: list[dict], ua: str) -> dict:
         "total_value_usd": sum(v["value"] for v in new.values()),
         "total_value_before_usd": sum(v["value"] for v in old.values()),
         "changes": compare(new, old),
+        "top_holdings": top_holdings(new),
+        "options_value_share": round(sum(v["value"] for k, v in new.items() if k[1]) / max(1, sum(v["value"] for v in new.values())) * 100, 1),
     })
     # 2023년부터 평가액은 달러 단위지만 아직 천 달러 단위로 내는 곳이 있다 (바우포스트·듀케인, 2026년 3분기).
     # 합계가 1억 달러도 안 되면 천 달러 단위로 보고 글에서는 금액 대신 비중만 쓴다

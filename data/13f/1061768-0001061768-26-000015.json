@@ -211,5 +211,78 @@
    "value_before_usd": 36160
   }
  ],
+ "top_holdings": [
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 3743854,
+   "weight_pct": 18.5
+  },
+  {
+   "name": "ELEVANCE HEALTH INC FORMERLY",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1275154,
+   "weight_pct": 9.8
+  },
+  {
+   "name": "RESTAURANT BRANDS INTL INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 6753112,
+   "weight_pct": 9.5
+  },
+  {
+   "name": "GENUINE PARTS CO",
+   "class": "COM",
+   "put_call": "",
+   "shares": 3097978,
+   "weight_pct": 7.7
+  },
+  {
+   "name": "FERGUSON ENTERPRISES INC",
+   "class": "COMMON STOCK NEW",
+   "put_call": "",
+   "shares": 1571594,
+   "weight_pct": 6.9
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL C",
+   "put_call": "",
+   "shares": 949931,
+   "weight_pct": 6.4
+  },
+  {
+   "name": "WESCO INTL INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 718523,
+   "weight_pct": 5.1
+  },
+  {
+   "name": "VISA INC",
+   "class": "COM CL A",
+   "put_call": "",
+   "shares": 701355,
+   "weight_pct": 5.0
+  },
+  {
+   "name": "UNION PAC CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 795395,
+   "weight_pct": 4.3
+  },
+  {
+   "name": "AON PLC",
+   "class": "SHS CL A",
+   "put_call": "",
+   "shares": 674779,
+   "weight_pct": 3.7
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": true
 }

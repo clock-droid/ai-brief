@@ -1207,5 +1207,78 @@
    "value_before_usd": 0
   }
  ],
+ "top_holdings": [
+  {
+   "name": "Natera Inc",
+   "class": "COM",
+   "put_call": "",
+   "shares": 3160666,
+   "weight_pct": 29.2
+  },
+  {
+   "name": "Seagate Technology Hldngs Pl",
+   "class": "ORD SHS",
+   "put_call": "",
+   "shares": 341790,
+   "weight_pct": 7.1
+  },
+  {
+   "name": "Amazon Com Inc",
+   "class": "COM",
+   "put_call": "",
+   "shares": 772600,
+   "weight_pct": 4.3
+  },
+  {
+   "name": "Fox Corp",
+   "class": "CL A COM",
+   "put_call": "",
+   "shares": 3046050,
+   "weight_pct": 4.3
+  },
+  {
+   "name": "Ypf Sociedad Anonima",
+   "class": "SPONSORED ADS",
+   "put_call": "",
+   "shares": 3541897,
+   "weight_pct": 4.0
+  },
+  {
+   "name": "Unity Software Inc",
+   "class": "COM",
+   "put_call": "",
+   "shares": 3956385,
+   "weight_pct": 3.6
+  },
+  {
+   "name": "Sea Ltd",
+   "class": "SPONSORD ADS",
+   "put_call": "",
+   "shares": 1592765,
+   "weight_pct": 3.5
+  },
+  {
+   "name": "Ishares Inc",
+   "class": "MSCI BRAZIL ETF",
+   "put_call": "",
+   "shares": 3377570,
+   "weight_pct": 2.8
+  },
+  {
+   "name": "Insmed Inc",
+   "class": "COM PAR $.01",
+   "put_call": "",
+   "shares": 1092650,
+   "weight_pct": 2.8
+  },
+  {
+   "name": "Amazon Com Inc",
+   "class": "COM",
+   "put_call": "Call",
+   "shares": 459300,
+   "weight_pct": 2.6
+  }
+ ],
+ "options_value_share": 7.2,
  "value_in_thousands_suspected": true
 }

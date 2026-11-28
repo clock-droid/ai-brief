@@ -559,5 +559,78 @@
    "value_before_usd": 611750
   }
  ],
+ "top_holdings": [
+  {
+   "name": "META PLATFORMS INC",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 655000,
+   "weight_pct": 10.4
+  },
+  {
+   "name": "UNUM GROUP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 5000000,
+   "weight_pct": 9.6
+  },
+  {
+   "name": "NVIDIA CORPORATION",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1500000,
+   "weight_pct": 7.5
+  },
+  {
+   "name": "CRH PLC",
+   "class": "ORD",
+   "put_call": "",
+   "shares": 2840000,
+   "weight_pct": 5.1
+  },
+  {
+   "name": "BLOCK INC",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 3180000,
+   "weight_pct": 5.1
+  },
+  {
+   "name": "MICROSOFT CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 450000,
+   "weight_pct": 5.0
+  },
+  {
+   "name": "FLEX LTD",
+   "class": "ORD",
+   "put_call": "",
+   "shares": 2000000,
+   "weight_pct": 4.8
+  },
+  {
+   "name": "CAPITAL ONE FINL CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1110000,
+   "weight_pct": 4.7
+  },
+  {
+   "name": "KEYSIGHT TECHNOLOGIES INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 570000,
+   "weight_pct": 4.5
+  },
+  {
+   "name": "LIVE NATION ENTERTAINMENT IN",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1195000,
+   "weight_pct": 4.4
+  }
+ ],
+ "options_value_share": 1.0,
  "value_in_thousands_suspected": false
 }

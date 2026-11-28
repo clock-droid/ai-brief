@@ -451,5 +451,78 @@
    "value_before_usd": 1317823
   }
  ],
+ "top_holdings": [
+  {
+   "name": "GREEN BRICK PARTNERS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 9467383,
+   "weight_pct": 17.6
+  },
+  {
+   "name": "FLUOR CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4607666,
+   "weight_pct": 6.2
+  },
+  {
+   "name": "CORE NATURAL RESOURCES INC",
+   "class": "COM SHS",
+   "put_call": "",
+   "shares": 2255990,
+   "weight_pct": 5.5
+  },
+  {
+   "name": "VERSIGENT PLC",
+   "class": "ORDINARY SHARES",
+   "put_call": "",
+   "shares": 3220500,
+   "weight_pct": 4.1
+  },
+  {
+   "name": "BRIGHTHOUSE FINL INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2842100,
+   "weight_pct": 4.0
+  },
+  {
+   "name": "PG&E CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 10000000,
+   "weight_pct": 3.4
+  },
+  {
+   "name": "ACADIA HEALTHCARE COMPANY IN",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4400641,
+   "weight_pct": 3.4
+  },
+  {
+   "name": "CENTENE CORP DEL",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1651150,
+   "weight_pct": 2.9
+  },
+  {
+   "name": "DHT HOLDINGS INC",
+   "class": "SHS NEW",
+   "put_call": "",
+   "shares": 4281242,
+   "weight_pct": 2.7
+  },
+  {
+   "name": "DAUCH CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 18411629,
+   "weight_pct": 2.7
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

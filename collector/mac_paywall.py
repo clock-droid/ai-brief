@@ -57,6 +57,8 @@ def main() -> int:
     srcs = json.loads((repo / "collector" / "sources.json").read_text())["sources"]
     tiers = {s["id"]: s.get("tier", 2) for s in srcs}
     broad = {s["id"] for s in srcs if s.get("broad")}
+    # 사용자가 구독 로그인으로 받기를 허락한 건 AI 관련 기사뿐이다 (2026-11-28). 경제 섹션 출처(WSJ Markets 등)는 받지 않는다
+    econ = {s["id"] for s in srcs if s.get("category") in rank.ECON_CATEGORIES}
     done = rank.written_urls() | rank.skipped_urls()
     folder = out / pq.DIR
     folder.mkdir(exist_ok=True)
@@ -67,7 +69,7 @@ def main() -> int:
         for line in open(f, encoding="utf-8"):
             r = json.loads(line)
             k = pq.key(r["url"])
-            if not pq.site(r["url"]) or k in seen or r["url"].rstrip("/") in done or not r.get("published"):
+            if not pq.site(r["url"]) or r["source"] in econ or k in seen or r["url"].rstrip("/") in done or not r.get("published"):
                 continue
             seen.add(k)
             if pq.status(r, index, out, now) != "wait":

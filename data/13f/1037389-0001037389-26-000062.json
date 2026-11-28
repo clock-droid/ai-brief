@@ -17995,18 +17995,6 @@
    "value_before_usd": 0
   },
   {
-   "kind": "청산",
-   "name": "INHIBRX BIOSCIENCES INC",
-   "class": "COM",
-   "cusip": "45720N103",
-   "put_call": "",
-   "shares_before": 62201,
-   "shares_after": 0,
-   "change_pct": -100.0,
-   "value_after_usd": 0,
-   "value_before_usd": 5893545
-  },
-  {
    "kind": "축소",
    "name": "EL POLLO LOCO HLDGS INC",
    "class": "COM",
@@ -18017,6 +18005,18 @@
    "change_pct": -1.8,
    "value_after_usd": 5893545,
    "value_before_usd": 7096064
+  },
+  {
+   "kind": "청산",
+   "name": "INHIBRX BIOSCIENCES INC",
+   "class": "COM",
+   "cusip": "45720N103",
+   "put_call": "",
+   "shares_before": 62201,
+   "shares_after": 0,
+   "change_pct": -100.0,
+   "value_after_usd": 0,
+   "value_before_usd": 5893545
   },
   {
    "kind": "축소",
@@ -44671,5 +44671,78 @@
    "value_before_usd": 0
   }
  ],
+ "top_holdings": [
+  {
+   "name": "MICRON TECHNOLOGY INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1520639,
+   "weight_pct": 2.2
+  },
+  {
+   "name": "ADVANCED MICRO DEVICES INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1995101,
+   "weight_pct": 1.6
+  },
+  {
+   "name": "UNITED THERAPEUTICS CORP DEL",
+   "class": "COM",
+   "put_call": "",
+   "shares": 1675899,
+   "weight_pct": 1.2
+  },
+  {
+   "name": "INTEL CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 6941236,
+   "weight_pct": 1.1
+  },
+  {
+   "name": "ALPHABET INC",
+   "class": "CAP STK CL A",
+   "put_call": "",
+   "shares": 2405471,
+   "weight_pct": 1.1
+  },
+  {
+   "name": "UNITEDHEALTH GROUP INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2226720,
+   "weight_pct": 1.1
+  },
+  {
+   "name": "EXELIXIS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 12792693,
+   "weight_pct": 1.0
+  },
+  {
+   "name": "VERISIGN INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2301071,
+   "weight_pct": 0.9
+  },
+  {
+   "name": "SPACE EXPLORATION TECHN CORP",
+   "class": "CLASS A COM STK",
+   "put_call": "",
+   "shares": 4113200,
+   "weight_pct": 0.8
+  },
+  {
+   "name": "CORCEPT THERAPEUTICS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4850083,
+   "weight_pct": 0.8
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }

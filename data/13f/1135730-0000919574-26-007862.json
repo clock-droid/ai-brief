@@ -571,5 +571,78 @@
    "value_before_usd": 224914
   }
  ],
+ "top_holdings": [
+  {
+   "name": "TAIWAN SEMICONDUCTOR MANUFAC",
+   "class": "SPONSORED ADS",
+   "put_call": "",
+   "shares": 9437369,
+   "weight_pct": 7.9
+  },
+  {
+   "name": "MICRON TECHNOLOGY INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 3274831,
+   "weight_pct": 6.4
+  },
+  {
+   "name": "MICROSOFT CORP",
+   "class": "COM",
+   "put_call": "",
+   "shares": 6458119,
+   "weight_pct": 6.1
+  },
+  {
+   "name": "META PLATFORMS INC",
+   "class": "CL A",
+   "put_call": "",
+   "shares": 4514481,
+   "weight_pct": 6.0
+  },
+  {
+   "name": "LAM RESEARCH CORP",
+   "class": "COM NEW",
+   "put_call": "",
+   "shares": 9926030,
+   "weight_pct": 6.0
+  },
+  {
+   "name": "SPACE EXPLORATION TECHN CORP",
+   "class": "CLASS A COM STK",
+   "put_call": "",
+   "shares": 19456346,
+   "weight_pct": 5.4
+  },
+  {
+   "name": "AMAZON COM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 11618033,
+   "weight_pct": 5.3
+  },
+  {
+   "name": "BROADCOM INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 6666450,
+   "weight_pct": 4.3
+  },
+  {
+   "name": "GE VERNOVA INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 2461674,
+   "weight_pct": 4.3
+  },
+  {
+   "name": "APPLIED MATLS INC",
+   "class": "COM",
+   "put_call": "",
+   "shares": 4516044,
+   "weight_pct": 4.2
+  }
+ ],
+ "options_value_share": 0.0,
  "value_in_thousands_suspected": false
 }
