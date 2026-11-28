@@ -77,10 +77,18 @@ def clean_text(s: str | None, limit: int = SUMMARY_LIMIT) -> str:
 
 
 def parse_date(s: str | None, naive_tz: dt.tzinfo = dt.timezone.utc) -> dt.datetime | None:
-    """시간대 표기가 없는 날짜는 naive_tz로 본다 (국내 피드는 KST를 표기 없이 준다)."""
+    """시간대 표기가 없는 날짜는 naive_tz로 본다 (국내 피드는 KST를 표기 없이 준다).
+
+    시각 없이 날짜만 주는 피드(Nature·Cell 계열 학술지)는 0시로 읽으면 실제 공개보다 최대 하루 오래된 것으로 계산돼
+    신선도 기준(WRITING.md 2절)에서 밀린다. 그래서 '지금'(= 처음 본 시각, 글은 seen.json으로 한 번만 받는다)과
+    그날 끝 중 이른 쪽을 쓴다. 수집이 2시간마다 돌아 실제 공개 시각과 가깝고, 지난 날짜는 그대로 오래된 글이 된다.
+    """
     if not s:
         return None
     s = s.strip()
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
+        day_end = dt.datetime.fromisoformat(s).replace(tzinfo=naive_tz) + dt.timedelta(days=1)
+        return min(now_utc(), day_end.astimezone(dt.timezone.utc))
     try:
         d = email.utils.parsedate_to_datetime(s)
     except (TypeError, ValueError):
