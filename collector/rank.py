@@ -63,8 +63,13 @@ AI_TECH = re.compile(
     r"|space (?:industry|economy|tourism|mining|exploration|race|force|agency|startup|company|companies|data ?cent\w*|solar)"
     r"|orbital (?:data ?cent\w*|compute|launch\w*|rocket\w*|station\w*|economy)|in orbit|low earth orbit|leo constellation"
     r"|lunar|moon (?:landing|base|mission)s?|mars (?:mission|landing|colony|base)s?|nasa|artemis|astronauts?|asteroid mining"
+    # 칩·컴퓨트: 회사 기사 제목엔 'chip'이 없다 (WSJ 엔비디아 기사 3편이 -4로 빠짐, 2026-11-28).
+    r"|nvidia|tsmc|asml|sk hynix|hbm\d?\w*|gpus?|tpus?|amd|intel|broadcom|qualcomm|foundr(?:y|ies)|wafers?|lithograph\w*"
+    # 자율주행·드론(로봇·자율주행 분야)
+    r"|waymo|robotaxis?|cybercabs?|self-driving|driverless|autonomous (?:vehicle|car|truck|driving)s?|full self-driving|zoox|wayve|pony\.ai"
+    r"|drones?(?! bees?)|evtols?"
     r"|chip(?!-?seq)|quantum(?! dots?))\b"
-    r"|인공지능|에이전트|로봇|반도체|자동화|양자|뇌[-– ]?컴퓨터|뇌 임플란트|뉴럴링크|우주|위성|발사체|스페이스X|스타십|누리호", re.I)
+    r"|인공지능|에이전트|로봇|반도체|자동화|양자|뇌[-– ]?컴퓨터|뇌 임플란트|뉴럴링크|우주|위성|발사체|스페이스X|스타십|누리호|엔비디아|하이닉스|로보택시|자율주행|드론", re.I)
 INNOVATION = re.compile(
     r"\b(launch(es|ed)?|release[sd]?|unveil\w*|introduc(es|ed|ing)|open[- ]?sourc\w*|open[- ]weights?|new model|"
     r"benchmark\w*|state[- ]of[- ]the[- ]art|sota|breakthrough|proof|proves?|proved|theorem|discover\w*|arxiv|"

@@ -28,6 +28,9 @@
 
     { "id": "robot-report", "tier": 2, "name": "The Robot Report", "type": "rss", "url": "https://www.therobotreport.com/feed/", "category": "robotics" },
     { "id": "ieee-spectrum", "tier": 2, "name": "IEEE Spectrum", "type": "rss", "url": "https://spectrum.ieee.org/feeds/feed.rss", "category": "robotics" },
+    { "id": "techcrunch-transport", "tier": 2, "broad": true, "name": "TechCrunch 모빌리티", "type": "rss", "url": "https://techcrunch.com/category/transportation/feed/", "category": "robotics" },
+    { "id": "electrek-av", "tier": 2, "name": "Electrek 자율주행", "type": "rss", "url": "https://electrek.co/guides/autonomous-driving/feed/", "category": "robotics" },
+    { "id": "dronelife", "tier": 2, "name": "DRONELIFE", "type": "rss", "url": "https://dronelife.com/feed/", "category": "robotics" },
 
     { "id": "nature", "tier": 1, "broad": true, "name": "Nature", "type": "rss", "url": "https://www.nature.com/nature.rss", "category": "science" },
     { "id": "science", "tier": 1, "broad": true, "name": "Science", "type": "rss", "url": "https://www.science.org/rss/news_current.xml", "category": "science" },
