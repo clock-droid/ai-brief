@@ -47,6 +47,7 @@
     { "id": "fed-speeches", "tier": 1, "name": "미 연준 연설", "type": "rss", "url": "https://www.federalreserve.gov/feeds/speeches.xml", "category": "economy" },
     { "id": "bok", "tier": 1, "name": "한국은행", "type": "rss", "url": "https://www.bok.or.kr/portal/bbs/B0000501/news.rss?menuNo=201264", "category": "economy" },
     { "id": "noahpinion", "tier": 2, "name": "Noahpinion", "type": "rss", "url": "https://www.noahpinion.blog/feed", "category": "economy" },
+    { "id": "wsj-tech", "tier": 2, "broad": true, "name": "WSJ 테크", "type": "rss", "url": "https://feeds.content.dowjones.io/public/rss/RSSWSJD", "category": "economy" },
     { "id": "money-stuff", "tier": 2, "name": "Money Stuff", "type": "rss", "url": "https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss", "category": "economy" },
     { "id": "stratechery", "tier": 2, "name": "Stratechery", "type": "rss", "url": "https://stratechery.com/feed/", "category": "economy" },
     { "id": "aitimes", "tier": 3, "timezone": "KST", "name": "AI타임스", "type": "rss", "url": "https://www.aitimes.com/rss/allArticle.xml", "category": "economy" },
