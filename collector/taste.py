@@ -52,6 +52,7 @@ class Embedder:
     def __init__(self, model: str = MODEL):
         self.model_name = model
         self._model = None
+        self._memo: dict[str, object] = {}  # 같은 글을 여러 번 비교할 때(자동 조정의 되짚어 보기) 다시 계산하지 않는다
         self.error: str | None = None
 
     def embed(self, texts: list[str]):
@@ -63,8 +64,11 @@ class Embedder:
 
             if self._model is None:
                 self._model = TextEmbedding(self.model_name, cache_dir=str(CACHE))
-            vecs = np.array(list(self._model.embed(texts)), dtype=np.float32)
-            return vecs / np.linalg.norm(vecs, axis=1, keepdims=True)
+            todo = list(dict.fromkeys(t for t in texts if t not in self._memo))
+            for t, v in zip(todo, self._model.embed(todo)):
+                v = np.asarray(v, dtype=np.float32)
+                self._memo[t] = v / np.linalg.norm(v)
+            return np.array([self._memo[t] for t in texts], dtype=np.float32)
         except Exception as exc:  # 설치 안 됨·모델 다운로드 실패·메모리 부족 등
             self.error = f"{type(exc).__name__}: {exc}"[:200]
             print(f"! 내용 유사도 꺼짐: {self.error}", file=sys.stderr)
