@@ -45,7 +45,7 @@ VIDEO_WINDOW_H = 96  # 인터뷰·팟캐스트 영상
 STOP = set("""the and for with from that this into over after about what will says said new how why are was has have its
 their your more than just only also amid via per using use used can not but you all one two now our out who which when
 https http com www status""".split())
-# broad 매체(Nature·Cell·바이오 전문지 등)에서 AI·기술 글만 골라내는 관문. 바이오 글은 AI가 섞인 것만 통과한다 (2026-11-28 사용자 결정).
+# broad 매체(Nature·Cell·바이오 전문지 등)에서 AI·기술 글만 골라내는 관문 (우주 기술은 AI 없이도 통과). 바이오 글은 AI가 섞인 것만 통과한다 (2026-11-28 사용자 결정).
 # 학술지 제목은 "AI" 대신 방법 이름을 쓰므로 AI 바이오 표현을 함께 본다. 생물 용어와 겹치는 낱말은 좁힌다:
 # neural circuit·neural barcode, quantum dot, ChIP-seq는 AI·기술 소식이 아니다.
 AI_TECH = re.compile(
@@ -57,8 +57,14 @@ AI_TECH = re.compile(
     r"|bcis?|brain[-– ](?:computer|machine)|brain implants?|neuroprosthe\w*|neurotechnolog\w*"
     r"|(?:intracortical|implanted|implantable|microelectrode|utah) (?:\w+ )?(?:electrodes?|arrays?|devices?|implants?)"
     r"|neuralink|synchron|paradromics|precision neuroscience|blackrock neurotech"
+    # 우주(에너지·우주 분야): AI 없이도 싣는다 — 미래를 엿보거나 경제와 얽힌 것 (2026-11-28 사용자 결정, WRITING.md 2절).
+    # 'orbital'은 분자 궤도(molecular orbital)와 겹쳐 우주 쪽 짝말이 붙을 때만 본다.
+    r"|spacex|starship|starlink|blue origin|rockets?|launch vehicles?|satellites?(?! (?:cells?|dna|glia))|space ?stations?|spacecraft|spaceflight"
+    r"|space (?:industry|economy|tourism|mining|exploration|race|force|agency|startup|company|companies|data ?cent\w*|solar)"
+    r"|orbital (?:data ?cent\w*|compute|launch\w*|rocket\w*|station\w*|economy)|in orbit|low earth orbit|leo constellation"
+    r"|lunar|moon (?:landing|base|mission)s?|mars (?:mission|landing|colony|base)s?|nasa|artemis|astronauts?|asteroid mining"
     r"|chip(?!-?seq)|quantum(?! dots?))\b"
-    r"|인공지능|에이전트|로봇|반도체|자동화|양자|뇌[-– ]?컴퓨터|뇌 임플란트|뉴럴링크", re.I)
+    r"|인공지능|에이전트|로봇|반도체|자동화|양자|뇌[-– ]?컴퓨터|뇌 임플란트|뉴럴링크|우주|위성|발사체|스페이스X|스타십|누리호", re.I)
 INNOVATION = re.compile(
     r"\b(launch(es|ed)?|release[sd]?|unveil\w*|introduc(es|ed|ing)|open[- ]?sourc\w*|open[- ]weights?|new model|"
     r"benchmark\w*|state[- ]of[- ]the[- ]art|sota|breakthrough|proof|proves?|proved|theorem|discover\w*|arxiv|"
