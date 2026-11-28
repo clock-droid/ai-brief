@@ -44670,5 +44670,6 @@
    "value_after_usd": 0,
    "value_before_usd": 0
   }
- ]
+ ],
+ "value_in_thousands_suspected": false
 }

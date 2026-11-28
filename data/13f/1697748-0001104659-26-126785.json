@@ -2394,5 +2394,6 @@
    "value_after_usd": 237,
    "value_before_usd": 12406622
   }
- ]
+ ],
+ "value_in_thousands_suspected": false
 }

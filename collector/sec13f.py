@@ -8,6 +8,7 @@
   (일반 UA는 403). 연락처는 환경 변수 SEC_CONTACT(메일 주소)로만 받고 저장소에 두지 않는다.
   없으면 수집기가 이 출처를 통째로 건너뛰고 경고를 남긴다 (collect.py collect_sec_13f).
 - 비교는 (CUSIP, 풋·콜) 단위로 주식 수를 합쳐 한다. 평가액(value, 달러)은 주가에 따라 변하므로 판단에 쓰지 않는다.
+  천 달러 단위로 내는 곳이 있어 합계가 1억 달러 미만이면 value_in_thousands_suspected를 붙인다.
 - 13F는 분기 말 45일 뒤에 나오고, 미국 상장 롱 포지션만 담는다 (공매도·현금·해외 주식 없음).
 
 조사 근거: research/06-econ-sources.md E절 (2026-11-28 버크셔 2→3분기 비교 시험).
@@ -176,6 +177,9 @@ def report(filer: dict, current: dict, rows: list[dict], ua: str) -> dict:
         "total_value_before_usd": sum(v["value"] for v in old.values()),
         "changes": compare(new, old),
     })
+    # 2023년부터 평가액은 달러 단위지만 아직 천 달러 단위로 내는 곳이 있다 (바우포스트·듀케인, 2026년 3분기).
+    # 합계가 1억 달러도 안 되면 천 달러 단위로 보고 글에서는 금액 대신 비중만 쓴다
+    out["value_in_thousands_suspected"] = out["total_value_usd"] < 100_000_000
     return out
 
 
