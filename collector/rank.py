@@ -32,6 +32,7 @@ import re
 from pathlib import Path
 
 import preferences
+import paywall_queue as pq
 import transcript_queue as tq
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -218,6 +219,17 @@ def transcript_note(r: dict, transcripts: Path, index: dict, tiers: dict) -> str
     return f"{why} — 영상 설명·같은 발언을 다룬 보도로 확인한다"
 
 
+def paywall_note(r: dict, handoff: Path, index: dict) -> str:
+    """유료 기사(WSJ) 후보 아래에 붙는 본문 상태 한 줄. 글쓰기 작업이 상태마다 할 일은 WRITING.md 1절 5."""
+    name = pq.site(r["url"])
+    st = pq.status(r, index, handoff, now())
+    if st == "have":
+        return f"{name} 본문 있음: {handoff / pq.DIR / pq.filename(r['url'])}"
+    if st == "wait":
+        return f"{name} 본문 대기 — Mac이 받을 수 있다. 원문 확인 2단계(같은 사건 보도)로 쓰거나 다음 실행으로 넘긴다"
+    return f"{name} 본문 못 받음 — 원문 확인 2단계(같은 사건 보도)로 확인한다"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--top", type=int, default=60)
@@ -233,6 +245,7 @@ def main() -> int:
     written_sets = written_token_sets()
     transcripts = ROOT.parent / "ai-brief-transcripts"  # Mac이 받아 둔 자막 (글쓰기 작업이 함께 clone)
     t_index = tq.load_index(transcripts)
+    p_index = pq.load_index(transcripts)
     prefs_model = preferences.Preferences(now())
 
     candidates = load_candidates()
@@ -295,6 +308,8 @@ def main() -> int:
             lines.append(f"   - {m['source']}: {m['url']}")
             if m.get("video"):
                 lines.append("     " + transcript_note(m, transcripts, t_index, tiers))
+            elif pq.site(m["url"]):
+                lines.append("     " + paywall_note(m, transcripts, p_index))
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0

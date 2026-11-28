@@ -38,6 +38,12 @@ def main() -> int:
                        check=True, timeout=500)
     except (OSError, subprocess.SubprocessError) as exc:
         print(f"GPT 원문 수집 실패: {exc}", file=sys.stderr)
+    # 유료 기사(WSJ) 본문도 같은 전달 폴더로 보낸다. 실패해도 자막 수집은 계속한다.
+    try:
+        subprocess.run([sys.executable, str(repo / "collector/mac_paywall.py"), str(repo), str(out)],
+                       check=True, timeout=500)
+    except (OSError, subprocess.SubprocessError) as exc:
+        print(f"유료 기사 본문 수집 실패: {exc}", file=sys.stderr)
 
     from youtube_transcript_api import YouTubeTranscriptApi
 
