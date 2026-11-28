@@ -23,7 +23,10 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 넓은 매체에서 AI·기술이 제목에 있으면(주제이면) +1
 - 탐색 후보: 관심 점수를 뺀 점수 상위 40 안에서 아직 반응이 없는 영역이거나 취향 점수가 음수인 것 3개를 맨 위에 따로 보인다
 
-사용: python3 collector/rank.py [--top 60]
+경제 섹션 후보(sources.json에서 경제 분류 출처의 글)는 AI와 따로 겨뤄 같은 파일 아래쪽 "경제 순위"에 상위 30개로 낸다.
+경제 점수는 economy_score() 설명 참고 (AI의 혁신·AI 관문 점수를 쓰지 않는다).
+
+사용: python3 collector/rank.py [--top 60] [--econ-top 30]
 이미 검토하고 건너뛴 후보(data/skipped.jsonl)는 빠진다.
 """
 from __future__ import annotations
@@ -44,6 +47,13 @@ DATA = ROOT / "data"
 CONTENT = ROOT / "web" / "src" / "content"
 OUT = DATA / "shortlist.md"
 WINDOW_H = 48
+# 경제 섹션 분류 (web/src/categories.ts ECON_CATEGORIES와 같아야 한다)
+ECON_CATEGORIES = {"rates", "markets", "companies", "commodities", "trade", "investors"}
+# 경제 쪽 핵심 인물: 이름난 투자자·중앙은행 수장·재무장관 (2026-11-28, research/06-econ-sources.md의 출처 인물)
+ECON_PEOPLE = re.compile(
+    r"\b(buffett|munger|howard marks|dalio|druckenmiller|ackman|tepper|klarman|einhorn|grantham|damodaran|asness|"
+    r"icahn|soros|cathie wood|dimon|powell|lagarde|ueda|bailey|bessent|yellen|summers|el-erian|pettis|setser|tooze)\b"
+    r"|버핏|하워드 막스|달리오|드러켄밀러|애크먼|파월|라가르드|우에다|베선트|이창용", re.I)
 TALK_N = 5  # 인터뷰·강연 몫: 뉴스와 따로 겨뤄 매번 검토하는 영상·팟캐스트 수
 VIDEO_WINDOW_H = 96  # 인터뷰·팟캐스트 (영상·음성 모두 퍼지는 데 며칠 걸린다)
 
@@ -222,6 +232,30 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
     return score, why
 
 
+def economy_score(r: dict, tiers: dict, wires: set) -> tuple[int, list[str]]:
+    """경제 후보 점수. 목표는 '투자 판단에 필요한 깊은 정보'(2026-11-28 사용자)라 원문의 무게를 본다.
+    - 신선도: 6시간 3, 12시간 2, 24시간 1 (서한·연구처럼 며칠 머무는 글은 0이어도 출처 등급으로 겨룬다)
+    - 출처 등급: 1차 원천 3(중앙은행·통계·투자사·공시), 전문가 2, 국내 2차 0
+    - 시장 뉴스 제목(wire): -3. 단독으로는 위에 오지 않고, 같은 사건 묶음의 출처 수로 기여한다
+    - 이름난 투자자·중앙은행 수장 등의 발언 +2, 13F 공시 +2
+    """
+    why = []
+    a = age_hours(r)
+    score = (3 if a <= 6 else 2 if a <= 12 else 1 if a <= 24 else 0) + {1: 3, 2: 2, 3: 0}.get(tiers.get(r["source"], 2), 2)
+    if r["source"] in wires:
+        score -= 3
+        why.append("시장 뉴스 제목")
+    if ECON_PEOPLE.search(" ".join([r["title"], r.get("summary", "")[:300]])):
+        score += 2
+        why.append("핵심 인물")
+    if r.get("filing"):
+        score += 2
+        why.append("13F 공시 — 비교 결과: " + (r["filing"].get("data") or "없음"))
+    if r.get("video"):
+        why.append("영상")
+    return score, why
+
+
 def cluster(rows: list[dict]) -> list[list[dict]]:
     groups: list[tuple[set[str], list[dict]]] = []
     for r in rows:
@@ -268,6 +302,7 @@ def paywall_note(r: dict, handoff: Path, index: dict) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--top", type=int, default=60)
+    ap.add_argument("--econ-top", type=int, default=30)
     ap.add_argument("--primary-dir", type=Path, help="GPT 원문 수집 파일이 있는 폴더")
     args = ap.parse_args()
 
@@ -284,77 +319,100 @@ def main() -> int:
     prefs_model = preferences.Preferences(now())
 
     candidates = load_candidates()
-    fresh = [r for r in candidates if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") or r.get("podcast") else WINDOW_H)]
+    windows = {x["id"]: max(WINDOW_H, x.get("max_age_days", 0) * 24) for x in srcs}
+
+    def in_window(r: dict) -> bool:
+        if r.get("video") or r.get("podcast"):
+            return age_hours(r) <= max(VIDEO_WINDOW_H, windows.get(r["source"], 0))
+        return age_hours(r) <= windows.get(r["source"], WINDOW_H)
+
+    fresh = [r for r in candidates if in_window(r)]
     # 같은 URL 중복 제거
     fresh = list({r["url"].rstrip("/"): r for r in fresh}.values())
     skipped = skipped_urls()
     fresh = [r for r in fresh if r["url"].rstrip("/") not in skipped]
+    econ_sources = {x["id"] for x in srcs if x.get("category") in ECON_CATEGORIES}
+    wires = {x["id"] for x in srcs if x.get("wire")}
+    ai_rows = [r for r in fresh if r["source"] not in econ_sources]
+    econ_rows = [r for r in fresh if r["source"] in econ_sources]
 
-    ranked = []
-    for g in cluster(fresh):
-        scored = [(item_score(r, tiers, broad, dc_signals), r) for r in g]
-        scored.sort(key=lambda x: -x[0][0])
-        (best_score, why), lead = scored[0]
-        sources = {r["source"] for r in g}
-        bonus = min(3, len(sources) - 1)
-        done = any(r["url"].rstrip("/") in written for r in g) or covered(set().union(*(tokens(r) for r in g)), written_sets)
-        # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
-        ranked.append({"base": best_score + bonus, "lead": lead, "members": [r for _, r in scored], "why": why,
-                       "n_sources": len(sources), "done": done})
-    prefs = prefs_model.score_groups([x["members"] for x in ranked])
-    for x, p in zip(ranked, prefs):
-        x["score"] = x["base"] + p.points
-        x["why"] = x["why"] + p.why
-    for i in prefs_model.explore([x["base"] for x in ranked], prefs, [x["done"] for x in ranked]):
-        ranked[i]["explore"] = True
-    # 이미 다룬 사건은 점수와 관계없이 뒤로 보낸다 (위쪽 자리를 새 소식에 쓰기 위해)
-    ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
-    # 인터뷰·강연 몫: 영상·팟캐스트는 신선도에서 속보를 못 이겨 상위 밖으로 밀리기 쉽다. 그들끼리 겨룬 상위 몇 개는 늘 보인다
-    talks = [x for x in ranked if not x["done"] and any(m.get("video") or m.get("podcast") for m in x["members"])]
-    for x in talks[:TALK_N]:
-        x["talk"] = True
+    def rank(rows: list[dict], score) -> list[dict]:
+        ranked = []
+        for g in cluster(rows):
+            scored = [(score(r), r) for r in g]
+            scored.sort(key=lambda x: -x[0][0])
+            (best_score, why), lead = scored[0]
+            sources = {r["source"] for r in g}
+            bonus = min(3, len(sources) - 1)
+            done = any(r["url"].rstrip("/") in written for r in g) or covered(set().union(*(tokens(r) for r in g)), written_sets)
+            # 이미 다룬 사건도 버리지 않는다: 후속 전개는 정리 글 갱신 후보 (WRITING.md 6-4)
+            ranked.append({"base": best_score + bonus, "lead": lead, "members": [r for _, r in scored], "why": why,
+                           "n_sources": len(sources), "done": done})
+        prefs = prefs_model.score_groups([x["members"] for x in ranked])
+        for x, p in zip(ranked, prefs):
+            x["score"] = x["base"] + p.points
+            x["why"] = x["why"] + p.why
+        for i in prefs_model.explore([x["base"] for x in ranked], prefs, [x["done"] for x in ranked]):
+            ranked[i]["explore"] = True
+        ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
+        # 인터뷰·강연 몫: 영상·팟캐스트는 신선도에서 속보를 못 이겨 상위 밖으로 밀리기 쉽다. 그들끼리 겨룬 상위 몇 개는 늘 보인다
+        talks = [x for x in ranked if not x["done"] and any(m.get("video") or m.get("podcast") for m in x["members"])]
+        for x in talks[:TALK_N]:
+            x["talk"] = True
+        return ranked
+
+    def render(ranked: list[dict], top: int) -> list[str]:
+        out = []
+        # 탐색 후보는 관심 감점으로 상위 밖에 밀려났어도 보인다
+        shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= top or x.get("explore") or x.get("talk")]
+        explore = [(i, x) for i, x in shown if x.get("explore")]
+        if explore:
+            out += ["탐색 후보 (취향과 무관하게 화제성이 높은 것. WRITING.md 1절 3): "
+                    + ", ".join(f"{i}위" for i, _ in explore), ""]
+        talk = [(i, x) for i, x in shown if x.get("talk")]
+        if talk:
+            out += ["인터뷰·강연 몫 (영상·팟캐스트끼리 겨룬 상위. 순위가 낮아도 검토한다): "
+                    + ", ".join(f"{i}위" for i, _ in talk), ""]
+        for i, x in shown:
+            lead = x["lead"]
+            flags = []
+            if x["n_sources"] > 1:
+                flags.append(f"출처 {x['n_sources']}곳")
+            if x["done"]:
+                flags.append("이미 다룬 사건 — 새 사실이 있으면 정리 글 갱신(6-4)")
+            if x.get("explore"):
+                flags.append("탐색 후보")
+            if x.get("talk"):
+                flags.append("인터뷰·강연 몫")
+            flags += x["why"]
+            lead_text = " ".join([lead["title"], lead.get("summary", "")[:300], (lead.get("tweet") or {}).get("author") or "",
+                                  (lead.get("signal") or {}).get("title", "")])
+            if KEY_PEOPLE.search(lead_text):
+                flags.insert(0, "핵심 인물 발언 — 의견이어도 싣는다")
+            out.append(f"{i}. **{x['score']}점** · {age_hours(lead):.0f}시간 전 · {lead['source_name']} — {display_title(lead)[:110]}")
+            if flags:
+                out.append(f"   - {' · '.join(flags)}")
+            for m in x["members"]:
+                out.append(f"   - {m['source']}: {m['url']}")
+                if m.get("video"):
+                    out.append("     " + transcript_note(m, transcripts, t_index, tiers))
+                elif pq.site(m["url"]):
+                    out.append("     " + paywall_note(m, transcripts, p_index))
+        return out
+
+    ai_ranked = rank(ai_rows, lambda r: item_score(r, tiers, broad, dc_signals))
+    econ_ranked = rank(econ_rows, lambda r: economy_score(r, tiers, wires))
 
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
-             "", f"발표 {WINDOW_H}시간 이내 후보 {len(fresh)}개 → 사건 {len(ranked)}개로 묶음. 상위 {args.top}개.",
+             "", f"AI: 발표 {WINDOW_H}시간 이내 후보 {len(ai_rows)}개 → 사건 {len(ai_ranked)}개로 묶음. 상위 {args.top}개.",
+             f"경제: 출처별 신선도 한도 안의 후보 {len(econ_rows)}개 → 사건 {len(econ_ranked)}개. 상위 {args.econ_top}개 (맨 아래 '경제 순위').",
              "점수 구성은 collector/rank.py 맨 위 설명 참고. 위에서부터 검토한다.", prefs_model.status() + ".", ""]
     from gpt_primary_sources.review import section
     lines += section(args.primary_dir or transcripts, candidates, written | skipped, now())
     lines += ["## 기존 사건 순위", ""]
-    # 탐색 후보는 관심 감점으로 상위 밖에 밀려났어도 보인다
-    shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= args.top or x.get("explore") or x.get("talk")]
-    explore = [(i, x) for i, x in shown if x.get("explore")]
-    if explore:
-        lines += ["탐색 후보 (취향과 무관하게 화제성이 높은 것. WRITING.md 1절 3): "
-                  + ", ".join(f"{i}위" for i, _ in explore), ""]
-    talk = [(i, x) for i, x in shown if x.get("talk")]
-    if talk:
-        lines += ["인터뷰·강연 몫 (영상·팟캐스트끼리 겨룬 상위. 순위가 낮아도 검토한다): "
-                  + ", ".join(f"{i}위" for i, _ in talk), ""]
-    for i, x in shown:
-        lead = x["lead"]
-        flags = []
-        if x["n_sources"] > 1:
-            flags.append(f"출처 {x['n_sources']}곳")
-        if x["done"]:
-            flags.append("이미 다룬 사건 — 새 사실이 있으면 정리 글 갱신(6-4)")
-        if x.get("explore"):
-            flags.append("탐색 후보")
-        if x.get("talk"):
-            flags.append("인터뷰·강연 몫")
-        flags += x["why"]
-        lead_text = " ".join([lead["title"], lead.get("summary", "")[:300], (lead.get("tweet") or {}).get("author") or "",
-                              (lead.get("signal") or {}).get("title", "")])
-        if KEY_PEOPLE.search(lead_text):
-            flags.insert(0, "핵심 인물 발언 — 의견이어도 싣는다")
-        lines.append(f"{i}. **{x['score']}점** · {age_hours(lead):.0f}시간 전 · {lead['source_name']} — {display_title(lead)[:110]}")
-        if flags:
-            lines.append(f"   - {' · '.join(flags)}")
-        for m in x["members"]:
-            lines.append(f"   - {m['source']}: {m['url']}")
-            if m.get("video"):
-                lines.append("     " + transcript_note(m, transcripts, t_index, tiers))
-            elif pq.site(m["url"]):
-                lines.append("     " + paywall_note(m, transcripts, p_index))
+    lines += render(ai_ranked, args.top)
+    lines += ["", "## 경제 순위", "", "경제 섹션 후보 (WRITING.md 2-1). AI 순위와 따로 겨룬다.", ""]
+    lines += render(econ_ranked, args.econ_top)
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0

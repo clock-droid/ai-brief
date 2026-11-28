@@ -24,6 +24,8 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import sec13f
+
 ROOT = Path(__file__).resolve().parent.parent
 SOURCES = ROOT / "collector" / "sources.json"
 DATA = ROOT / "data"
@@ -149,13 +151,32 @@ def parse_feed(text: str, naive_tz: dt.tzinfo = dt.timezone.utc) -> list[dict]:
     return out
 
 
+def max_age(src: dict) -> dt.timedelta:
+    """출처별 신선도 한도. 월 1~2회 쓰는 서한·메모·연구 노트는 sources.json max_age_days로 넓힌다."""
+    if src.get("max_age_days"):
+        return dt.timedelta(days=src["max_age_days"])
+    return VIDEO_MAX_AGE if src.get("video") else MAX_AGE
+
+
+def _url_date(url: str) -> dt.datetime | None:
+    m = re.search(r"[-_/](20\d{2})(\d{2})(\d{2})(?:\D|$)", url)
+    try:
+        return dt.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=dt.timezone.utc) if m else None
+    except ValueError:
+        return None
+
+
 def collect_rss(src: dict) -> list[dict]:
     items = []
     naive_tz = KST if src.get("timezone") == "KST" else dt.timezone.utc
-    max_age = VIDEO_MAX_AGE if src.get("video") else MAX_AGE
+    limit = max_age(src)
     for e in parse_feed(fetch(src["url"]), naive_tz):
-        if e["published"] and now_utc() - e["published"] > max_age:
+        if not e["published"]:  # 날짜 없는 피드(연준 FEDS Notes)는 주소의 날짜를 쓴다
+            e["published"] = _url_date(e["url"])
+        if e["published"] and now_utc() - e["published"] > limit:
             continue
+        if src.get("title_filter") and not re.search(src["title_filter"], e["title"], re.I):
+            continue  # 여러 방송이 섞인 채널에서 한 방송만 (예: Bloomberg Podcasts의 Odd Lots)
         if src.get("video") and "/shorts/" in e["url"]:
             continue  # 쇼츠는 발언 확인이 어려워 뺀다
         item = make_item(src, e["title"], e["url"], e["published"], e["summary"])
@@ -243,6 +264,85 @@ def collect_page_links(src: dict) -> list[dict]:
         url = base + m.group(1)
         items[url] = make_item(src, title[:200], url, published, "")
     return list(items.values())
+
+
+DATE_PATTERNS = [
+    (re.compile(r"\b([A-Z][a-z]{2,8}\.? \d{1,2}, \d{4})\b"), ("%b %d, %Y", "%B %d, %Y", "%b. %d, %Y")),
+    (re.compile(r"/(\d{4}/\d{2})/"), ("%Y/%m",)),  # 주소의 연/월 (Carnegie)
+]
+
+
+def _find_date(text: str) -> dt.datetime | None:
+    for pattern, fmts in DATE_PATTERNS:
+        for m in pattern.finditer(text):
+            for fmt in fmts:
+                try:
+                    return dt.datetime.strptime(m.group(1), fmt).replace(tzinfo=dt.timezone.utc)
+                except ValueError:
+                    continue
+    return None
+
+
+def collect_page_list(src: dict) -> list[dict]:
+    """RSS가 없는 글 목록 페이지(투자사 메모·연구소 블로그). link_pattern에 맞는 href를 글로 본다.
+
+    날짜는 링크 주소나 링크 뒤 가까운 글자에서 찾는다. 날짜를 못 찾은 글도 넣고, 새 글인지는 main()이
+    "지난 실행 때 목록에 있었나"(data/page_lists.json)로 가린다. seen은 21일 뒤 잊으므로 오래된 글이 되살아나지 않게
+    목록 기억을 따로 둔다. 처음 실행하면 목록을 기억만 하고 후보로 내지 않는다.
+    """
+    page = fetch(src["url"])
+    base = re.match(r"https?://[^/]+", src["url"]).group(0)
+    items = {}
+    for m in re.finditer(r'<a\b[^>]*href="(' + src["link_pattern"] + r')"[^>]*>([\s\S]*?)</a>', page):
+        url = m.group(1) if m.group(1).startswith("http") else base + m.group(1)
+        if url in items:
+            continue
+        title = clean_text(m.group(2), 300)
+        if len(title) < 8:  # 그림 링크·"Read more" 등은 같은 글의 다른 링크에서 제목을 얻는다
+            continue
+        published = _find_date(m.group(1)) or _find_date(page[m.end(): m.end() + 600])
+        if published and now_utc() - published > max_age(src):
+            continue
+        items[url] = make_item(src, title, url, published, "")
+    return list(items.values())
+
+
+# ---------- SEC 13F (큰손 포트폴리오 변화) ----------
+
+def collect_sec_13f(src: dict) -> list[dict]:
+    """filers마다 새 13F-HR을 찾아 직전 분기와 비교한다. 비교 결과는 data/13f/에 (sec13f.py)."""
+    ua = sec13f.contact_ua()
+    if ua is None:
+        # 비교 없는 공시 알림은 쓸 것이 없다. 본 것으로 기록하지 않아야 연락처를 넣은 뒤 다시 잡힌다
+        print("! sec-13f: SEC_CONTACT 환경 변수가 없어 건너뜀 (SEC가 연락처 없는 요청을 막음)", file=sys.stderr)
+        return []
+    items = []
+    for filer in src["filers"]:
+        try:
+            rows = sec13f.filings(filer["cik"])
+        except Exception as exc:
+            print(f"! sec-13f {filer['name']}: {exc}", file=sys.stderr)
+            continue
+        if not rows:
+            continue
+        current = rows[0]
+        filed = sec13f.parse_day(current["filed"])
+        if now_utc() - filed > max_age(src):
+            continue
+        url = sec13f.filing_url(filer["cik"], current["accession"])
+        if item_id(url) in SEEN_IDS:
+            continue  # 이미 비교한 공시는 SEC에 다시 묻지 않는다
+        try:
+            rep = sec13f.report(filer, current, rows, ua)
+        except Exception as exc:
+            print(f"! sec-13f {filer['name']} 비교 실패: {exc}", file=sys.stderr)
+            rep = {"changes": None, "note": f"비교 실패: {exc}", "period": current["period"]}
+        path = None if DRY_RUN else sec13f.save({**rep, "cik": filer["cik"], "accession": current["accession"]})
+        title = f"{filer['name']} 13F ({current['period']} 분기)"
+        item = make_item(src, title, url, filed, sec13f.summary_line(rep))
+        item["filing"] = {"kind": "13F", "data": str(path.relative_to(ROOT)) if path else None}
+        items.append(item)
+    return items
 
 
 # ---------- 유튜브 인물 검색 (YouTube Data API, 무료 할당량) ----------
@@ -514,7 +614,12 @@ def make_item(src: dict, title: str, url: str, published: dt.datetime | None, su
 
 COLLECTORS = {"rss": collect_rss, "hf_papers": collect_hf_papers, "hf_models": collect_hf_models,
               "gh_trending": collect_gh_trending, "page_links": collect_page_links,
+              "page_list": collect_page_list, "sec_13f": collect_sec_13f,
               "youtube_search": collect_youtube_search, "podcast_chart": collect_podcast_chart}
+
+
+SEEN_IDS: set[str] = set()  # main()이 채운다. 비싼 요청(SEC 비교) 전에 이미 본 글인지 확인하는 데 쓴다
+PAGE_LISTS = DATA / "page_lists.json"  # page_list 출처별로 지난 실행 때 목록에 있던 글 id
 
 
 def load_seen() -> dict:
@@ -539,6 +644,8 @@ def main() -> int:
         sources = [s for s in sources if s["id"] in wanted]
 
     seen = load_seen()
+    SEEN_IDS.update(seen)
+    page_lists = json.loads(PAGE_LISTS.read_text()) if PAGE_LISTS.exists() else {}
     new_items: list[dict] = []
     failures = []
     for src in sources:
@@ -553,6 +660,13 @@ def main() -> int:
             failures.append(src["id"])
             print(f"! {src['id']} 실패: {exc}", file=sys.stderr)
             continue
+        if src["type"] == "page_list":
+            known = page_lists.get(src["id"])
+            page_lists[src["id"]] = sorted({it["id"] for it in items} | set(known or []))  # 목록은 수십 개라 다 기억한다
+            if known is None:  # 첫 실행: 이미 목록에 있던 글은 새 소식이 아니다
+                print(f"{src['id']:20s} 목록 기억 {len(items)} (첫 실행, 후보로 내지 않음)")
+                continue
+            items = [it for it in items if it["id"] not in known]
         fresh = []
         for it in items:  # 같은 실행 안의 중복(한 글이 같은 트윗을 여러 번 링크)도 거른다
             if it["id"] in seen:
@@ -574,6 +688,7 @@ def main() -> int:
         for it in new_items:
             f.write(json.dumps(it, ensure_ascii=False) + "\n")
     SEEN.write_text(json.dumps(seen, ensure_ascii=False, indent=0, sort_keys=True))
+    PAGE_LISTS.write_text(json.dumps(page_lists, ensure_ascii=False, indent=0, sort_keys=True))
     return 0
 
 
