@@ -71,6 +71,10 @@
     { "id": "krebs", "tier": 2, "name": "Krebs on Security", "type": "rss", "url": "https://krebsonsecurity.com/feed/", "category": "policy" },
 
     { "id": "edsurge", "tier": 2, "name": "EdSurge", "type": "rss", "url": "https://www.edsurge.com/articles_rss", "category": "education" },
+    { "id": "insidehighered", "tier": 2, "broad": true, "name": "Inside Higher Ed", "type": "rss", "url": "https://www.insidehighered.com/rss.xml", "category": "education" },
+    { "id": "hechinger", "tier": 2, "broad": true, "name": "Hechinger Report", "type": "rss", "url": "https://hechingerreport.org/feed/", "category": "education" },
+    { "id": "crunchbase-news", "tier": 2, "broad": true, "name": "Crunchbase News", "type": "rss", "url": "https://news.crunchbase.com/feed/", "category": "startups" },
+    { "id": "techcrunch-startups", "tier": 2, "broad": true, "name": "TechCrunch 스타트업", "type": "rss", "url": "https://techcrunch.com/category/startups/feed/", "category": "startups" },
     { "id": "pew", "tier": 2, "name": "Pew Research", "type": "rss", "url": "https://www.pewresearch.org/internet/feed/", "category": "society" },
 
     { "id": "yt-people", "tier": 2, "video": true, "name": "유튜브 인물 검색", "type": "youtube_search", "category": "models",

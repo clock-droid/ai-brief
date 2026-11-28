@@ -2,6 +2,7 @@
 // collector/sources.json의 category, 글 frontmatter의 category가 모두 이 키를 쓴다.
 
 // AI 섹션. 근거: Stanford AI Index 2026 장 구성 + HF Daily Papers 분야 분포 (research/02-leading-sources.md).
+// 교육·대학과 창업은 AI가 바꾸는 배움·일하는 방식의 변화를 다룬다 (2026-11-28 사용자 결정). 창업 회사의 투자·가치는 경제 분류.
 export const AI_CATEGORIES = {
   models: 'AI 모델·연구',
   agents: '에이전트·코딩',
@@ -12,7 +13,8 @@ export const AI_CATEGORIES = {
   infra: '칩·컴퓨트',
   safety: '안전·정렬',
   policy: '정책·지정학',
-  education: '교육',
+  education: '교육·대학',
+  startups: '창업',
   society: '여론·사회',
   tech: '테크',
   future: '에너지·우주',
