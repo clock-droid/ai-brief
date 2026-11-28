@@ -42,7 +42,7 @@ const posts = defineCollection({
     date: z.coerce.date(),
     category: z.enum(CATEGORY_KEYS),
     updated: z.coerce.date().optional(), // 연재 정리 글을 갱신한 시각 (WRITING.md 6-4)
-    format: z.enum(['해설', '원문 요약', '정리']),
+    format: z.enum(['해설', '원문 요약', '정리', '갈리는 시각', '포트폴리오']), // 뒤 둘은 경제 섹션 (WRITING.md 6-5·6-6)
     summary: z.array(z.string()).length(3), // 3줄 요약
     sources: z.array(source).min(1),
     figure: figure.optional(),
