@@ -19,7 +19,8 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 사용자 관심: 직접 지정(collector/interests.json), 내용 유사도(주인의 반응·읽은 기록이 붙은 글과 닮은 정도),
   출처·분류별 반응률로 -4~+4. 내용 유사도와 반응률을 얼마나 쓸지는 매 실행 과거 반응으로 되짚어 자동으로 고른다
   (collector/preferences.py, 계산은 collector/taste.py, 자동 조정은 collector/tune.py)
-- 인터뷰·강연 몫: 영상·팟캐스트끼리 겨룬 상위 5개는 순위가 낮아도 보인다 (신선도에서 속보에 밀리지 않게)
+- 인터뷰·강연 몫: 영상·팟캐스트끼리 신선도·출처 등급을 빼고 겨룬 상위 5개는 순위가 낮아도 보인다 (속보에 밀리지 않게)
+- 출연자 유명도(영상·팟캐스트): 제목에 나온 생존 인물의 위키백과 30일 조회 1만/3만/30만 이상 +1/+2/+3. 핵심 인물 점수와 겹치면 큰 쪽만 (collector/fame.py)
 - 넓은 매체에서 AI·기술이 제목에 있으면(주제이면) +1
 - 탐색 후보: 관심 점수를 뺀 점수 상위 40 안에서 아직 반응이 없는 영역이거나 취향 점수가 음수인 것 3개를 맨 위에 따로 보인다
 
@@ -38,6 +39,7 @@ import json
 import re
 from pathlib import Path
 
+import fame
 import preferences
 import paywall_queue as pq
 import transcript_queue as tq
@@ -54,6 +56,10 @@ ECON_PEOPLE = re.compile(
     r"\b(buffett|munger|howard marks|dalio|druckenmiller|ackman|tepper|klarman|einhorn|grantham|damodaran|asness|"
     r"icahn|soros|cathie wood|dimon|powell|lagarde|ueda|bailey|bessent|yellen|summers|el-erian|pettis|setser|tooze)\b"
     r"|버핏|하워드 막스|달리오|드러켄밀러|애크먼|파월|라가르드|우에다|베선트|이창용", re.I)
+FAME = fame.load_cache()
+# 출연자 위키 30일 조회수 → 점수. 2026-11-28 실측(팟캐스트 차트·영상 제목에서 찾은 생존 인물 65명):
+# 중앙값 1만 안팎, 상위 20% 3만 안팎, 누구나 아는 이름(정치인·빅테크 CEO) 30만 이상
+FAME_PTS = [(300_000, 3), (30_000, 2), (10_000, 1)]
 TALK_N = 5  # 인터뷰·강연 몫: 뉴스와 따로 겨뤄 매번 검토하는 영상·팟캐스트 수
 VIDEO_WINDOW_H = 96  # 인터뷰·팟캐스트 (영상·음성 모두 퍼지는 데 며칠 걸린다)
 
@@ -177,21 +183,27 @@ def tokens(r: dict) -> set[str]:
     return toks
 
 
+def fresh_points(r: dict) -> int:
+    a = age_hours(r)
+    return 3 if a <= 6 else 2 if a <= 12 else 1 if a <= 24 else 0
+
+
+def tier_points(r: dict, tiers: dict) -> int:
+    return 2 if r.get("tweet") else {1: 3, 2: 2, 3: 0}.get(tiers.get(r["source"], 2), 2)
+
+
+def is_talk(r: dict) -> bool:
+    return bool(r.get("video") or r.get("podcast"))
+
+
 def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int, list[str]]:
     why = []
     if r["source"] in broad and not AI_TECH.search(r["title"] + " " + r.get("summary", "")[:300]):
         return -4, ["AI·기술 무관"]
-    a = age_hours(r)
-    fresh = 3 if a <= 6 else 2 if a <= 12 else 1 if a <= 24 else 0
-    score = fresh
+    score = fresh_points(r) + tier_points(r, tiers)
     if r["source"] in broad and AI_TECH.search(r["title"]):
         score += 1  # 넓은 매체에서 AI·기술이 설명에 스친 게 아니라 제목(주제)인 글
         why.append("AI 주제")
-    if r.get("tweet"):
-        tier_pts = 2
-    else:
-        tier_pts = {1: 3, 2: 2, 3: 0}.get(tiers.get(r["source"], 2), 2)
-    score += tier_pts
     if sig := r.get("signal"):
         live = dc_signals.get(sig["url"], {})
         rec, views = live.get("recommend", 0), live.get("views", 0)
@@ -217,8 +229,13 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
         why.append("영상")
     elif r.get("podcast"):
         why.append("팟캐스트")
-    if KEY_PEOPLE.search(" ".join([r["title"], r.get("summary", "")[:300], (r.get("tweet") or {}).get("author") or ""])):
-        score += 2  # 핵심 인물의 발언·강연
+    person = 2 if KEY_PEOPLE.search(" ".join([r["title"], r.get("summary", "")[:300], (r.get("tweet") or {}).get("author") or ""])) else 0
+    if (r.get("video") or r.get("podcast")) and (guests := fame.guests(FAME, r["title"])):
+        top = guests[0]  # 출연자 유명도: 위키백과 최근 30일 조회수 (collector/fame.py). 핵심 인물 점수와 겹치면 큰 쪽만
+        fpts = next((pts for floor, pts in FAME_PTS if top["views"] >= floor), 0)
+        person = max(person, fpts)
+        why.append(f"출연 {top['name']} 위키 30일 조회 {top['views']:,}")
+    score += person  # 핵심 인물·유명 인물의 발언·강연
     if (cr := r.get("chart_rank")) is not None:
         score += 2 if cr <= 25 else 1 if cr <= 100 else 0
         why.append(f"팟캐스트 차트 {cr}위")
@@ -361,8 +378,10 @@ def main() -> int:
         for i in prefs_model.explore([x["base"] for x in ranked], prefs, [x["done"] for x in ranked]) if explore else []:
             ranked[i]["explore"] = True
         ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
-        # 인터뷰·강연 몫: 영상·팟캐스트는 신선도에서 속보를 못 이겨 상위 밖으로 밀리기 쉽다. 그들끼리 겨룬 상위 몇 개는 늘 보인다
-        talks = [x for x in ranked if not x["done"] and any(m.get("video") or m.get("podcast") for m in x["members"])]
+        # 인터뷰·강연 몫: 영상·팟캐스트는 신선도에서 속보를 못 이겨 상위 밖으로 밀리기 쉽다. 그들끼리 겨룬 상위 몇 개는 늘 보인다.
+        # 그들끼리는 신선도(시간 단위)와 출처 등급을 빼고 겨룬다 — 인터뷰는 며칠씩 읽히고, 무게는 출연자·화제성(유명도·차트·조회수)에 있다
+        talks = [x for x in ranked if not x["done"] and is_talk(x["lead"])]
+        talks.sort(key=lambda x: -(x["score"] - fresh_points(x["lead"]) - tier_points(x["lead"], tiers)))
         for x in talks[:TALK_N]:
             x["talk"] = True
         return ranked

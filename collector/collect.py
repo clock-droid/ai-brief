@@ -24,6 +24,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import fame
 import sec13f
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -346,7 +347,6 @@ def collect_sec_13f(src: dict) -> list[dict]:
             # 본 것으로 남기지 않아야 다음 실행에서 다시 비교한다 (클라우드에서 SEC가 막는 경우 등)
             print(f"! sec-13f {filer['name']} 비교 실패: {exc}", file=sys.stderr)
             continue
-
         path = None if DRY_RUN else sec13f.save({**rep, "cik": filer["cik"], "accession": current["accession"]})
         title = f"{filer['name']} 13F ({current['period']} 분기)"
         item = make_item(src, title, url, filed, sec13f.summary_line(rep))
@@ -632,6 +632,30 @@ SEEN_IDS: set[str] = set()  # main()이 채운다. 비싼 요청(SEC 비교) 전
 PAGE_LISTS = DATA / "page_lists.json"  # page_list 출처별로 지난 실행 때 목록에 있던 글 id
 
 
+def update_fame(new_items: list[dict]) -> None:
+    """인터뷰·강연(영상·팟캐스트) 후보 제목에 나온 인물의 유명도를 data/fame.json에 채운다 (collector/fame.py).
+    이번에 새로 온 것만이 아니라 아직 순위표에 남을 기간의 후보 전체를 본다 — 요청 한도로 못 다 물은 이름을 다음 실행이 잇는다.
+    순위표는 저장된 결과만 읽는다."""
+    talks = [it["title"] for it in new_items if it.get("video") or it.get("podcast")]
+    cutoff = (now_utc() - VIDEO_MAX_AGE).astimezone(KST).strftime("%Y-%m-%d")
+    for f in sorted(INBOX.glob("*.jsonl")):
+        if f.stem < cutoff:
+            continue
+        for line in f.read_text(encoding="utf-8").splitlines():
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get("video") or r.get("podcast"):
+                talks.append(r["title"])
+    if not talks:
+        return
+    f = fame.Fame(fetch, now_utc(), DRY_RUN)
+    f.prepare(list(dict.fromkeys(talks)))
+    f.save()
+    print(f"유명도: 새 이름 {f.asked}개 확인, 요청 {f.requests}번")
+
+
 def load_seen() -> dict:
     if not SEEN.exists():
         return {}
@@ -687,6 +711,7 @@ def main() -> int:
         print(f"{src['id']:20s} 새 글 {len(fresh)}")
 
     print(f"합계 새 글 {len(new_items)}, 실패 {len(failures)} {failures}")
+    update_fame(new_items)
     if args.dry_run:
         for it in new_items[:20]:
             print(json.dumps(it, ensure_ascii=False)[:300])
