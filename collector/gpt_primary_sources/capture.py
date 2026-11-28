@@ -20,6 +20,9 @@ CONFIG = json.loads((HERE / "sources.json").read_text())
 SNAPSHOT = "gpt-primary-sources.json"
 SEARCH_INTERVAL = dt.timedelta(hours=3)
 SEARCH_PAUSE = dt.timedelta(days=1)
+AMPLIFY_WINDOW = dt.timedelta(hours=48)  # 리트윗 기록을 들고 있는 기간
+MATCH_AUTHORS = 8                         # 한 회차에 원 글을 찾으러 가는 원작성자 수 (X 요청 수)
+MATCH_TRIES = 3                           # 원 글을 못 찾으면 이만큼 시도 후 포기
 
 
 def timestamp(value):
@@ -30,7 +33,8 @@ class XRateLimit(Exception):
     pass
 
 
-def read_x(request):
+def read_x(request, amps=None):
+    """X 조회 결과 (행들, 끝까지 읽었나). amps 목록을 주면 계정 게시물 탭의 리트윗 기록(AMP)을 거기에 담는다."""
     executable = shutil.which("aside") or str(Path.home() / ".local/bin/aside")
     script = "const input = " + json.dumps(request) + ";\n" + (HERE / "x.js").read_text()
     proc = subprocess.run([executable, "repl", script], capture_output=True, text=True, timeout=125)
@@ -40,6 +44,8 @@ def read_x(request):
         raise XRateLimit
     if proc.returncode or not ends:
         raise RuntimeError(f"Aside 응답 미완료 (exit={proc.returncode})")
+    if amps is not None:
+        amps.extend(json.loads(line[4:]) for line in lines if line.startswith("AMP "))
     return [json.loads(line[4:]) for line in lines if line.startswith("ROW ")], ends[-1] == "END true"
 
 
@@ -105,7 +111,11 @@ def capture(directory):
         if "day" in row:
             return start.date().isoformat() <= row["day"] <= now.date().isoformat()
         return start <= timestamp(row["published"]) <= now
-    rows = {r["url"]: r for r in previous.get("rows", []) if recent(r)}
+    def recent_amplified(row):
+        return "amplified_at" in row and now - timestamp(row["amplified_at"]) <= dt.timedelta(hours=24)
+    rows = {r["url"]: r for r in previous.get("rows", []) if recent(r) or recent_amplified(r)}
+    amplified = {k: a for k, a in previous.get("amplified", {}).items() if now - timestamp(a["at"]) <= AMPLIFY_WINDOW}
+    amps = []
     cursors = previous.get("last_complete", {})
     warnings = []
     # People come from each account's Posts tab, which does not depend on X search.
@@ -135,11 +145,12 @@ def capture(directory):
             since = max(start, last - dt.timedelta(minutes=10))
         if kind == "people":
             request = {"user": key, "since": since.isoformat()}
+            # 게시물 탭의 리트윗은 since 이후 것만 의미 있지만, 원 글 자체는 그보다 오래됐을 수 있다
         else:
             window = since.strftime(" since:%Y-%m-%d_%H:%M:%S_UTC") + now.strftime(" until:%Y-%m-%d_%H:%M:%S_UTC")
             request = {"query": key + " -filter:retweets" + window}
         try:
-            batch, complete = read_x(request)
+            batch, complete = read_x(request, amps if kind == "people" else None)
             for row in batch:
                 if recent(row):
                     old = rows.get(row["url"], {})
@@ -160,6 +171,44 @@ def capture(directory):
                 warnings.append(f"X 검색 실패, {SEARCH_PAUSE.days}일 중지: {key} ({exc})")
             else:
                 warnings.append(f"X 계정 글 조회 실패: {key} ({exc})")
+
+    # 추적 계정이 리트윗한 글: 누가 무엇을 퍼뜨렸나를 모으고, 원작성자 게시물 탭에서 본문 앞부분으로 원 글을 찾는다
+    for a in amps:
+        if timestamp(a["at"]) < start:
+            continue
+        entry = amplified.setdefault(f"{a['author'].lower()}|{a['prefix']}",
+                                     {"author": a["author"], "prefix": a["prefix"], "by": [], "at": a["at"], "tries": 0})
+        if a["by"] not in entry["by"]:
+            entry["by"].append(a["by"])
+        entry["at"] = min(entry["at"], a["at"])
+    pending: dict[str, list] = {}
+    for entry in amplified.values():
+        # 답글(@로 시작)은 게시물 탭에 없어 찾을 수 없다
+        if not entry.get("url") and entry["tries"] < MATCH_TRIES and not entry["prefix"].startswith("@"):
+            pending.setdefault(entry["author"], []).append(entry)
+    order = sorted(pending, key=lambda au: -max(len(e["by"]) for e in pending[au]))
+    for author in order[:MATCH_AUTHORS] if not rate_limited else []:
+        entries = pending[author]
+        try:
+            batch, _ = read_x({"match": {"author": author, "prefixes": [e["prefix"] for e in entries]}})
+        except XRateLimit:
+            rate_limited = True
+            warnings.append("X 요청 한도(429) · 리트윗 원 글은 다음 회차에 찾음")
+            break
+        except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
+            warnings.append(f"리트윗 원 글 조회 실패: @{author} ({exc})")
+            continue
+        found = {r["prefix"]: r for r in batch}
+        for e in entries:
+            e["tries"] += 1
+            if e["prefix"] in found:
+                e["url"] = found[e["prefix"]]["url"]
+                row = {k: v for k, v in found[e["prefix"]].items() if k != "prefix"}
+                rows[row["url"]] = {**rows.get(row["url"], {"kind": "amplified"}), **row}
+    for e in amplified.values():
+        if e.get("url") and e["url"] in rows:
+            rows[e["url"]].update(amplified_by=e["by"], amplified_at=e["at"])
+            rows[e["url"]].setdefault("kind", "amplified")
 
     try:
         for row in schmid_index(start, now):
@@ -198,7 +247,8 @@ def capture(directory):
             row["parents"] = chain
 
     verified, public_ids = public_rows(list(rows.values()), previous.get("public_ids", []), warnings)
-    snapshot = dict(public_ids=public_ids, checked=now.isoformat(), last_complete=cursors, search=search_state, warnings=warnings, rows=verified)
+    snapshot = dict(public_ids=public_ids, checked=now.isoformat(), last_complete=cursors, search=search_state,
+                    warnings=warnings, rows=verified, amplified=amplified)
     directory.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(mode="w", dir=directory, delete=False) as out:
         json.dump(snapshot, out, ensure_ascii=False)
