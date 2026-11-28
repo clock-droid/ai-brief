@@ -57,7 +57,7 @@ AI_TECH = re.compile(
     r"|bcis?|brain[-– ](?:computer|machine)|brain implants?|neuroprosthe\w*|neurotechnolog\w*"
     r"|(?:intracortical|implanted|implantable|microelectrode|utah) (?:\w+ )?(?:electrodes?|arrays?|devices?|implants?)"
     r"|neuralink|synchron|paradromics|precision neuroscience|blackrock neurotech"
-    # 우주(에너지·우주 분야): AI 없이도 싣는다 — 미래를 엿보거나 경제와 얽힌 것 (2026-11-28 사용자 결정, WRITING.md 2절).
+    # 우주(에너지·우주 분야): 관문은 넓게 통과시키고, AI나 경제와 이어지는지는 글쓰기 단계가 가린다 (WRITING.md 2절 "AI 밖 기술 분야").
     # 'orbital'은 분자 궤도(molecular orbital)와 겹쳐 우주 쪽 짝말이 붙을 때만 본다.
     r"|spacex|starship|starlink|blue origin|rockets?|launch vehicles?|satellites?(?! (?:cells?|dna|glia))|space ?stations?|spacecraft|spaceflight"
     r"|space (?:industry|economy|tourism|mining|exploration|race|force|agency|startup|company|companies|data ?cent\w*|solar)"
