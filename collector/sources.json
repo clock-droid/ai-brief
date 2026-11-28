@@ -102,6 +102,10 @@
     { "id": "platformer", "tier": 2, "name": "Platformer", "type": "rss", "url": "https://www.platformer.news/rss/", "category": "tech" },
     { "id": "canary", "tier": 2, "name": "Canary Media", "type": "rss", "url": "https://www.canarymedia.com/rss.rss", "category": "future" },
     { "id": "spacenews", "tier": 2, "name": "SpaceNews", "type": "rss", "url": "https://spacenews.com/feed/", "category": "future" },
+    { "id": "ars-space", "tier": 2, "name": "Ars Technica 우주", "type": "rss", "url": "https://arstechnica.com/space/feed/", "category": "future" },
+    { "id": "nasaspaceflight", "tier": 2, "name": "NASASpaceflight", "type": "rss", "url": "https://www.nasaspaceflight.com/feed/", "category": "future" },
+    { "id": "payload", "tier": 2, "name": "Payload", "type": "rss", "url": "https://payloadspace.com/feed/", "category": "future" },
+    { "id": "spacepolicyonline", "tier": 2, "name": "SpacePolicyOnline", "type": "rss", "url": "https://spacepolicyonline.com/feed/", "category": "future" },
 
     { "id": "fightaging", "tier": 2, "name": "Fight Aging!", "type": "rss", "url": "https://www.fightaging.org/feed/", "category": "frontier" },
     { "id": "lifespan", "tier": 2, "name": "Lifespan.io", "type": "rss", "url": "https://www.lifespan.io/feed/", "category": "frontier" },

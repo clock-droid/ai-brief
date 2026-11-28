@@ -29,7 +29,9 @@
     "biohub",
     "chaidiscovery",
     "ProfluentBio",
-    "InSilicoMeds"
+    "InSilicoMeds",
+    "SpaceX",
+    "blueorigin"
   ],
   "discovery": [
     "(DeepMind OR OpenAI OR Anthropic OR Gemini OR xAI OR MetaAI) (\"we found\" OR \"we measured\" OR \"our benchmark\" OR \"my experiments\")",
