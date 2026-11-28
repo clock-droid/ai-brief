@@ -75,6 +75,11 @@
 
     { "id": "yt-people", "tier": 2, "video": true, "name": "유튜브 인물 검색", "type": "youtube_search", "category": "models",
       "people": ["Geoffrey Hinton", "Yann LeCun", "Yoshua Bengio", "Demis Hassabis", "Ilya Sutskever", "Sam Altman", "Dario Amodei", "Jensen Huang", "Andrej Karpathy", "Terence Tao", "Steve Eisman", "Eric Schmidt"] },
+    { "id": "yt-popular", "tier": 2, "video": true, "name": "유튜브 조회수 상위", "type": "youtube_search", "category": "models", "broad": true,
+      "order": "viewCount", "interval_hours": 7.5, "max_results": 15, "min_views": 10000,
+      "queries": ["AI interview", "AI podcast", "artificial intelligence keynote"] },
+    { "id": "podcast-charts", "tier": 3, "name": "인기 팟캐스트 차트", "type": "podcast_chart", "category": "economy", "broad": true,
+      "genres": [1318, 1321], "top": 200, "episodes": 3 },
     { "id": "yt-openai", "tier": 1, "video": true, "name": "OpenAI (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXZCJLdBC09xxGZ6gcdrc6A", "category": "models" },
     { "id": "yt-deepmind", "tier": 1, "video": true, "name": "Google DeepMind (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCP7jMXSY2xbc3KCAE0MHQ-A", "category": "models" },
     { "id": "yt-anthropic", "tier": 1, "video": true, "name": "Anthropic (YouTube)", "type": "rss", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrDwWp7EBBv4NwvScIpBDOA", "category": "models" },

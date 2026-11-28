@@ -247,32 +247,47 @@ def collect_page_links(src: dict) -> list[dict]:
 
 # ---------- 유튜브 인물 검색 (YouTube Data API, 무료 할당량) ----------
 
+YT_STATE = DATA / "yt_state.json"
+
+
+def _yt_due(src: dict, state: dict) -> bool:
+    """출처마다 마지막 검색 후 interval_hours(기본 3.5시간)가 지났나. 수동 실행이 겹쳐도 할당량을 넘지 않게."""
+    last = state.get(src["id"]) or (state.get("last_search") if src["id"] == "yt-people" else None)  # 예전 키
+    hours = src.get("interval_hours", 3.5)
+    if last and now_utc() - dt.datetime.fromisoformat(last) < dt.timedelta(hours=hours):
+        print(f"  ({src['name']}: 마지막 검색 {last} — {hours}시간 안 지나 건너뜀)", file=sys.stderr)
+        return False
+    return True
+
+
 def collect_youtube_search(src: dict) -> list[dict]:
-    """핵심 인물 이름으로 최근 영상을 한 명씩 검색한다. 강연·인터뷰는 매번 다른 채널에 올라와 채널 구독으로는 못 따라간다.
-    여러 명을 묶어 검색하면 상위 몇 개에 묻혀 놓친다(케임브리지·NTU 강연 등) — 그래서 한 명씩.
-    할당량: 검색 1회 = 100 단위, 하루 무료 10,000. 인물 12명 × 4시간마다(하루 6회) = 7,200 단위.
-    마지막 검색 후 3.5시간이 안 지났으면 건너뛴다 (수동 실행이 겹쳐도 한도를 넘지 않게).
+    """유튜브 검색으로 채널 구독이 못 따라가는 영상을 찾는다. 출처 설정에 따라 두 가지:
+    - people: 핵심 인물 이름으로 한 명씩 (강연·인터뷰는 매번 다른 채널에 올라온다. 여러 명을 묶으면 상위 몇 개에 묻힌다)
+    - queries + order viewCount: 사람을 정하지 않고, 최근 AI 인터뷰·강연 중 조회수가 높은 것
+      (재가공 클립 채널까지 — 누가 나오든 지금 퍼지고 있는 영상을 잡는다)
+    할당량: 검색 1회 = 100 단위, 하루 무료 10,000. 인물 12명 × 하루 6회 = 7,200, 조회수 검색 3개 × 하루 3회 = 900.
     YOUTUBE_API_KEY 환경변수가 없으면 건너뛴다."""
     key = os.environ.get("YOUTUBE_API_KEY")
     if not key:
-        print("  (YOUTUBE_API_KEY 없음 — 유튜브 인물 검색 건너뜀)", file=sys.stderr)
+        print(f"  (YOUTUBE_API_KEY 없음 — {src['name']} 건너뜀)", file=sys.stderr)
         return []
-    state_path = DATA / "yt_state.json"
-    state = json.loads(state_path.read_text()) if state_path.exists() else {}
-    last = state.get("last_search")
-    if last and now_utc() - dt.datetime.fromisoformat(last) < dt.timedelta(hours=3, minutes=30):
-        print(f"  (유튜브 인물 검색: 마지막 검색 {last} — 3.5시간 안 지나 건너뜀)", file=sys.stderr)
+    state = json.loads(YT_STATE.read_text()) if YT_STATE.exists() else {}
+    if not _yt_due(src, state):
         return []
     after = (now_utc() - VIDEO_MAX_AGE).strftime("%Y-%m-%dT%H:%M:%SZ")
-    found: dict[str, tuple[dict, str]] = {}
-    for person in src["people"]:
-        params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": f'"{person}"', "publishedAfter": after,
-                                         "order": "relevance", "maxResults": 8, "relevanceLanguage": "en", "key": key})
+    order = src.get("order", "relevance")
+    searches = [(f'"{p}"', p) for p in src.get("people", [])] + [(q, None) for q in src.get("queries", [])]
+    found: dict[str, tuple[dict, str | None]] = {}
+    for q, person in searches:
+        params = urllib.parse.urlencode({"part": "snippet", "type": "video", "q": q, "publishedAfter": after,
+                                         "order": order, "maxResults": src.get("max_results", 8),
+                                         "relevanceLanguage": "en", "key": key})
         for it in json.loads(fetch(f"https://www.googleapis.com/youtube/v3/search?{params}")).get("items", []):
             found.setdefault(it["id"]["videoId"], (it["snippet"], person))
     if not DRY_RUN:
-        state["last_search"] = now_utc().isoformat()
-        state_path.write_text(json.dumps(state))
+        state.pop("last_search", None)
+        state[src["id"]] = now_utc().isoformat()
+        YT_STATE.write_text(json.dumps(state))
     if not found:
         return []
     stats: dict[str, dict] = {}
@@ -285,15 +300,66 @@ def collect_youtube_search(src: dict) -> list[dict]:
         st = stats.get(vid, {})
         if not re.search(r"\d+M|\d+H", st.get("contentDetails", {}).get("duration", "")):
             continue  # 1분 미만 쇼츠 제외
-        surname = person.split()[-1].lower()
-        if surname not in (sn.get("title", "") + " " + sn.get("description", "")).lower():
+        if person and person.split()[-1].lower() not in (sn.get("title", "") + " " + sn.get("description", "")).lower():
             continue  # 이름이 실제로 나오지 않는 영상(드라마 등) 제외
         views = int(st.get("statistics", {}).get("viewCount", 0))
+        if views < src.get("min_views", 0):
+            continue
         url = f"https://www.youtube.com/watch?v={vid}"
-        summary = f"{sn.get('channelTitle', '')} · 조회 {views:,} · 인물 {person} · {clean_text(sn.get('description'), 400)}"
+        who = f" · 인물 {person}" if person else ""
+        summary = f"{sn.get('channelTitle', '')} · 조회 {views:,}{who} · {clean_text(sn.get('description'), 400)}"
         item = make_item(src, clean_text(sn.get("title"), 200), url, parse_date(sn.get("publishedAt")), summary)
-        item.update({"video": True, "views": views, "channel": sn.get("channelTitle"), "person": person})
+        item.update({"video": True, "views": views, "channel": sn.get("channelTitle")})
+        if person:
+            item["person"] = person
         items.append(item)
+    return items
+
+
+# ---------- 인기 팟캐스트 차트 ----------
+
+PODCAST_STATE = DATA / "podcast_charts.json"
+
+
+def podcast_chart_ranks(src: dict) -> dict[str, int]:
+    """애플 팟캐스트 분야별 상위 차트: 쇼 id → 순위 (여러 분야에 들면 높은 쪽). 하루에 한 번만 새로 받는다."""
+    state = json.loads(PODCAST_STATE.read_text()) if PODCAST_STATE.exists() else {}
+    if state.get("ranks") and now_utc() - dt.datetime.fromisoformat(state["fetched"]) < dt.timedelta(days=1):
+        return state["ranks"]
+    ranks: dict[str, int] = {}
+    for genre in src["genres"]:
+        url = f"https://itunes.apple.com/{src.get('country', 'us')}/rss/toppodcasts/limit={src['top']}/genre={genre}/json"
+        for pos, e in enumerate(json.loads(fetch(url))["feed"].get("entry", []), 1):
+            sid = e["id"]["attributes"]["im:id"]
+            ranks[sid] = min(pos, ranks.get(sid, pos))
+    if ranks and not DRY_RUN:
+        PODCAST_STATE.write_text(json.dumps({"fetched": now_utc().isoformat(), "ranks": ranks}))
+    return ranks
+
+
+def collect_podcast_chart(src: dict) -> list[dict]:
+    """인기 팟캐스트 차트(애플 기술·비즈니스 분야 상위)에 든 쇼의 최신 에피소드.
+    사람이나 쇼를 손으로 고르지 않는다 — 많이 듣는 쇼가 차트에 오르면 저절로 구독된다.
+    피드 전체(수 MB) 대신 애플 조회 API로 쇼마다 최신 에피소드 몇 개만 받는다 (요청 50쇼당 1번).
+    AI·기술과 무관한 에피소드는 순위표의 broad 관문이 가린다. 차트 전체를 받으면 하루 수십 편이라
+    출처 등급은 대량 집계(0)로 두고, 순위표가 차트 순위(chart_rank)로 화제성 점수를 준다."""
+    ranks = podcast_chart_ranks(src)
+    ids = list(ranks)
+    items = []
+    for k in range(0, len(ids), 50):
+        q = urllib.parse.urlencode({"id": ",".join(ids[k:k + 50]), "entity": "podcastEpisode", "limit": src.get("episodes", 3)})
+        for r in json.loads(fetch(f"https://itunes.apple.com/lookup?{q}")).get("results", []):
+            if r.get("wrapperType") != "podcastEpisode":
+                continue
+            published = parse_date(r.get("releaseDate"))
+            if not published or now_utc() - published > VIDEO_MAX_AGE:
+                continue
+            title = f"{r.get('collectionName', '')} — {r.get('trackName', '')}"
+            item = make_item(src, clean_text(title, 200), r["trackViewUrl"].split("?")[0], published,
+                             clean_text(r.get("description") or r.get("shortDescription")))
+            item.update({"podcast": True, "channel": r.get("collectionName"),
+                         "chart_rank": ranks.get(str(r.get("collectionId")))})
+            items.append(item)
     return items
 
 
@@ -448,7 +514,7 @@ def make_item(src: dict, title: str, url: str, published: dt.datetime | None, su
 
 COLLECTORS = {"rss": collect_rss, "hf_papers": collect_hf_papers, "hf_models": collect_hf_models,
               "gh_trending": collect_gh_trending, "page_links": collect_page_links,
-              "youtube_search": collect_youtube_search}
+              "youtube_search": collect_youtube_search, "podcast_chart": collect_podcast_chart}
 
 
 def load_seen() -> dict:

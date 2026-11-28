@@ -15,9 +15,12 @@ data/inbox의 후보 중 발표 48시간 이내이고 아직 글로 쓰지 않�
 - 핵심 인물(연구소 경영진·수석 과학자·튜링/필즈상 수상자 등)의 발언 +2
 - 혁신성: 새 모델·논문·벤치마크·증명·발견·로봇 시연·오픈소스 공개 +2 / 인수·투자 유치·주가·소송·인사·정치 공방 -1
 - 급상승 지표: GitHub 오늘 별 500/1000 이상 +1/+2, 허깅페이스 급상승 점수 100/300 이상 +1/+2
+- 인기 팟캐스트 차트(애플 기술·비즈니스 분야) 25위/100위 안 +2/+1. 유튜브 조회 2만/10만 이상 +1/+2
 - 사용자 관심: 직접 지정(collector/interests.json), 내용 유사도(주인의 반응·읽은 기록이 붙은 글과 닮은 정도),
   출처·분류별 반응률로 -4~+4. 내용 유사도와 반응률을 얼마나 쓸지는 매 실행 과거 반응으로 되짚어 자동으로 고른다
   (collector/preferences.py, 계산은 collector/taste.py, 자동 조정은 collector/tune.py)
+- 인터뷰·강연 몫: 영상·팟캐스트끼리 겨룬 상위 5개는 순위가 낮아도 보인다 (신선도에서 속보에 밀리지 않게)
+- 넓은 매체에서 AI·기술이 제목에 있으면(주제이면) +1
 - 탐색 후보: 관심 점수를 뺀 점수 상위 40 안에서 아직 반응이 없는 영역이거나 취향 점수가 음수인 것 3개를 맨 위에 따로 보인다
 
 사용: python3 collector/rank.py [--top 60]
@@ -41,7 +44,8 @@ DATA = ROOT / "data"
 CONTENT = ROOT / "web" / "src" / "content"
 OUT = DATA / "shortlist.md"
 WINDOW_H = 48
-VIDEO_WINDOW_H = 96  # 인터뷰·팟캐스트 영상
+TALK_N = 5  # 인터뷰·강연 몫: 뉴스와 따로 겨뤄 매번 검토하는 영상·팟캐스트 수
+VIDEO_WINDOW_H = 96  # 인터뷰·팟캐스트 (영상·음성 모두 퍼지는 데 며칠 걸린다)
 
 STOP = set("""the and for with from that this into over after about what will says said new how why are was has have its
 their your more than just only also amid via per using use used can not but you all one two now our out who which when
@@ -168,6 +172,9 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
     a = age_hours(r)
     fresh = 3 if a <= 6 else 2 if a <= 12 else 1 if a <= 24 else 0
     score = fresh
+    if r["source"] in broad and AI_TECH.search(r["title"]):
+        score += 1  # 넓은 매체에서 AI·기술이 설명에 스친 게 아니라 제목(주제)인 글
+        why.append("AI 주제")
     if r.get("tweet"):
         tier_pts = 2
     else:
@@ -196,8 +203,13 @@ def item_score(r: dict, tiers: dict, broad: set, dc_signals: dict) -> tuple[int,
         why.append(f"HF 급상승{tr:.0f}")
     if r.get("video"):
         why.append("영상")
+    elif r.get("podcast"):
+        why.append("팟캐스트")
     if KEY_PEOPLE.search(" ".join([r["title"], r.get("summary", "")[:300], (r.get("tweet") or {}).get("author") or ""])):
         score += 2  # 핵심 인물의 발언·강연
+    if (cr := r.get("chart_rank")) is not None:
+        score += 2 if cr <= 25 else 1 if cr <= 100 else 0
+        why.append(f"팟캐스트 차트 {cr}위")
     if (vw := r.get("views")) is not None:
         score += 2 if vw >= 100_000 else 1 if vw >= 20_000 else 0
         why.append(f"조회{vw:,}")
@@ -272,7 +284,7 @@ def main() -> int:
     prefs_model = preferences.Preferences(now())
 
     candidates = load_candidates()
-    fresh = [r for r in candidates if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") else WINDOW_H)]
+    fresh = [r for r in candidates if age_hours(r) <= (VIDEO_WINDOW_H if r.get("video") or r.get("podcast") else WINDOW_H)]
     # 같은 URL 중복 제거
     fresh = list({r["url"].rstrip("/"): r for r in fresh}.values())
     skipped = skipped_urls()
@@ -297,6 +309,10 @@ def main() -> int:
         ranked[i]["explore"] = True
     # 이미 다룬 사건은 점수와 관계없이 뒤로 보낸다 (위쪽 자리를 새 소식에 쓰기 위해)
     ranked.sort(key=lambda x: (-x["score"], age_hours(x["lead"])))
+    # 인터뷰·강연 몫: 영상·팟캐스트는 신선도에서 속보를 못 이겨 상위 밖으로 밀리기 쉽다. 그들끼리 겨룬 상위 몇 개는 늘 보인다
+    talks = [x for x in ranked if not x["done"] and any(m.get("video") or m.get("podcast") for m in x["members"])]
+    for x in talks[:TALK_N]:
+        x["talk"] = True
 
     lines = [f"# 후보 순위표 ({now().astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%m월 %d일 %H:%M')} KST)",
              "", f"발표 {WINDOW_H}시간 이내 후보 {len(fresh)}개 → 사건 {len(ranked)}개로 묶음. 상위 {args.top}개.",
@@ -305,11 +321,15 @@ def main() -> int:
     lines += section(args.primary_dir or transcripts, candidates, written | skipped, now())
     lines += ["## 기존 사건 순위", ""]
     # 탐색 후보는 관심 감점으로 상위 밖에 밀려났어도 보인다
-    shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= args.top or x.get("explore")]
+    shown = [(i, x) for i, x in enumerate(ranked, 1) if i <= args.top or x.get("explore") or x.get("talk")]
     explore = [(i, x) for i, x in shown if x.get("explore")]
     if explore:
         lines += ["탐색 후보 (취향과 무관하게 화제성이 높은 것. WRITING.md 1절 3): "
                   + ", ".join(f"{i}위" for i, _ in explore), ""]
+    talk = [(i, x) for i, x in shown if x.get("talk")]
+    if talk:
+        lines += ["인터뷰·강연 몫 (영상·팟캐스트끼리 겨룬 상위. 순위가 낮아도 검토한다): "
+                  + ", ".join(f"{i}위" for i, _ in talk), ""]
     for i, x in shown:
         lead = x["lead"]
         flags = []
@@ -319,6 +339,8 @@ def main() -> int:
             flags.append("이미 다룬 사건 — 새 사실이 있으면 정리 글 갱신(6-4)")
         if x.get("explore"):
             flags.append("탐색 후보")
+        if x.get("talk"):
+            flags.append("인터뷰·강연 몫")
         flags += x["why"]
         lead_text = " ".join([lead["title"], lead.get("summary", "")[:300], (lead.get("tweet") or {}).get("author") or "",
                               (lead.get("signal") or {}).get("title", "")])
