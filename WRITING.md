@@ -9,7 +9,7 @@
 
 ## 1. 실행 절차 (매 실행)
 
-1. **먼저 수집한다.** 저장소 루트에서 `pip install -q youtube-transcript-api fastembed` 후 `python3 collector/collect.py`를 실행한다 (1분 안팎). 새 후보가 `data/inbox/`에 쌓인다.
+1. **먼저 수집한다.** 저장소 루트에서 `python3 -m pip install -q youtube-transcript-api fastembed` 후 `python3 collector/collect.py`를 실행한다 (1분 안팎). 클라우드의 `pip` 명령은 `python3`와 다른 파이썬(3.13)에 설치해 순위표가 numpy·fastembed를 못 찾으므로 반드시 `python3 -m pip`으로 설치한다. 새 후보가 `data/inbox/`에 쌓인다.
 2. **순위표를 만든다.** `python3 collector/rank.py`를 실행하면 `data/shortlist.md`에 상위 60개 사건이 점수순으로 나온다. 발표 48시간 이내이고 아직 안 쓴 후보만, 같은 사건끼리 묶어서 보여준다. 점수 구성은 `collector/rank.py` 맨 위 설명에 있다 (신선도, 출처 등급, 특갤 화제성(추천·조회), 같은 사건을 다룬 출처 수, 사용자 관심).
    - **사용자 관심 점수**(-4~+4)는 사용자가 직접 정한 `collector/interests.json`과 **내용 유사도**에서 나온다 (`collector/preferences.py`, 계산은 `collector/taste.py`). 내용 유사도는 사용자가 사이트에서 남긴 좋아요·싫어요(+이유)와 읽은 기록이 붙은 글과 후보가 얼마나 닮았는지다. 신호는 비공개 저장소 `ai-brief-taste`(이 저장소 옆 폴더)의 `signals/`에 있고, 순위표가 직접 읽는다. 순위표에 "관심 지정"·"비관심 지정"·"취향 ±n (닮은 글: …)"으로 표시된다. 글쓰기 작업은 `interests.json`과 `signals/`를 고치지 않고, 신호 내용을 공개 저장소에 옮기지 않는다. 닮은 글에 붙은 이유(예: "홍보성", "더 깊게 보고 싶음")는 고를 때와 긴 글로 쓸지 정할 때 참고한다.
    - 순위표 머리에 "내용 유사도 꺼짐"이 보이면(모델 설치·다운로드 실패) 그 실행은 관심 점수 없이 진행하고, 최종 보고에 그 줄을 적는다.

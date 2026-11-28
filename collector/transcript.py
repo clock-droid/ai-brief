@@ -4,7 +4,7 @@
 결과: data/transcripts/<id>.txt (저장소에 커밋하지 않음)
 
 공개 영상의 자동 자막을 youtube-transcript-api로 받는다. 설치돼 있지 않으면 설치 방법을 출력하고 끝낸다.
-    pip install -q youtube-transcript-api
+    python3 -m pip install -q youtube-transcript-api
 자막은 요약과 짧은 인용을 위한 확인 자료로만 쓴다. 자막 전문을 사이트에 싣지 않는다 (WRITING.md 7절).
 """
 from __future__ import annotations
@@ -43,7 +43,7 @@ def main() -> int:
     try:
         from youtube_transcript_api import YouTubeTranscriptApi
     except ImportError:
-        print("youtube-transcript-api가 없음. 먼저: pip install -q youtube-transcript-api", file=sys.stderr)
+        print("youtube-transcript-api가 없음. 먼저: python3 -m pip install -q youtube-transcript-api", file=sys.stderr)
         return 2
     OUT.mkdir(parents=True, exist_ok=True)
     api = YouTubeTranscriptApi()
