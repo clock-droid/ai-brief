@@ -9,7 +9,7 @@
 3. 출처·분류 반응률: 사이트에 실린 카드가 보였을 때 열어 봤는지를 출처(도메인·X 계정)와 분류별로 세어,
    전체 평균보다 잘 열리는 쪽은 +, 늘 지나치는 쪽은 -. 노출이 적으면 평균 쪽으로 당겨(AFF_PRIOR) 몇 번의 우연에 흔들리지 않는다.
    오래된 반응일수록 덜 믿으므로, 한동안 덜 실린 출처도 시간이 지나면 0으로 돌아온다.
-4. 자동 조정 (tune.py): 2와 3을 얼마나 쓸지는 고정하지 않는다. 매 실행 지난 사흘을 하루씩 되짚어 보며
+4. 자동 조정 (tune.py): 2와 3을 얼마나 쓸지는 고정하지 않는다. 매 실행 지난 날들(최대 2주)을 하루씩 되짚어 보며
    "그 전 신호로 매긴 점수"가 "그 뒤 실제 반응"과 얼마나 맞았는지 재고, 더 잘 맞는 설정이 분명할 때만 바꾼다.
    조정 결과는 순위표 머리 한 줄(공개 저장소에 올라가지 않는 data/shortlist.md)에만 남는다.
 5. 탐색 몫: 취향에 갇히지 않도록, 화제성은 높은데 아직 반응이 거의 없는 영역의 후보를 순위표 위에 따로 보여준다.
@@ -52,7 +52,7 @@ EXPLORE_N = 3
 EXPLORE_SUPPORT = 0.1    # 닮은 라벨의 무게 합이 이보다 작으면 '아직 잘 모르는 영역'
 READ_MAX = 0.15         # 버튼 없이 읽기만 한 글의 최대 y
 AFF_PRIOR = 8            # 출처·분류 반응률을 전체 평균 쪽으로 당기는 가상 노출 수 (대부분의 출처는 노출이 몇 번뿐이라 크게 당긴다)
-TUNE_WINDOWS = 3         # 자동 조정이 되짚어 보는 하루 단위 구간 수
+TUNE_MAX_DAYS = 14       # 자동 조정이 되짚어 보는 최대 날수 (신호가 있는 날만)
 TUNE_MIN_ITEMS = 15      # 구간에 처음 보인 카드가 이보다 적으면 그 구간은 평가하지 않는다
 QUALITY_REASONS = {"너무 뻔함", "과장"}  # 주제가 아니라 그 글이 별로라는 이유 (web/src/lib/signals.ts의 DISLIKE_REASONS 중)
 
@@ -168,22 +168,29 @@ def group_events(events: list[dict]) -> dict[str, list[dict]]:
     return out
 
 
+def source_keys(r: dict) -> tuple[str, str | None]:
+    """반응률을 세는 단위: (출처, 분류). 순위표 후보와 실린 카드의 원 후보에 똑같이 쓴다."""
+    return site_key(r["url"]), r.get("category_hint")
+
+
 class Affinity:
     """카드가 보였을 때 열어 본 비율을 출처·분류별로. 값은 전체 평균 대비 log2 비율을 -1~+1로 자른 것.
-    카드만 센다 (긴 글은 들어오는 길이 달라 열어 보는 비율의 기준이 다르다)."""
+    카드만 센다 (긴 글은 들어오는 길이 달라 열어 보는 비율의 기준이 다르다).
+    source(pid)는 그 카드가 된 수집 후보 — 순위표가 새 후보를 보는 것과 같은 출처·분류로 센다."""
 
-    def __init__(self, events: list[dict], now: dt.datetime, meta):
+    def __init__(self, events: list[dict], now: dt.datetime, source):
         self.site: dict[str, list[float]] = {}
         self.cat: dict[str, list[float]] = {}
         n = k = 0.0
         for pid, evs in group_events(events).items():
-            m = meta(pid) if pid.startswith("cards/") else None
-            if not m or not m[1]:
+            r = source(pid) if pid.startswith("cards/") else None
+            if not r:
                 continue
             w = decay(_parse(evs[-1]["at"]), now)
             hit = w * (grade(evs) >= 1)
             n, k = n + w, k + hit
-            for table, key in ((self.cat, m[0]), (self.site, site_key(m[1][0]))):
+            site, cat = source_keys(r)
+            for table, key in ((self.cat, cat), (self.site, site)):
                 row = table.setdefault(key, [0.0, 0.0])
                 row[0] += w
                 row[1] += hit
@@ -208,8 +215,8 @@ def candidate_text(r: dict) -> str:
     return r["title"] + ". " + r.get("summary", "")[:300]
 
 
-def inbox_texts() -> dict[str, str]:
-    """수집 후보 url → 비교용 텍스트. 라벨 글의 원문판을 찾는 데 쓴다."""
+def inbox_records() -> dict[str, dict]:
+    """수집 후보 url → 후보. 실린 글의 원 후보(원문판·출처·분류)를 찾는 데 쓴다."""
     out = {}
     for f in sorted(INBOX.glob("*.jsonl")):
         for line in f.read_text(encoding="utf-8").splitlines():
@@ -217,7 +224,7 @@ def inbox_texts() -> dict[str, str]:
                 r = json.loads(line)
             except ValueError:
                 continue
-            out[r["url"].rstrip("/")] = candidate_text(r)
+            out[r["url"].rstrip("/")] = r
     return out
 
 
@@ -234,13 +241,10 @@ def _urls(fm: str) -> list[str]:
     return [u.strip('"').rstrip("/") for u in re.findall(r"^\s+url: (\S+)", fm, re.M)]
 
 
-def post_meta(pid: str) -> tuple[str, list[str]] | None:
-    """cards/<id>, posts/<id> 글의 (분류, 출처 url들)."""
+def post_urls(pid: str) -> list[str]:
+    """cards/<id>, posts/<id> 글의 출처 url들 (frontmatter 순서)."""
     split = _split(pid)
-    if not split:
-        return None
-    cat = re.search(r"^category: (\S+)", split[0], re.M)
-    return (cat[1] if cat else "", _urls(split[0]))
+    return _urls(split[0]) if split else []
 
 
 def post_texts(pid: str, originals: dict[str, str]) -> list[str] | None:
@@ -271,21 +275,25 @@ class Preferences:
     def __init__(self, now: dt.datetime, embedder: taste.Embedder | None = None, signals: Path | None = None):
         self.interests = load_interests()
         self.embedder = embedder or taste.Embedder()
-        self._meta: dict[str, tuple[str, list[str]] | None] = {}
         events = load_events(signals)
-        self.originals = inbox_texts() if events else {}
+        self.records = inbox_records() if events else {}
+        self.originals = {u: candidate_text(r) for u, r in self.records.items()}
+        self._source: dict[str, dict | None] = {}
         self.choice = self._tune(events, now)
         self.config = self.choice.config
         labels = self._labels(events, now)
         self.n_labels = len(labels)
         self.n_strong = sum(abs(l.y) >= 0.5 for l in labels)  # 좋아요·싫어요를 누른 글만 센다
-        self.taste = taste.Taste(self._pick(labels, self.config.strong_only), self.embedder)
-        self.affinity = Affinity(events, now, self.meta)
+        self.taste = taste.Taste(labels, self.embedder)
+        # 반응 글만 쓰는 설정이어도 '아직 모르는 영역'(탐색 몫)은 모든 라벨 기준으로 본다
+        self.scoring_taste = taste.Taste(self._pick(labels, True), self.embedder) if self.config.strong_only else self.taste
+        self.affinity = Affinity(events, now, self.source)
 
-    def meta(self, pid: str):
-        if pid not in self._meta:
-            self._meta[pid] = post_meta(pid)
-        return self._meta[pid]
+    def source(self, pid: str) -> dict | None:
+        """실린 글이 된 수집 후보: 출처 url 중 수집함에 있는 첫 번째."""
+        if pid not in self._source:
+            self._source[pid] = next((self.records[u] for u in post_urls(pid) if u in self.records), None)
+        return self._source[pid]
 
     def _labels(self, events: list[dict], now: dt.datetime) -> list[taste.Label]:
         labels = []
@@ -301,37 +309,36 @@ class Preferences:
         return [l for l in labels if abs(l.y) >= 0.5] if strong_only else labels
 
     def _tune(self, events: list[dict], now: dt.datetime) -> tune.Choice:
-        """지난 TUNE_WINDOWS일을 하루씩: 그 날 전 신호로 만든 점수 ↔ 그 날 처음 보인 카드의 실제 반응."""
+        """하루(KST 자정 기준)씩 되짚기: 그 날 전 신호로 만든 점수 ↔ 그 날 처음 보인 카드의 실제 반응.
+        구간 경계가 자정에 고정돼 있어 같은 날의 실행끼리는 같은 결론을 낸다. 오늘(아직 반응이 덜 쌓인 날)은 빼고,
+        신호가 있는 가장 이른 날까지(최대 TUNE_MAX_DAYS일) 쓰므로 반응이 쌓일수록 근거가 늘어난다."""
         if not events:
             return tune.Choice(tune.DEFAULT, "자동 조정 보류 (신호 없음)")
         by_id = group_events(events)
         first = {pid: _parse(evs[0]["at"]) for pid, evs in by_id.items()}
-        windows, parts = [], []
-        for d in range(TUNE_WINDOWS, 0, -1):
-            cut, end = now - dt.timedelta(days=d), now - dt.timedelta(days=d - 1)
-            items = []  # (등급, 후보 원문, 분류, 출처)
-            for pid, evs in by_id.items():
-                m = self.meta(pid) if pid.startswith("cards/") and cut <= first[pid] < end else None
-                text = next((self.originals[u] for u in m[1] if u in self.originals), None) if m and m[1] else None
-                if text:
-                    items.append((grade(evs), text, m[0], site_key(m[1][0])))
+        kst = dt.timezone(dt.timedelta(hours=9))
+        today = now.astimezone(kst).replace(hour=0, minute=0, second=0, microsecond=0)
+        earliest = min(first.values())
+        windows = []
+        for d in range(TUNE_MAX_DAYS, 0, -1):
+            cut, end = today - dt.timedelta(days=d), today - dt.timedelta(days=d - 1)
+            if end <= earliest:
+                continue
+            items = [(grade(evs), self.source(pid)) for pid, evs in by_id.items()
+                     if pid.startswith("cards/") and cut <= first[pid] < end]
+            items = [(g, r) for g, r in items if r]
             if len(items) < TUNE_MIN_ITEMS:
                 continue
             past = [e for e in events if _parse(e["at"]) < cut]
             labels = self._labels(past, cut)
-            texts = [x[1] for x in items]
+            texts = [candidate_text(r) for _, r in items]
             content = {s: [m.value for m in taste.Taste(self._pick(labels, s), self.embedder).match_many(texts)]
                        for s in (False, True)}
-            aff = Affinity(past, cut, self.meta)
-            parts.append((content, [aff.of_site(x[3]) for x in items], [aff.of_cat(x[2]) for x in items]))
-            windows.append(tune.Window(cut.date().isoformat(), [x[0] for x in items]))
-
-        def score(cfg: tune.Config, i: int) -> list[float]:
-            content, site, cat = parts[i]
-            return [cfg.content_pts * c + cfg.site_pts * s + cfg.cat_pts * k
-                    for c, s, k in zip(content[cfg.strong_only], site, cat)]
-
-        return tune.choose(windows, score)
+            aff = Affinity(past, cut, self.source)
+            keys = [source_keys(r) for _, r in items]
+            windows.append(tune.Window(cut.date().isoformat(), [g for g, _ in items], content,
+                                       [aff.of_site(k[0]) for k in keys], [aff.of_cat(k[1]) for k in keys]))
+        return tune.choose(windows)
 
     def status(self) -> str:
         if not self.n_labels:
@@ -342,25 +349,22 @@ class Preferences:
 
     def score_groups(self, groups: list[list[dict]]) -> list[Pref]:
         """같은 사건 묶음마다 관심 점수. 내용·출처·분류는 묶음의 대표 후보(첫 번째)로 본다."""
-        cfg = self.config
         texts = [candidate_text(g[0]) for g in groups]
-        matches = self.taste.match_many(texts)
+        matches = self.scoring_taste.match_many(texts)
+        supports = self.taste.match_many(texts) if self.scoring_taste is not self.taste else matches
         out = []
-        for g, m in zip(groups, matches):
+        for g, m, sup in zip(groups, matches, supports):
             pts, why = designated(g, self.interests)
-            cpts = round(m.value * cfg.content_pts)
+            site, cat = source_keys(g[0])
+            cpts, spts, kpts = self.config.points(m.value, self.affinity.of_site(site), self.affinity.of_cat(cat))
             if cpts:
-                pts += cpts
                 why.append(f"취향 {cpts:+d} (닮은 글: " + " / ".join(l.note for l, _ in m.neighbors[:2]) + ")")
-            spts = round(self.affinity.of_site(site_key(g[0]["url"])) * cfg.site_pts)
             if spts:
-                pts += spts
                 why.append(f"출처 반응 {spts:+d}")
-            kpts = round(self.affinity.of_cat(g[0].get("category_hint")) * cfg.cat_pts)
             if kpts:
-                pts += kpts
                 why.append(f"분류 반응 {kpts:+d}")
-            out.append(Pref(max(-CLAMP, min(CLAMP, pts)), why, m.support < EXPLORE_SUPPORT, m.value))
+            pts += cpts + spts + kpts
+            out.append(Pref(max(-CLAMP, min(CLAMP, pts)), why, sup.support < EXPLORE_SUPPORT, m.value))
         return out
 
     def explore(self, base_scores: list[float], prefs: list[Pref], skip: list[bool]) -> list[int]:
