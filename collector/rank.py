@@ -50,7 +50,7 @@ https http com www status""".split())
 # neural circuit·neural barcode, quantum dot, ChIP-seq는 AI·기술 소식이 아니다.
 AI_TECH = re.compile(
     r"\b(ai|a\.i\.|llm|gpt|claude|gemini|agent|robot|algorithm|semiconductor|compute|data ?center|automation|software|brain-computer|bci"
-    r"|artificial intelligence|machine[- ]learn\w*|deep[- ]learn\w*|neural[- ]?(?:network|net)s?|foundation models?|language models?"
+    r"|artificial intelligence|machine[- ]learn\w*|deep[- ]learn\w*|neural[- ]?(?:network|net)s?|neural (?:interface|implant|decod\w*|prosthe\w*)s?|foundation models?|language models?"
     r"|generative|diffusion models?|alphafold\w*|isomorphic labs|de novo (?:\w+ )?design\w*|virtual (?:cell|scientist)s?"
     r"|self-driving lab\w*|lab autonomy|autonomous (?:lab|laborator)\w*"
     r"|chip(?!-?seq)|quantum(?! dots?))\b"

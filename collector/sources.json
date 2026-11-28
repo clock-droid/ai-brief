@@ -42,7 +42,7 @@
     { "id": "nature-biotech", "tier": 1, "broad": true, "name": "Nature Biotechnology", "type": "rss", "url": "https://www.nature.com/nbt.rss", "category": "science" },
     { "id": "nature-medicine", "tier": 1, "broad": true, "name": "Nature Medicine", "type": "rss", "url": "https://www.nature.com/nm.rss", "category": "medicine" },
     { "id": "nature-methods", "tier": 1, "broad": true, "name": "Nature Methods", "type": "rss", "url": "https://www.nature.com/nmeth.rss", "category": "science" },
-    { "id": "cell", "tier": 1, "broad": true, "name": "Cell", "type": "rss", "url": "https://www.cell.com/cell/current.rss", "category": "science" },
+    { "id": "cell", "tier": 1, "broad": true, "name": "Cell", "type": "rss", "url": "https://www.cell.com/cell/inpress.rss", "category": "science" },
     { "id": "gen", "tier": 2, "broad": true, "name": "GEN", "type": "rss", "url": "https://www.genengnews.com/feed/", "category": "medicine" },
     { "id": "biopharmadive", "tier": 2, "broad": true, "name": "BioPharma Dive", "type": "rss", "url": "https://www.biopharmadive.com/feeds/news/", "category": "medicine" },
 
