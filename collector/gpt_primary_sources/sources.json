@@ -21,7 +21,15 @@
     "hardmaru",
     "SemiAnalysis_",
     "AIatMeta",
-    "MSFTResearch"
+    "MSFTResearch",
+    "IsomorphicLabs",
+    "arcinstitute",
+    "FutureHouseSF",
+    "LilaSciences",
+    "EvoscaleAI",
+    "chaidiscovery",
+    "ProfluentBio",
+    "InSilicoMeds"
   ],
   "discovery": [
     "(DeepMind OR OpenAI OR Anthropic OR Gemini OR xAI OR MetaAI) (\"we found\" OR \"we measured\" OR \"our benchmark\" OR \"my experiments\")",
