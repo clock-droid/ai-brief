@@ -1,7 +1,7 @@
 ---
 title: "삼성디스플레이, ams오스람에 3,084억 투자해 최대주주로"
 date: 2026-11-25T17:12:00+09:00
-category: economy
+category: companies
 sources:
   - name: 디일렉
     url: https://www.thelec.kr/news/articleView.html?idxno=65901

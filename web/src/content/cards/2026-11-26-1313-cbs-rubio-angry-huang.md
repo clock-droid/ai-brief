@@ -1,7 +1,7 @@
 ---
 title: "CBS \"루비오, 젠슨 황 복귀 소식에 격분\""
 date: 2026-11-26T13:13:00+09:00
-category: economy
+category: trade
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: CBS News — Inside Trump's effort to reinstate Jensen Huang as Nvidia's CEO

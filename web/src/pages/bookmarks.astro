@@ -1,13 +1,19 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import { SECTIONS, sectionOf } from '../categories';
 import { href } from '../lib/format';
+
+// 경제 카드는 경제 피드(/econ/#id)에 있다. 북마크에는 글 id만 저장되므로 섹션을 여기서 알려 준다
+const econCards = (await getCollection('cards', (c) => sectionOf(c.data.category) === 'econ')).map((c) => c.id);
 ---
 
 <Base title="북마크" current="bookmarks">
   <h1 id="bookmarks-heading" tabindex="-1">북마크</h1>
   <p class="meta" id="bookmarks-empty" hidden>북마크한 글이 없어요.</p>
   <p class="meta" id="bookmarks-status" role="status"></p>
-  <ul id="bookmarks-list" aria-labelledby="bookmarks-heading" data-feed={href('/')} data-posts={href('/posts/')}></ul>
+  <ul id="bookmarks-list" aria-labelledby="bookmarks-heading" data-feed={href(SECTIONS.ai.feed)}
+    data-econ-feed={href(SECTIONS.econ.feed)} data-econ-cards={JSON.stringify(econCards)} data-posts={href('/posts/')}></ul>
   <template id="bookmark-row">
     <li>
       <div>
@@ -29,6 +35,8 @@ import { href } from '../lib/format';
   const list = document.getElementById('bookmarks-list')!;
   const row = document.querySelector<HTMLTemplateElement>('#bookmark-row')!.content.firstElementChild!;
 
+  const econCards = new Set<string>(JSON.parse(list.dataset.econCards ?? '[]'));
+
   function paint(items: Bookmark[]) {
     empty.hidden = items.length > 0;
     list.replaceChildren(...items.map(({ id, title }) => {
@@ -36,9 +44,10 @@ import { href } from '../lib/format';
       const li = row.cloneNode(true) as HTMLLIElement;
       const link = li.querySelector('a')!;
       const remove = li.querySelector('button')!;
-      li.querySelector('p')!.textContent = kind === 'cards' ? '속보' : '긴 글';
+      const econ = kind === 'cards' && econCards.has(slug);
+      li.querySelector('p')!.textContent = kind === 'cards' ? (econ ? '경제' : '속보') : '긴 글';
       link.textContent = title;
-      link.href = kind === 'cards' ? `${list.dataset.feed}#${encodeURIComponent(slug)}` :
+      link.href = kind === 'cards' ? `${econ ? list.dataset.econFeed : list.dataset.feed}#${encodeURIComponent(slug)}` :
         `${list.dataset.posts}${encodeURIComponent(slug)}/`;
       remove.setAttribute('aria-label', `해제: ${title}`);
       remove.addEventListener('click', () => {

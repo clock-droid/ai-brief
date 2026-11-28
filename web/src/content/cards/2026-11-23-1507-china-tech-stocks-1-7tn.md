@@ -1,7 +1,7 @@
 ---
 title: "중국 기술주 시총 5개월간 1조7000억달러 감소"
 date: 2026-11-23T15:07:00+09:00
-category: economy
+category: markets
 sources:
   - name: AI타임스 — 중국 AI 열풍 급랭
     url: https://www.aitimes.com/news/articleView.html?idxno=217683

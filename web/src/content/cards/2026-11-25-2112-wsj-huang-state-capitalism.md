@@ -1,7 +1,7 @@
 ---
 title: "WSJ \"황 복귀는 유감스러운 국가자본주의\""
 date: 2026-11-25T21:12:00+09:00
-category: economy
+category: trade
 sources:
   - name: Techmeme (Wall Street Journal)
     url: https://www.techmeme.com/261125/p16#a261125p16

@@ -1,7 +1,7 @@
 ---
 title: "젠슨 황 사임에서 복귀까지 11일, 무슨 일이 있었나"
 date: 2026-11-24T11:11:00+09:00
-category: economy
+category: companies
 format: 정리
 updated: 2026-11-28T17:12:00+09:00
 summary:

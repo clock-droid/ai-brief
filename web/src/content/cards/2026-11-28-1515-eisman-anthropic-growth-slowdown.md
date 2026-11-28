@@ -1,7 +1,7 @@
 ---
 title: "아이스먼 \"앤트로픽 성장 145%→45%, AI의 아킬레스건\""
 date: 2026-11-28T15:15:00+09:00
-category: economy
+category: investors
 post: 2026-11-28-1515-eisman-weekly-wrap-ai-review-summary
 sources:
   - name: 유튜브 — Steve Eisman (Jensen's Back; AI Review | The Weekly Wrap)

@@ -1,0 +1,12 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { sectionOf } from '../../categories';
+
+const posts = await getCollection('posts', (p) => sectionOf(p.data.category) === 'econ');
+---
+
+<Base title="경제 긴 글" section="econ" current="posts" railPosts={false}>
+  <PostList posts={posts} />
+</Base>

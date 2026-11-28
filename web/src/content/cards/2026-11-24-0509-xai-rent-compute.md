@@ -1,7 +1,7 @@
 ---
 title: "xAI, 자체 개발 줄이고 Anthropic에 월 31억 달러 컴퓨트 임대"
 date: 2026-11-24T05:09:00+09:00
-category: economy
+category: companies
 sources:
   - name: The Decoder
     url: https://the-decoder.com/anthropics-appetite-for-compute-is-pushing-xai-toward-a-rent-over-build-strategy/

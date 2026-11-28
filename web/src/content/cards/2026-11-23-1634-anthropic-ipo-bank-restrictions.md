@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽, IPO 은행에 6개월간 오픈AI 등 경쟁사 업무 제한 요구"
 date: 2026-11-23T16:34:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스 (로이터 보도 인용)
     url: https://www.aitimes.com/news/articleView.html?idxno=217689

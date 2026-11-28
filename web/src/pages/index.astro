@@ -2,8 +2,9 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import CardFeed from '../components/CardFeed.astro';
+import { sectionOf } from '../categories';
 
-const cards = await getCollection('cards');
+const cards = await getCollection('cards', (c) => sectionOf(c.data.category) === 'ai');
 ---
 
 <Base current="cards">

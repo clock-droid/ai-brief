@@ -1,7 +1,7 @@
 ---
 title: "손정의, SK하이닉스 1조달러 인수 검토했다고 보도"
 date: 2026-11-23T17:09:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스
     url: https://www.aitimes.com/news/articleView.html?idxno=217653

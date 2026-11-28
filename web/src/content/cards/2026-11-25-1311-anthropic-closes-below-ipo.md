@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽, 상장 4거래일 만에 공모가 아래 마감…81.91달러"
 date: 2026-11-25T13:11:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스
     url: https://www.aitimes.com/news/articleView.html?idxno=217753

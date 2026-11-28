@@ -1,7 +1,7 @@
 ---
 title: "크라우드스트라이크, 지스케일러 439억달러에 인수"
 date: 2026-11-23T21:09:00+09:00
-category: economy
+category: companies
 sources:
   - name: CrowdStrike
     url: https://www.crowdstrike.com/en-us/press-releases/crowdstrike-to-acquire-zscaler-bringing-network-security-and-zero-trust-to-the-falcon-platform/

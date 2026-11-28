@@ -1,7 +1,7 @@
 ---
 title: "스페이스X·테슬라, 3.5조 달러 합병 협상 중"
 date: 2026-11-24T21:11:00+09:00
-category: economy
+category: companies
 sources:
   - name: Techmeme (Financial Times)
     url: https://www.techmeme.com/261124/p8#a261124p8

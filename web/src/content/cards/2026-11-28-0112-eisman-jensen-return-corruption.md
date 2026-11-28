@@ -1,7 +1,7 @@
 ---
 title: "아이스먼 \"젠슨 황 복귀, 부패의 냄새…조사 끝나지 않았다\""
 date: 2026-11-28T01:12:00+09:00
-category: economy
+category: investors
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: 유튜브 — Invest Daily (CNBC 출연 장면 포함)

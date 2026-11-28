@@ -1,7 +1,7 @@
 ---
 title: "트럼프 \"젠슨 황 사면은 언제나 선택지\""
 date: 2026-11-25T09:11:00+09:00
-category: economy
+category: trade
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: Techmeme (New York Post)

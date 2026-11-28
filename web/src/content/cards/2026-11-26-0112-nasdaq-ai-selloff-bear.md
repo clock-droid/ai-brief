@@ -1,7 +1,7 @@
 ---
 title: "나스닥100 4% 급락, 약세장 진입…엔비디아·앤트로픽 9%↓"
 date: 2026-11-26T01:12:00+09:00
-category: economy
+category: markets
 sources:
   - name: Techmeme (Financial Times)
     url: https://www.techmeme.com/261125/p24#a261125p24

@@ -1,7 +1,7 @@
 ---
 title: "앨리스 황 '협력자'냐, FBI·CIA 판단 엇갈려"
 date: 2026-11-27T11:14:00+09:00
-category: economy
+category: trade
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: AI타임스 — 미 정보당국 "중국, 젠슨 황 사건 배후 조종 증거 없어"…간첩 의혹 판단은 엇갈려

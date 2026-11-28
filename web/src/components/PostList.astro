@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BookmarkButton from './BookmarkButton.astro';
+import Disclosure from './Disclosure.astro';
+import Feedback from './Feedback.astro';
+import { CATEGORIES } from '../categories';
+import { groupByDay, href } from '../lib/format';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+}
+
+// 긴 글 목록. 갱신된 정리 글은 갱신 시각으로 줄을 세운다 (연재가 위로 올라오도록)
+const rows = Astro.props.posts
+  .map((p) => ({ post: p, data: { date: p.data.updated ?? p.data.date } }))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const days = groupByDay(rows);
+---
+
+{
+  days.length === 0 ? (
+    <p class="meta">아직 긴 글 없음</p>
+  ) : (
+    <div class="days">
+      {days.map((day) => (
+        <section aria-labelledby={`d-${day.key}`}>
+          <h1 class="day" id={`d-${day.key}`}>{day.label}</h1>
+          <div class="rows">
+            {day.items.map(({ post: p, data }) => (
+              <Disclosure id={p.id} signal={`posts/${p.id}`} time={data.date} title={p.data.title}>
+                <p class="meta">
+                  {p.data.updated && <>갱신 · </>}
+                  {p.data.format} · <a class="category" href={href(`/c/${p.data.category}/`)}>{CATEGORIES[p.data.category]}</a>
+                </p>
+                <ol class="summary" aria-label="3줄 요약">
+                  {p.data.summary.map((line) => <li>{line}</li>)}
+                </ol>
+                <p class="more"><a href={href(`/posts/${p.id}/`)}>전문 읽기</a></p>
+                <BookmarkButton id={`posts/${p.id}`} title={p.data.title} />
+                <Feedback id={`posts/${p.id}`} />
+              </Disclosure>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  /* 날짜 묶음·줄 사이 선은 속보 목록(CardFeed.astro)과 같은 문법 */
+  .days {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .day {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .rows {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rows > :global(.row ~ .row) {
+    border-top: 1px solid var(--line);
+  }
+
+  .category {
+    color: var(--muted);
+  }
+
+  .summary {
+    margin: 0;
+    padding-left: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .more {
+    font-size: var(--fs-small);
+  }
+</style>

@@ -2,19 +2,22 @@
 import '../styles/global.css';
 import Rail from '../components/Rail.astro';
 import Signals from '../components/Signals.astro';
-import { CATEGORIES, CATEGORY_KEYS, type CategoryKey } from '../categories';
+import { CATEGORIES, SECTIONS, type CategoryKey, type SectionKey } from '../categories';
 import { href } from '../lib/format';
 
 interface Props {
   title?: string;
   description?: string;
-  current?: 'cards' | 'posts' | 'bookmarks';
+  section?: SectionKey; // AI · 경제. 분류 메뉴와 곁줄이 이 섹션 것만 보인다
+  current?: 'cards' | 'posts' | 'bookmarks'; // 섹션 안의 속보·긴 글, 또는 북마크
   category?: CategoryKey; // 분류 페이지일 때 왼쪽 메뉴에서 현재 위치로 표시
   railPosts?: boolean; // 곁줄의 긴 글 목록. 긴 글 목록 페이지에서는 본문과 겹치므로 끈다
 }
 
 const SITE_NAME = 'AI 브리핑'; // 가제
-const { title, description = 'AI와 미래 산업 소식을 빠르고 깊게.', current, category, railPosts = true } = Astro.props;
+const { title, description = 'AI와 미래 산업, 경제 소식을 빠르고 깊게.', section = 'ai', current, category, railPosts = true } =
+  Astro.props;
+const on = (s: SectionKey, page: 'cards' | 'posts') => here(section === s && current === page && !category);
 const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
 const here = (on: boolean) => (on ? 'page' : undefined);
 ---
@@ -33,13 +36,15 @@ const here = (on: boolean) => (on ? 'page' : undefined);
       <header class="side">
         <a class="site-name" href={href('/')}>{SITE_NAME}</a>
         <nav aria-label="주요 메뉴">
-          <a href={href('/')} aria-current={here(current === 'cards' && !category)}>속보</a>
-          <a href={href('/posts/')} aria-current={here(current === 'posts')}>긴 글</a>
+          <a href={href(SECTIONS.ai.feed)} aria-current={on('ai', 'cards')}>속보</a>
+          <a href={href(SECTIONS.ai.posts)} aria-current={on('ai', 'posts')}>긴 글</a>
+          <a href={href(SECTIONS.econ.feed)} aria-current={on('econ', 'cards')}>경제</a>
+          <a href={href(SECTIONS.econ.posts)} aria-current={on('econ', 'posts')}>경제 긴 글</a>
           <a href={href('/bookmarks/')} aria-current={here(current === 'bookmarks')}>북마크</a>
         </nav>
-        <nav class="categories" aria-label="분류">
+        <nav class="categories" aria-label={`${SECTIONS[section].label} 분류`}>
           {
-            CATEGORY_KEYS.map((key) => (
+            SECTIONS[section].categories.map((key) => (
               <a href={href(`/c/${key}/`)} aria-current={here(category === key)}>
                 {CATEGORIES[key]}
               </a>
@@ -51,7 +56,7 @@ const here = (on: boolean) => (on ? 'page' : undefined);
         <slot />
       </main>
       <div class="rail-col">
-        <Rail posts={railPosts} />
+        <Rail section={section} posts={railPosts} />
       </div>
     </div>
     <Signals />

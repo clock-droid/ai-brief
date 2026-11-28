@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽, 58개 기업 조사 \"AI 가치 55%는 생산 확대\""
 date: 2026-11-24T21:11:00+09:00
-category: economy
+category: society
 sources:
   - name: Anthropic — Working with AI
     url: https://www.anthropic.com/research/working-with-ai

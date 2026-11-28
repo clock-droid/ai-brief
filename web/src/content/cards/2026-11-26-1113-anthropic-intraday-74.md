@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽 장중 73.85달러, 공모가 11% 아래"
 date: 2026-11-26T11:13:00+09:00
-category: economy
+category: companies
 post: 2026-11-25-1311-anthropic-ipo-first-week
 sources:
   - name: AI타임스 — AI 투자 불안에 기술주 하락 지속…앤트로픽 장중 74달러까지 밀려

@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽 나스닥 상장, 공모 규모 813억 달러 역대 최대"
 date: 2026-11-23T13:25:00+09:00
-category: economy
+category: companies
 sources:
   - name: Latent Space — AINews, Anthropic completes largest IPO in history
     url: https://latent.space/p/ainews-anthropic-successfully-completes-largest-ipo-in-history-valued-at-1-5t/

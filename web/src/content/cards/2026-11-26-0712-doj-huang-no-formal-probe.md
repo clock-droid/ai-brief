@@ -1,7 +1,7 @@
 ---
 title: "로이터 \"법무부, 젠슨 황 정식 수사 없이 면죄\""
 date: 2026-11-26T07:12:00+09:00
-category: economy
+category: trade
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: Techmeme (Reuters)

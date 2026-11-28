@@ -1,7 +1,7 @@
 ---
 title: "엔비디아, 2018년 암호화폐 매출 소송 2억9천만 달러에 예비 합의"
 date: 2026-11-28T17:12:00+09:00
-category: economy
+category: companies
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: WSJ — The Savvy Showmanship That Helps Jensen Huang Always Come Out on Top

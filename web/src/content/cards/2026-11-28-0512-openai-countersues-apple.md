@@ -1,7 +1,7 @@
 ---
 title: "OpenAI, 애플 맞고소 \"영업비밀 탈취·공급사 압박\""
 date: 2026-11-28T05:12:00+09:00
-category: economy
+category: companies
 sources:
   - name: Techmeme — OpenAI countersues Apple for allegedly stealing trade secrets… (Financial Times)
     url: https://www.techmeme.com/261127/p12#a261127p12

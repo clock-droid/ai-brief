@@ -1,7 +1,7 @@
 ---
 title: "이코노미스트 \"젠슨 황 복귀는 실수, 나쁜 선례\""
 date: 2026-11-25T23:13:00+09:00
-category: economy
+category: companies
 sources:
   - name: 유튜브 — The Economist
     url: https://www.youtube.com/watch?v=aOEPJe35Np8

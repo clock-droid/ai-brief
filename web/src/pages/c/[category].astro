@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CardFeed from '../../components/CardFeed.astro';
-import { CATEGORIES, CATEGORY_KEYS, type CategoryKey } from '../../categories';
+import { CATEGORIES, CATEGORY_KEYS, sectionOf, type CategoryKey } from '../../categories';
 
 export function getStaticPaths() {
   return CATEGORY_KEYS.map((category) => ({ params: { category } }));
@@ -12,7 +12,7 @@ const category = Astro.params.category as CategoryKey;
 const cards = await getCollection('cards', (c) => c.data.category === category);
 ---
 
-<Base title={CATEGORIES[category]} current="cards" category={category}>
+<Base title={CATEGORIES[category]} section={sectionOf(category)} current="cards" category={category}>
   <h1 class="page-title">{CATEGORIES[category]}</h1>
   <CardFeed cards={cards} />
 </Base>

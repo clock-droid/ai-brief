@@ -1,7 +1,7 @@
 ---
 title: "G2i 대표 \"연구소엔 수백만 달러 데이터 예산도 '푼돈'\""
 date: 2026-11-28T09:11:00+09:00
-category: economy
+category: companies
 post: 2026-11-28-0911-g2i-training-data-market-summary
 sources:
   - name: Latent Space — Inside the AI Training Data Market (Gabe Greenberg, G2i)

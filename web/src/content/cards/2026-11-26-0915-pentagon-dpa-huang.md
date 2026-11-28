@@ -1,7 +1,7 @@
 ---
 title: "WP \"국방부, 젠슨 황 복귀 압박에 국방물자생산법 검토\""
 date: 2026-11-26T09:15:00+09:00
-category: economy
+category: trade
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: Techmeme (Washington Post)

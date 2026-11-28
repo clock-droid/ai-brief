@@ -1,7 +1,7 @@
 ---
 title: "일레븐랩스, 기업가치 330억 달러 투자 협상…두 달 새 1.5배"
 date: 2026-11-26T05:12:00+09:00
-category: economy
+category: companies
 sources:
   - name: Techmeme — Bloomberg 보도 요약
     url: https://www.techmeme.com/261125/p30#a261125p30

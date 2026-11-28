@@ -1,7 +1,7 @@
 ---
 title: "젠슨 황, 복귀 첫날 직원에 사과: \"더 나은 CEO 되겠다\""
 date: 2026-11-24T09:09:00+09:00
-category: economy
+category: companies
 sources:
   - name: 디일렉
     url: https://www.thelec.kr/news/articleView.html?idxno=65803

@@ -1,7 +1,7 @@
 ---
 title: "머스크: \"내년 AI 업계 자금 부족 수천억달러\" 재경고"
 date: 2026-11-24T02:36:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스
     url: https://www.aitimes.com/news/articleView.html?idxno=217699

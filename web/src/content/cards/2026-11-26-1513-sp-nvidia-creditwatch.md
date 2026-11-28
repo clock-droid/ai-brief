@@ -1,7 +1,7 @@
 ---
 title: "S&P, 엔비디아 'AA' 등급 하향 검토…\"이사회 독립성 취약\""
 date: 2026-11-26T15:13:00+09:00
-category: economy
+category: companies
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: AI타임스 — S&P, 엔비디아 신용등급 하향 검토…황 복귀에도 지배구조 불안

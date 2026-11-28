@@ -1,7 +1,7 @@
 ---
 title: "아시아 반도체주 급락… 어드밴테스트 12%·SK하이닉스 6% ↓"
 date: 2026-11-25T11:11:00+09:00
-category: economy
+category: markets
 sources:
   - name: Techmeme (CNBC)
     url: https://www.techmeme.com/261124/p47#a261124p47

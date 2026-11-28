@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽 '컴퓨팅 승수', AI 인프라 투자자 불안 키워"
 date: 2026-11-27T17:10:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스 (비즈니스 인사이더 인용)
     url: https://www.aitimes.com/news/articleView.html?idxno=217803

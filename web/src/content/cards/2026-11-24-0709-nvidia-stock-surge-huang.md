@@ -1,7 +1,7 @@
 ---
 title: "젠슨 황 복귀 발표에 엔비디아 주가 31% 급등"
 date: 2026-11-24T07:09:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스
     url: https://www.aitimes.com/news/articleView.html?idxno=217709

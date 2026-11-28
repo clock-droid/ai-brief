@@ -1,7 +1,7 @@
 ---
 title: "엔비디아 이사회, 젠슨 황 만장일치로 CEO 복귀 결정"
 date: 2026-11-23T23:12:00+09:00
-category: economy
+category: companies
 sources:
   - name: NVIDIA Newsroom
     url: https://nvidianews.nvidia.com/news/nvidia-board-reinstates-jensen-huang-as-president-ceo-and-board-director

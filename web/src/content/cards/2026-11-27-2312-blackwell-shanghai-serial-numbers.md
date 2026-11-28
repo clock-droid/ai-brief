@@ -1,7 +1,7 @@
 ---
 title: "블룸버그 \"블랙웰 랙, 앨리스 황 연관 상하이 센터에\""
 date: 2026-11-27T23:12:00+09:00
-category: economy
+category: trade
 post: 2026-11-24-1111-jensen-huang-ouster-return
 sources:
   - name: Techmeme (Bloomberg 헤드라인)

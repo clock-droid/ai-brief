@@ -1,7 +1,7 @@
 ---
 title: "데이원, 50억달러 미국 IPO 보류…AI 데이터센터 상장 줄줄이 차질"
 date: 2026-11-23T15:07:00+09:00
-category: economy
+category: companies
 sources:
   - name: AI타임스 — AI 데이터센터 IPO 잇단 차질
     url: https://www.aitimes.com/news/articleView.html?idxno=217688

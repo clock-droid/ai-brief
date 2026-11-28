@@ -1,7 +1,7 @@
 ---
 title: "젠슨 황, 첫 전체회의서 \"행동강령 위반\" 인정"
 date: 2026-11-25T03:12:00+09:00
-category: economy
+category: companies
 sources:
   - name: Techmeme (Wired)
     url: https://www.techmeme.com/261124/p28#a261124p28

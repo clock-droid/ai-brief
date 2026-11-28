@@ -1,18 +1,22 @@
 ---
 import { getCollection } from 'astro:content';
-import { CATEGORIES, type CategoryKey } from '../categories';
+import { CATEGORIES, sectionOf, type CategoryKey, type SectionKey } from '../categories';
 import { dayKey, dayLabel, href } from '../lib/format';
 
 interface Props {
+  section: SectionKey;
   posts?: boolean;
 }
 
-// 오른쪽 곁줄: 최신 긴 글, 가장 최근 날짜의 분류별 소식 수. 실제 글에서만 뽑는다.
+// 오른쪽 곁줄: 이 섹션의 최신 긴 글, 가장 최근 날짜의 분류별 소식 수. 실제 글에서만 뽑는다.
 // "오늘"은 빌드 시각이 아니라 가장 최근 카드의 KST 날짜다 (정적 빌드라 빌드 시각과 화면 시각이 다르다).
 const latest = (p: { data: { date: Date; updated?: Date } }) => (p.data.updated ?? p.data.date).getTime();
-const posts = Astro.props.posts === false ? [] : (await getCollection('posts')).sort((a, b) => latest(b) - latest(a)).slice(0, 5);
+const { section } = Astro.props;
+const inSection = (e: { data: { category: CategoryKey } }) => sectionOf(e.data.category) === section;
+const posts =
+  Astro.props.posts === false ? [] : (await getCollection('posts', inSection)).sort((a, b) => latest(b) - latest(a)).slice(0, 5);
 
-const cards = (await getCollection('cards')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const cards = (await getCollection('cards', inSection)).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const newest = cards[0]?.data.date;
 const counts = new Map<CategoryKey, number>();
 if (newest) {

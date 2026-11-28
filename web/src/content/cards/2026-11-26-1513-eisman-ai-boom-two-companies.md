@@ -1,7 +1,7 @@
 ---
 title: "스티브 아이스먼 \"AI 붐 전체가 적자 회사 두 곳에 달려\""
 date: 2026-11-26T15:13:00+09:00
-category: economy
+category: investors
 post: 2026-11-26-1513-eisman-ai-boom-summary
 sources:
   - name: 유튜브 — TRIGGERnometry Clips

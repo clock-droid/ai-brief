@@ -1,7 +1,7 @@
 ---
 title: "앤트로픽 주가, 공모가 83달러 아래로…8% 넘게 하락"
 date: 2026-11-25T01:12:00+09:00
-category: economy
+category: companies
 sources:
   - name: Techmeme (Reuters)
     url: https://www.techmeme.com/261124/p21#a261124p21

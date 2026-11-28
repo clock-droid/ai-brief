@@ -1,7 +1,7 @@
 ---
 title: "美 스마트폰 출하 9%↓…메모리값에 안드로이드 타격"
 date: 2026-11-27T15:13:00+09:00
-category: economy
+category: companies
 sources:
   - name: Techmeme — 카운터포인트 리서치 보고서 요약
     url: https://www.techmeme.com/261127/p1#a261127p1

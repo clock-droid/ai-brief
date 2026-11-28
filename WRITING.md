@@ -102,7 +102,7 @@
 3. 공식 기록 갱신 (큐비트 수·오류율, 수명 연장 수치 등)
 4. 대규모 투자·인수
 
-**분류(category)** 는 후보의 `category_hint`를 출발점으로 쓰되 내용 기준으로 다시 정한다. 키 목록은 `web/src/categories.ts`.
+**분류(category)** 는 후보의 `category_hint`를 출발점으로 쓰되 내용 기준으로 다시 정한다. 키 목록은 `web/src/categories.ts`. 분류가 곧 섹션을 정한다: AI 분류의 글은 AI 속보에, 경제 분류(rates·markets·companies·commodities·trade·investors)의 글은 경제 섹션에 실린다. **AI 기업이라도 상장·투자 유치·주가·실적·인수·소송·경영진 거취는 경제 분류**로 쓴다(2026-11-28 사용자 결정). AI 도입 조사처럼 돈이 아닌 소식은 AI 분류(society 등)로 둔다.
 
 ---
 

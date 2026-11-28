@@ -1,7 +1,7 @@
 ---
 title: "외국인, 11월 대만 주식 331억 달러 순매도…두 달 연속 최대"
 date: 2026-11-27T17:10:00+09:00
-category: economy
+category: markets
 sources:
   - name: Techmeme (블룸버그 헤드라인)
     url: https://www.techmeme.com/261127/p2#a261127p2
