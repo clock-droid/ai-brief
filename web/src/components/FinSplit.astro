@@ -6,7 +6,8 @@ interface Props {
 }
 
 // 매출 100원 쪼개기: 회사마다 막대 하나를 매출 100원으로 놓고 원가·연구개발·그 밖의 비용·영업이익으로 나눈다.
-// 금액 규모가 다른 회사끼리도 같은 잣대로 견줄 수 있다. 칸 안 숫자는 칸이 충분히 넓을 때만 (좁은 칸은 마우스·표로).
+// 금액 규모가 다른 회사끼리도 같은 잣대로 견줄 수 있다. 비용 칸 안 숫자는 칸이 충분히 넓을 때만 (좁은 칸은 마우스·표로).
+// 영업이익(손실)은 이 그림의 결론이라 칸 크기와 상관없이 막대 오른쪽에 늘 적는다.
 // 영업손실이면 비용 합이 100원을 넘으므로 막대 전체 폭을 가장 큰 비용 합에 맞추고, 그 줄의 100원 자리에 눈금을 단다
 // (눈금은 막대 뒤에 깔려 막대 위아래로만 보인다 — 칸 안 숫자를 가로지르지 않게).
 const { rows } = Astro.props;
@@ -62,12 +63,14 @@ const SWATCH: Record<FinSplitKey, string> = {
                   style={`flex-grow: ${p.v}; background: ${SWATCH[p.key]}`}
                   title={`${p.label} ${won(p.n)}`}
                 >
-                  {p.v >= LABEL_MIN && won(p.n)}
+                  {p.key !== 'profit' && p.v >= LABEL_MIN && won(p.n)}
                 </span>
               ))}
             </span>
             {r.parts.profit < 0 && <span class="hundred" style={`left: ${(100 / scale) * 100}%`} />}
-            {r.parts.profit < 0 && <span class="loss">영업손실 {won(-shownWon(r).profit)}</span>}
+          </span>
+          <span class:list={['profit-val', { me: r.subject }]}>
+            {shownWon(r).profit >= 0 ? `영업이익 ${won(shownWon(r).profit)}` : `영업손실 ${won(-shownWon(r).profit)}`}
           </span>
         </>
       ))
@@ -143,7 +146,7 @@ const SWATCH: Record<FinSplitKey, string> = {
 
   .rows {
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: max-content 1fr max-content;
     align-items: center;
     column-gap: var(--s-3);
     row-gap: var(--s-2);
@@ -165,7 +168,7 @@ const SWATCH: Record<FinSplitKey, string> = {
     font-size: var(--fs-meta);
   }
 
-  /* 막대 폭은 칸 전체 폭 기준. 영업손실 문구는 막대 아래 줄에 둔다 */
+  /* 막대 폭은 칸 전체 폭 기준 */
   .cell {
     position: relative;
     isolation: isolate;
@@ -192,10 +195,6 @@ const SWATCH: Record<FinSplitKey, string> = {
     color: var(--text);
   }
 
-  .part.profit {
-    color: var(--bg);
-  }
-
   .hundred {
     position: absolute;
     top: -4px;
@@ -205,10 +204,14 @@ const SWATCH: Record<FinSplitKey, string> = {
     background: var(--text);
   }
 
-  .loss {
-    display: block;
-    margin-top: var(--s-1);
-    font-size: var(--fs-meta);
+  .profit-val {
+    text-align: right;
+    color: var(--muted);
+  }
+
+  .profit-val.me {
+    color: var(--text);
+    font-weight: 500;
   }
 
   .note {
