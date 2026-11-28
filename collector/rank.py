@@ -49,12 +49,16 @@ https http com www status""".split())
 # 학술지 제목은 "AI" 대신 방법 이름을 쓰므로 AI 바이오 표현을 함께 본다. 생물 용어와 겹치는 낱말은 좁힌다:
 # neural circuit·neural barcode, quantum dot, ChIP-seq는 AI·기술 소식이 아니다.
 AI_TECH = re.compile(
-    r"\b(ai|a\.i\.|llm|gpt|claude|gemini|agent|robot|algorithm|semiconductor|compute|data ?center|automation|software|brain-computer|bci"
+    r"\b(ai|a\.i\.|llm|gpt|claude|gemini|agent|robot|algorithm|semiconductor|compute|data ?center|automation|software"
     r"|artificial intelligence|machine[- ]learn\w*|deep[- ]learn\w*|neural[- ]?(?:network|net)s?|neural (?:interface|implant|decod\w*|prosthe\w*)s?|foundation models?|language models?"
     r"|generative|diffusion models?|alphafold\w*|isomorphic labs|de novo (?:\w+ )?design\w*|virtual (?:cell|scientist)s?"
     r"|self-driving lab\w*|lab autonomy|autonomous (?:lab|laborator)\w*"
+    # BCI(장수·BCI·양자 분야): 학술지 제목은 'BCI' 대신 전극·임플란트·신경보철로 쓴다.
+    r"|bcis?|brain[-– ](?:computer|machine)|brain implants?|neuroprosthe\w*|neurotechnolog\w*"
+    r"|(?:intracortical|implanted|implantable|microelectrode|utah) (?:\w+ )?(?:electrodes?|arrays?|devices?|implants?)"
+    r"|neuralink|synchron|paradromics|precision neuroscience|blackrock neurotech"
     r"|chip(?!-?seq)|quantum(?! dots?))\b"
-    r"|인공지능|에이전트|로봇|반도체|자동화|양자", re.I)
+    r"|인공지능|에이전트|로봇|반도체|자동화|양자|뇌[-– ]?컴퓨터|뇌 임플란트|뉴럴링크", re.I)
 INNOVATION = re.compile(
     r"\b(launch(es|ed)?|release[sd]?|unveil\w*|introduc(es|ed|ing)|open[- ]?sourc\w*|open[- ]weights?|new model|"
     r"benchmark\w*|state[- ]of[- ]the[- ]art|sota|breakthrough|proof|proves?|proved|theorem|discover\w*|arxiv|"
