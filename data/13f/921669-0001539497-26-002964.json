@@ -1,0 +1,106 @@
+{
+ "filer": "칼 아이칸",
+ "manager": "칼 아이칸",
+ "cik": 921669,
+ "form": "13F-HR",
+ "accession": "0001539497-26-002964",
+ "filed": "2026-11-13",
+ "period": "2026-09-30",
+ "url": "https://www.sec.gov/Archives/edgar/data/921669/000153949726002964/",
+ "previous": {
+  "period": "2026-06-30",
+  "accessions": [
+   "0001539497-26-002243"
+  ]
+ },
+ "positions": 10,
+ "positions_before": 12,
+ "total_value_usd": 9428081917,
+ "total_value_before_usd": 8264090525,
+ "changes": [
+  {
+   "kind": "추가",
+   "name": "Icahn Enterprises LP",
+   "class": "DEPOSITARY UNIT",
+   "cusip": "451100101",
+   "put_call": "",
+   "shares_before": 618393343,
+   "shares_after": 658924537,
+   "change_pct": 6.6,
+   "value_after_usd": 4447740626,
+   "value_before_usd": 4458616003
+  },
+  {
+   "kind": "축소",
+   "name": "International Flavors and Fragrances Inc.",
+   "class": "COM",
+   "cusip": "459506101",
+   "put_call": "",
+   "shares_before": 4275000,
+   "shares_after": 2993728,
+   "change_pct": -30.0,
+   "value_after_usd": 249916413,
+   "value_before_usd": 338665500
+  },
+  {
+   "kind": "청산",
+   "name": "JetBlue Airways Corp.",
+   "class": "COM",
+   "cusip": "477143101",
+   "put_call": "",
+   "shares_before": 20658179,
+   "shares_after": 0,
+   "change_pct": -100.0,
+   "value_after_usd": 0,
+   "value_before_usd": 118371366
+  },
+  {
+   "kind": "추가",
+   "name": "SandRidge Energy, Inc.",
+   "class": "COM NEW",
+   "cusip": "80007P869",
+   "put_call": "",
+   "shares_before": 5054907,
+   "shares_after": 5082427,
+   "change_pct": 0.5,
+   "value_after_usd": 68561946,
+   "value_before_usd": 69252220
+  },
+  {
+   "kind": "청산",
+   "name": "American Electric Power Company",
+   "class": "COM",
+   "cusip": "025537101",
+   "put_call": "",
+   "shares_before": 434710,
+   "shares_after": 0,
+   "change_pct": -100.0,
+   "value_after_usd": 0,
+   "value_before_usd": 59472675
+  },
+  {
+   "kind": "축소",
+   "name": "EchoStar Corporation",
+   "class": "CL A",
+   "cusip": "278768106",
+   "put_call": "",
+   "shares_before": 1404542,
+   "shares_after": 500000,
+   "change_pct": -64.4,
+   "value_after_usd": 44705000,
+   "value_before_usd": 142561013
+  },
+  {
+   "kind": "축소",
+   "name": "Bausch Plus Lomb Corp.",
+   "class": "COMMON SHARES",
+   "cusip": "071705107",
+   "put_call": "",
+   "shares_before": 3500000,
+   "shares_after": 2378100,
+   "change_pct": -32.1,
+   "value_after_usd": 40427700,
+   "value_before_usd": 57960000
+  }
+ ]
+}

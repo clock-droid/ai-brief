@@ -1,0 +1,46 @@
+{
+ "filer": "히말라야 캐피털",
+ "manager": "리루",
+ "cik": 1709323,
+ "form": "13F-HR",
+ "accession": "0002043585-26-000030",
+ "filed": "2026-11-16",
+ "period": "2026-09-30",
+ "url": "https://www.sec.gov/Archives/edgar/data/1709323/000204358526000030/",
+ "previous": {
+  "period": "2026-06-30",
+  "accessions": [
+   "0002043585-26-000022"
+  ]
+ },
+ "positions": 8,
+ "positions_before": 8,
+ "total_value_usd": 3781431260,
+ "total_value_before_usd": 3702921099,
+ "changes": [
+  {
+   "kind": "추가",
+   "name": "PDD HOLDINGS INC",
+   "class": "SPON ADS",
+   "cusip": "722304102",
+   "put_call": "",
+   "shares_before": 10761119,
+   "shares_after": 11761119,
+   "change_pct": 9.3,
+   "value_after_usd": 916661615,
+   "value_before_usd": 820858157
+  },
+  {
+   "kind": "추가",
+   "name": "TENCENT MUSIC ENTERTAINM",
+   "class": "SPON ADS",
+   "cusip": "88034P109",
+   "put_call": "",
+   "shares_before": 6590836,
+   "shares_after": 14824464,
+   "change_pct": 124.9,
+   "value_after_usd": 117558000,
+   "value_before_usd": 55033481
+  }
+ ]
+}

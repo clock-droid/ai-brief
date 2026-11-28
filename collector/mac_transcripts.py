@@ -60,7 +60,7 @@ def main() -> int:
             if not vid or vid in seen or r["url"].rstrip("/") in done or not r.get("published"):
                 continue
             seen.add(vid)
-            if q.status(r, index, out, now, tiers, rank.KEY_PEOPLE) == "wait" and q.due(r, index, now):
+            if q.status(r, index, out, now, tiers, rank.SPEAKERS) == "wait" and q.due(r, index, now):
                 cands.append((r.get("views") or 0, vid, r))
     cands.sort(key=lambda x: -x[0])
 

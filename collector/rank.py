@@ -98,6 +98,8 @@ KEY_PEOPLE = re.compile(
     r"\b(hinton|lecun|bengio|hassabis|sutskever|altman|amodei|jensen huang|suleyman|musk|karpathy|noam brown|pachocki|"
     r"terence tao|fei-fei li|eisman|borcherds|schmidt|gundotra|tegmark|nadella|pichai|zuckerberg|alexandr wang|mark chen|"
     r"jan leike|chris olah|paul christiano|ilya)\b|힌튼|르쿤|벤지오|하사비스|알트만|아모데이|젠슨|머스크|카파시", re.I)
+# 자막을 받아 둘 영상의 발언자: AI 쪽 핵심 인물 + 경제 쪽 핵심 인물 (transcript_queue.is_target, mac_transcripts.py)
+SPEAKERS = re.compile(f"(?:{KEY_PEOPLE.pattern})|(?:{ECON_PEOPLE.pattern})", re.I)
 TRENDING_SOURCES = {"github-trending", "hf-trending-models"}
 PLACEHOLDER = re.compile(r"^(pic\.twitter\.com/\S+|https?://t\.co/\S+)$")
 
@@ -276,7 +278,7 @@ def cluster(rows: list[dict]) -> list[list[dict]]:
 
 def transcript_note(r: dict, transcripts: Path, index: dict, tiers: dict) -> str:
     """영상 후보 아래에 붙는 자막 상태 한 줄. 글쓰기 작업이 상태마다 할 일은 WRITING.md 1절 5."""
-    st = tq.status(r, index, transcripts, now(), tiers, KEY_PEOPLE)
+    st = tq.status(r, index, transcripts, now(), tiers, SPEAKERS)
     vid = tq.video_id(r["url"]) or "-"
     if st == "have":
         return f"자막 있음: {transcripts / (vid + '.txt')}"

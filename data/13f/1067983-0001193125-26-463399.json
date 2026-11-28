@@ -1,0 +1,154 @@
+{
+ "filer": "버크셔 해서웨이",
+ "manager": "워런 버핏",
+ "cik": 1067983,
+ "form": "13F-HR",
+ "accession": "0001193125-26-463399",
+ "filed": "2026-11-16",
+ "period": "2026-09-30",
+ "url": "https://www.sec.gov/Archives/edgar/data/1067983/000119312526463399/",
+ "previous": {
+  "period": "2026-06-30",
+  "accessions": [
+   "0001193125-26-352200"
+  ]
+ },
+ "positions": 30,
+ "positions_before": 29,
+ "total_value_usd": 304196581325,
+ "total_value_before_usd": 299253556246,
+ "changes": [
+  {
+   "kind": "축소",
+   "name": "BANK OF AMER CORP",
+   "class": "COM",
+   "cusip": "060505104",
+   "put_call": "",
+   "shares_before": 483394015,
+   "shares_after": 455860908,
+   "change_pct": -5.7,
+   "value_after_usd": 24812509222,
+   "value_before_usd": 27543790975
+  },
+  {
+   "kind": "추가",
+   "name": "DELTA AIR LINES INC",
+   "class": "COM NEW",
+   "cusip": "247361702",
+   "put_call": "",
+   "shares_before": 57320000,
+   "shares_after": 64450000,
+   "change_pct": 12.4,
+   "value_after_usd": 5378997000,
+   "value_before_usd": 5368591200
+  },
+  {
+   "kind": "축소",
+   "name": "DAVITA INC",
+   "class": "COM",
+   "cusip": "23918K108",
+   "put_call": "",
+   "shares_before": 28880209,
+   "shares_after": 28697229,
+   "change_pct": -0.6,
+   "value_after_usd": 5019719296,
+   "value_before_usd": 6425268898
+  },
+  {
+   "kind": "추가",
+   "name": "LENNAR CORP",
+   "class": "CL A",
+   "cusip": "526057104",
+   "put_call": "",
+   "shares_before": 13111741,
+   "shares_after": 26034436,
+   "change_pct": 98.6,
+   "value_after_usd": 2124149633,
+   "value_before_usd": 1186481443
+  },
+  {
+   "kind": "축소",
+   "name": "KROGER CO",
+   "class": "COM",
+   "cusip": "501044101",
+   "put_call": "",
+   "shares_before": 39000000,
+   "shares_after": 35000000,
+   "change_pct": -10.3,
+   "value_after_usd": 2051700000,
+   "value_before_usd": 2165670000
+  },
+  {
+   "kind": "축소",
+   "name": "VERISIGN INC",
+   "class": "COM",
+   "cusip": "92343E102",
+   "put_call": "",
+   "shares_before": 8989880,
+   "shares_after": 5922136,
+   "change_pct": -34.1,
+   "value_after_usd": 1670101573,
+   "value_before_usd": 2261494212
+  },
+  {
+   "kind": "신규",
+   "name": "BENDING SPOONS SPA",
+   "class": "COM SHS",
+   "cusip": "T19377109",
+   "put_call": "",
+   "shares_before": 0,
+   "shares_after": 20689655,
+   "change_pct": null,
+   "value_after_usd": 689379305,
+   "value_before_usd": 0
+  },
+  {
+   "kind": "축소",
+   "name": "NUCOR CORP",
+   "class": "COM",
+   "cusip": "670346105",
+   "put_call": "",
+   "shares_before": 1857752,
+   "shares_after": 1580776,
+   "change_pct": -14.9,
+   "value_after_usd": 369506390,
+   "value_before_usd": 413814258
+  },
+  {
+   "kind": "축소",
+   "name": "CAPITAL ONE FINL CORP",
+   "class": "COM",
+   "cusip": "14040H105",
+   "put_call": "",
+   "shares_before": 3000000,
+   "shares_after": 1150000,
+   "change_pct": -61.7,
+   "value_after_usd": 222030500,
+   "value_before_usd": 601860000
+  },
+  {
+   "kind": "추가",
+   "name": "MACYS INC",
+   "class": "COM",
+   "cusip": "55616P104",
+   "put_call": "",
+   "shares_before": 7347426,
+   "shares_after": 7538800,
+   "change_pct": 2.6,
+   "value_after_usd": 171658476,
+   "value_before_usd": 173031882
+  },
+  {
+   "kind": "추가",
+   "name": "LENNAR CORP",
+   "class": "CL B",
+   "cusip": "526057302",
+   "put_call": "",
+   "shares_before": 298117,
+   "shares_after": 553000,
+   "change_pct": 85.5,
+   "value_after_usd": 44234470,
+   "value_before_usd": 26445959
+  }
+ ]
+}

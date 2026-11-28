@@ -61,9 +61,11 @@ def filing_url(cik: int, accession: str) -> str:
     return f"https://www.sec.gov/Archives/edgar/data/{cik}/{accession.replace('-', '')}/"
 
 
-def holdings(cik: int, accession: str, ua: str) -> dict[tuple[str, str], dict]:
+def _documents(cik: int, accession: str, ua: str) -> tuple[bytes, bytes | None]:
+    """(primary_doc.xml, 정보표 XML). 정보표 파일 이름은 공시마다 제각각이라 내용으로 찾는다."""
     base = filing_url(cik, accession)
     index = json.loads(_get(base + "index.json", ua))
+    primary = _get(base + "primary_doc.xml", ua)
     table = None
     for item in index["directory"]["item"]:
         name = item["name"]
@@ -72,16 +74,46 @@ def holdings(cik: int, accession: str, ua: str) -> dict[tuple[str, str], dict]:
             if b"informationTable" in body:
                 table = body
                 break
-    if table is None:
-        raise ValueError(f"정보표 없음: {base}")
-    agg: dict[tuple[str, str], dict] = collections.defaultdict(lambda: {"shares": 0, "value": 0, "name": ""})
+    return primary, table
+
+
+def _amendment_type(primary: bytes) -> str:
+    """정정 공시의 종류: RESTATEMENT(전체를 다시 냄) 또는 NEW HOLDINGS(빠뜨린 종목만 더함)."""
+    root = ET.fromstring(primary)
+    node = next((el for el in root.iter() if el.tag.endswith("amendmentType")), None)
+    return (node.text or "").strip().upper() if node is not None else ""
+
+
+def _parse_table(table: bytes) -> dict[tuple[str, str], dict]:
+    agg: dict[tuple[str, str], dict] = collections.defaultdict(lambda: {"shares": 0, "value": 0, "name": "", "class": ""})
     for t in ET.fromstring(table).findall("n:infoTable", NS):
         key = (t.findtext("n:cusip", namespaces=NS), t.findtext("n:putCall", default="", namespaces=NS))
         row = agg[key]
         row["shares"] += int(t.findtext("n:shrsOrPrnAmt/n:sshPrnamt", namespaces=NS))
         row["value"] += int(t.findtext("n:value", namespaces=NS))
         row["name"] = t.findtext("n:nameOfIssuer", namespaces=NS)
+        row["class"] = t.findtext("n:titleOfClass", default="", namespaces=NS)  # ETF는 이름이 같아 종류로 구별 (예: SPDR의 TECHNOLOGY)
     return dict(agg)
+
+
+def holdings(cik: int, filings_of_period: list[dict], ua: str) -> dict[tuple[str, str], dict]:
+    """한 분기의 보유 내역. 원본 13F-HR에 정정 공시를 접수 순서대로 반영한다:
+    RESTATEMENT는 통째로 바꾸고, NEW HOLDINGS는 빠뜨린 종목을 더한다."""
+    result: dict[tuple[str, str], dict] = {}
+    for f in sorted(filings_of_period, key=lambda r: (r["filed"], r["form"] != "13F-HR")):
+        primary, table = _documents(cik, f["accession"], ua)
+        if table is None:
+            continue  # 보유 내역 없는 정정(서류 보완)
+        rows = _parse_table(table)
+        if f["form"] == "13F-HR" or _amendment_type(primary) == "RESTATEMENT":
+            result = rows
+        else:
+            for key, row in rows.items():
+                if key in result:
+                    result[key] = {**row, "shares": result[key]["shares"] + row["shares"], "value": result[key]["value"] + row["value"]}
+                else:
+                    result[key] = row
+    return result
 
 
 def compare(new: dict, old: dict) -> list[dict]:
@@ -96,6 +128,7 @@ def compare(new: dict, old: dict) -> list[dict]:
         changes.append({
             "kind": kind,
             "name": (n or o)["name"],
+            "class": (n or o).get("class", ""),
             "cusip": key[0],
             "put_call": key[1],
             "shares_before": os_,
@@ -107,13 +140,13 @@ def compare(new: dict, old: dict) -> list[dict]:
     return sorted(changes, key=lambda c: -(c["value_after_usd"] or c["value_before_usd"]))
 
 
-def previous_period(rows: list[dict], period: str) -> dict | None:
-    """직전 분기의 최신 접수 (정정이 있으면 정정본)."""
-    older = [r for r in rows if r["period"] < period]
-    if not older:
-        return None
-    prev_period = max(r["period"] for r in older)
-    return next(r for r in rows if r["period"] == prev_period)
+def of_period(rows: list[dict], period: str) -> list[dict]:
+    return [r for r in rows if r["period"] == period]
+
+
+def previous_period(rows: list[dict], period: str) -> str | None:
+    older = [r["period"] for r in rows if r["period"] < period]
+    return max(older) if older else None
 
 
 def report(filer: dict, current: dict, rows: list[dict], ua: str) -> dict:
@@ -133,10 +166,10 @@ def report(filer: dict, current: dict, rows: list[dict], ua: str) -> dict:
         out["changes"] = None
         out["note"] = "직전 분기 공시 없음"
         return out
-    new = holdings(filer["cik"], current["accession"], ua)
-    old = holdings(filer["cik"], prev["accession"], ua)
+    new = holdings(filer["cik"], of_period(rows, current["period"]), ua)
+    old = holdings(filer["cik"], of_period(rows, prev), ua)
     out.update({
-        "previous": {"accession": prev["accession"], "period": prev["period"], "filed": prev["filed"]},
+        "previous": {"period": prev, "accessions": [r["accession"] for r in of_period(rows, prev)]},
         "positions": len(new),
         "positions_before": len(old),
         "total_value_usd": sum(v["value"] for v in new.values()),
