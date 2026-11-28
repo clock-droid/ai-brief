@@ -21,10 +21,13 @@ const figure = z.object({
 
 // 숫자 그림: 미국 상장사 분기 실적. 숫자는 collector/financials.py가 받은 SEC 공시 파일에서만 온다 (WRITING.md 3-2).
 // through는 글이 다루는 마지막 분기의 끝 날짜 — 나중에 숫자 파일이 갱신돼도 그 글의 그림은 그 분기까지만 그린다.
-const financials = z.object({
-  ticker: z.string().min(1),
+// name은 글에 쓰는 우리말 이름(마이크로소프트). peers는 같은 분기 비교에 세울 경쟁사, split은 매출 100원 쪼개기.
+const company = z.object({ ticker: z.string().min(1), name: z.string().min(1) });
+const financials = company.extend({
   metrics: z.array(z.enum(FIN_METRICS)).min(1).max(3),
   through: z.coerce.date(),
+  peers: z.array(company).max(4).optional(),
+  split: z.boolean().optional(),
 });
 
 // 속보 카드: 한 소식을 설명하는 짧은 글. 큰 소식은 굵은 소제목 2~3개, 작은 소식은 문단 2~3개 (WRITING.md 3절).

@@ -1,0 +1,119 @@
+---
+import { finValue, type FinPeerChart } from '../lib/financials';
+
+interface Props {
+  chart: FinPeerChart;
+  unit: 'USD' | 'USD/shares';
+  label: string; // 항목 이름 (표 제목용)
+}
+
+// 같은 분기, 다른 회사: 가로 막대. 글의 회사는 본문색, 경쟁사는 회색. 몇 줄뿐이라 값은 줄마다 오른쪽 칸에 적는다.
+const { chart, unit, label } = Astro.props;
+const values = chart.rows.map((r) => r.value);
+const max = Math.max(0, ...values);
+const min = Math.min(0, ...values);
+const span = max - min || 1;
+const zero = (-min / span) * 100;
+---
+
+{
+  chart.rows.length > 1 && (
+    <div class="peers">
+      <p class="sub">같은 분기, 다른 회사</p>
+      <div class="rows" aria-hidden="true">
+        {chart.rows.map((r) => {
+          const w = (Math.abs(r.value) / span) * 100;
+          const left = r.value >= 0 ? zero : zero - w;
+          return (
+            <>
+              <span class:list={['who', { me: r.subject }]}>
+                {r.name}
+                {r.offLabel && <span class="off"> {r.offLabel}</span>}
+              </span>
+              <span class="track" title={`${r.name} ${finValue(r.value, unit)}`}>
+                <span class:list={['bar', { me: r.subject, neg: r.value < 0 }]} style={`left: ${left}%; width: ${w}%`} />
+              </span>
+              <span class:list={['val', { me: r.subject }]}>{finValue(r.value, unit)}</span>
+            </>
+          );
+        })}
+      </div>
+      <table class="sr-only">
+        <caption>{`같은 분기 ${label}`}</caption>
+        <tbody>
+          {chart.rows.map((r) => (
+            <tr>
+              <th scope="row">{r.name}{r.offLabel ? ` (${r.offLabel} 분기)` : ''}</th>
+              <td>{finValue(r.value, unit)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+<style>
+  .peers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+  }
+
+  .sub {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .rows {
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    align-items: center;
+    column-gap: var(--s-3);
+    row-gap: var(--s-2);
+    font-size: var(--fs-small);
+    line-height: var(--lh-title);
+  }
+
+  .who,
+  .val {
+    color: var(--muted);
+  }
+
+  .who.me,
+  .val.me {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .off {
+    font-size: var(--fs-meta);
+  }
+
+  .val {
+    text-align: right;
+  }
+
+  .track {
+    position: relative;
+    height: 16px;
+  }
+
+  .bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 0 4px 4px 0;
+    background: var(--chart-past);
+  }
+
+  .bar.neg {
+    border-radius: 4px 0 0 4px;
+  }
+
+  .bar.me {
+    background: var(--text);
+  }
+</style>

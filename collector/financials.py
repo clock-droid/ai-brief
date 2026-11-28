@@ -53,6 +53,7 @@ METRICS: dict[str, tuple[str, list[str], str, str]] = {
         "USD",
         "flow",
     ),
+    "cost_of_revenue": ("매출원가", ["CostOfRevenue", "CostOfGoodsAndServicesSold"], "USD", "flow"),
     "gross_profit": ("매출총이익", ["GrossProfit"], "USD", "flow"),
     "operating_income": ("영업이익", ["OperatingIncomeLoss"], "USD", "flow"),
     "net_income": ("순이익", ["NetIncomeLoss"], "USD", "flow"),

@@ -1,0 +1,218 @@
+---
+import { FIN_SPLIT_PARTS, type FinSplitKey, type FinSplitRow } from '../lib/financials';
+
+interface Props {
+  rows: FinSplitRow[];
+}
+
+// 매출 100원 쪼개기: 회사마다 막대 하나를 매출 100원으로 놓고 원가·연구개발·그 밖의 비용·영업이익으로 나눈다.
+// 금액 규모가 다른 회사끼리도 같은 잣대로 견줄 수 있다. 칸 안 숫자는 칸이 충분히 넓을 때만 (좁은 칸은 마우스·표로).
+// 영업손실이면 비용 합이 100원을 넘으므로 막대 전체 폭을 가장 큰 비용 합에 맞추고, 그 줄의 100원 자리에 눈금을 단다
+// (눈금은 막대 뒤에 깔려 막대 위아래로만 보인다 — 칸 안 숫자를 가로지르지 않게).
+const { rows } = Astro.props;
+const costOf = (r: FinSplitRow) => r.parts.cost + r.parts.rnd + r.parts.other;
+const scale = Math.max(100, ...rows.map(costOf));
+const LABEL_MIN = 9; // 100원 중 9원(휴대폰 막대 약 30px) 이상이면 "47원"이 칸 안에 들어간다
+const shown = (r: FinSplitRow) => {
+  const n = shownWon(r);
+  return FIN_SPLIT_PARTS.filter((p) => r.parts[p.key] > 0).map((p) => ({ ...p, v: r.parts[p.key], n: n[p.key] }));
+};
+const won = (v: number) => `${v}원`;
+/** 칸에 적는 정수. 비용은 반올림하고 영업이익은 100에서 뺀 값이라, 적힌 숫자끼리 늘 100원으로 맞는다 */
+function shownWon(r: FinSplitRow): Record<FinSplitKey, number> {
+  const cost = Math.round(r.parts.cost);
+  const rnd = Math.round(r.parts.rnd);
+  const other = Math.round(r.parts.other);
+  return { cost, rnd, other, profit: 100 - cost - rnd - other };
+}
+const anyFolded = rows.some((r) => r.rndFolded);
+const SWATCH: Record<FinSplitKey, string> = {
+  cost: 'var(--split-1)',
+  rnd: 'var(--split-2)',
+  other: 'var(--split-3)',
+  profit: 'var(--text)',
+};
+---
+
+<div class="split">
+  <p class="head"><span class="name">매출 100원은 어디로</span></p>
+  <ul class="legend" aria-hidden="true">
+    {
+      FIN_SPLIT_PARTS.map((p) => (
+        <li>
+          <span class="swatch" style={`background: ${SWATCH[p.key]}`} />
+          {p.label}
+        </li>
+      ))
+    }
+  </ul>
+  <div class="rows" aria-hidden="true">
+    {
+      rows.map((r) => (
+        <>
+          <span class:list={['who', { me: r.subject }]}>
+            {r.name}
+            {r.offLabel && <span class="off"> {r.offLabel}</span>}
+          </span>
+          <span class="cell">
+            <span class="bar" style={`width: ${(Math.max(100, costOf(r)) / scale) * 100}%`}>
+              {shown(r).map((p) => (
+                <span
+                  class:list={['part', p.key]}
+                  style={`flex-grow: ${p.v}; background: ${SWATCH[p.key]}`}
+                  title={`${p.label} ${won(p.n)}`}
+                >
+                  {p.v >= LABEL_MIN && won(p.n)}
+                </span>
+              ))}
+            </span>
+            {r.parts.profit < 0 && <span class="hundred" style={`left: ${(100 / scale) * 100}%`} />}
+            {r.parts.profit < 0 && <span class="loss">영업손실 {won(-shownWon(r).profit)}</span>}
+          </span>
+        </>
+      ))
+    }
+  </div>
+  <table class="sr-only">
+    <caption>매출 100원을 나누면</caption>
+    <thead>
+      <tr>
+        <th scope="col">회사</th>
+        {FIN_SPLIT_PARTS.map((p) => <th scope="col">{p.label}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr>
+            <th scope="row">{r.name}</th>
+            {FIN_SPLIT_PARTS.map((p) => (
+              <td>{p.key === 'rnd' && r.rndFolded ? '그 밖의 비용에 포함' : won(shownWon(r)[p.key])}</td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  {
+    anyFolded && (
+      <p class="note">
+        {rows.filter((r) => r.rndFolded).map((r) => r.name).join('·')}는 연구개발비를 따로 공시하지 않아 그 밖의 비용에 포함
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .split {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .head {
+    font-size: var(--fs-small);
+  }
+
+  .name {
+    font-weight: 500;
+  }
+
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-4);
+    font-size: var(--fs-meta);
+    color: var(--muted);
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-1);
+  }
+
+  .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  .rows {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    column-gap: var(--s-3);
+    row-gap: var(--s-2);
+    margin-top: var(--s-1);
+    font-size: var(--fs-small);
+    line-height: var(--lh-title);
+  }
+
+  .who {
+    color: var(--muted);
+  }
+
+  .who.me {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .off {
+    font-size: var(--fs-meta);
+  }
+
+  /* 막대 폭은 칸 전체 폭 기준. 영업손실 문구는 막대 아래 줄에 둔다 */
+  .cell {
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* 칸 사이 2px 바탕색 틈이 칸을 나눈다 (테두리 없이) */
+  .bar {
+    display: flex;
+    gap: 2px;
+    height: 28px;
+    max-width: 100%;
+  }
+
+  .part {
+    flex-basis: 0;
+    min-width: 0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: var(--s-1);
+    font-size: var(--fs-meta);
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .part.profit {
+    color: var(--bg);
+  }
+
+  .hundred {
+    position: absolute;
+    top: -4px;
+    height: 36px; /* 막대 28 + 위아래 4 */
+    width: 1px;
+    z-index: -1;
+    background: var(--text);
+  }
+
+  .loss {
+    display: block;
+    margin-top: var(--s-1);
+    font-size: var(--fs-meta);
+  }
+
+  .note {
+    font-size: var(--fs-meta);
+    color: var(--muted);
+  }
+</style>

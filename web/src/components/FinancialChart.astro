@@ -1,8 +1,10 @@
 ---
-import { finChartData, finPct, finValue, type FinMetric } from '../lib/financials';
+import { finChartData, finPct, finPeers, finSplit, finValue, type FinCompany, type FinMetric } from '../lib/financials';
+import FinPeerBars from './FinPeerBars.astro';
+import FinSplit from './FinSplit.astro';
 
 interface Props {
-  financials: { ticker: string; metrics: FinMetric[]; through: Date };
+  financials: FinCompany & { metrics: FinMetric[]; through: Date; peers?: FinCompany[]; split?: boolean };
   where: string; // 빌드 오류 메시지에 쓸 글 id
 }
 
@@ -10,6 +12,12 @@ interface Props {
 // 막대 위 숫자는 처음 값이 있는 분기와 마지막 분기에만 — 나머지는 마우스를 올리면(title) 보이고, 화면 읽기 프로그램에는 표로 읽힌다.
 const { financials, where } = Astro.props;
 const data = finChartData(financials, where);
+const subject = { ticker: financials.ticker, name: financials.name };
+const peers = financials.peers ?? [];
+const peerCharts = peers.length ? finPeers(subject, peers, financials.metrics, financials.through, where) : [];
+const splitRows = financials.split ? finSplit(subject, peers, financials.through, where) : [];
+const peersMissing = [...new Set(peerCharts.flatMap((c) => c.missing))];
+const anyOffMonth = [...peerCharts.flatMap((c) => c.rows), ...splitRows].some((r) => r.offLabel);
 
 function geometry(values: number[]) {
   const max = Math.max(0, ...values);
@@ -22,9 +30,9 @@ const quarterName = (fq: number) => `${fq}분기`;
 const yearName = (fy: number) => `FY${String(fy).slice(2)}`;
 ---
 
-<figure class="fin" aria-label={`${data.ticker} 분기 실적`}>
+<figure class="fin" aria-label={`${financials.name} 분기 실적`}>
   {
-    data.series.map((s) => {
+    data.series.map((s, si) => {
       const g = geometry(s.slots.flatMap((x) => (x.q ? [x.q.value] : [])));
       const last = s.slots.at(-1)!.q!;
       const first = s.slots.findIndex((x) => x.q);
@@ -63,7 +71,7 @@ const yearName = (fy: number) => `FY${String(fy).slice(2)}`;
             ))}
           </div>
           <table class="sr-only">
-            <caption>{`${data.ticker} 분기 ${s.label}`}</caption>
+            <caption>{`${financials.name} 분기 ${s.label}`}</caption>
             <tbody>
               {s.slots.map(({ fy, fq, q }) => (
                 <tr>
@@ -73,14 +81,18 @@ const yearName = (fy: number) => `FY${String(fy).slice(2)}`;
               ))}
             </tbody>
           </table>
+          {peerCharts[si] && <FinPeerBars chart={peerCharts[si]} unit={s.unit} label={s.label} />}
         </div>
       );
     })
   }
+  {splitRows.length > 0 && <FinSplit rows={splitRows} />}
   <figcaption>
-    회계연도 기준 분기 실적({data.fyeMonth}월 결산)
+    {financials.name} 회계연도 기준 분기 실적({data.fyeMonth}월 결산)
     {data.anyDerived && ', 4분기와 일부 현금흐름은 누적치에서 앞 분기를 빼서 계산'}
     {data.anyMissing && ', 빈 칸은 분기 숫자를 따로 공시하지 않은 분기'}
+    {anyOffMonth && ', 다른 회사는 끝 달이 가장 가까운 분기와 비교(끝 달 표시)'}
+    {peersMissing.length > 0 && `, ${peersMissing.join('·')}는 일부 항목을 따로 공시하지 않아 비교에서 빠짐`}
     {data.newerQuarterPending && ', 가장 최근 분기는 실적 발표만 나오고 정식 공시 전이라 빠짐'}
     <span aria-hidden="true"> · </span>
     숫자 <a href={data.filingsUrl} target="_blank" rel="noopener">SEC 공시(10-Q·10-K)</a>
@@ -207,12 +219,4 @@ const yearName = (fy: number) => `FY${String(fy).slice(2)}`;
     white-space: nowrap;
   }
 
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
 </style>
